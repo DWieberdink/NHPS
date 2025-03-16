@@ -9,11 +9,9 @@
 
     <h2>NHPS Dynamic Workflow Viewer</h2>
 
-    <!-- Dropdown to select school -->
-    <label for="schoolSelector">Choose a school:</label>
-    <select id="schoolSelector" onchange="updateWorkflow()">
-        <option value="" disabled selected>Loading schools...</option>
-    </select>
+    <!-- Toggle Switch -->
+    <label for="toggleSwitch">Special Condition:</label>
+    <input type="checkbox" id="toggleSwitch" onchange="updateWorkflow()">
 
     <!-- Slider to change utilization -->
     <label for="utilizationSlider">Utilization: <span id="utilizationValue">50</span>%</label>
@@ -24,6 +22,7 @@
 
     <script>
         let schoolData = {}; // Store school data from JSON
+        let selectedSchool = "Lincoln High"; // Default school (hardcoded for now)
 
         async function loadData() {
             try {
@@ -39,46 +38,30 @@
 
                 console.log("✅ Loaded school data:", schoolData);
 
-                let schoolSelector = document.getElementById("schoolSelector");
-                schoolSelector.innerHTML = ""; // Clear previous options
-
-                if (!schoolData || Object.keys(schoolData).length === 0) {
-                    console.error("❌ No schools found in data.json!");
-                    return;
-                }
-
-                // Populate dropdown with schools
-                for (let school in schoolData) {
-                    let option = document.createElement("option");
-                    option.value = school;
-                    option.textContent = schoolData[school].name;
-                    schoolSelector.appendChild(option);
-                }
-
-                console.log("✅ Schools added to dropdown!");
-                schoolSelector.selectedIndex = 0; // Set default selection
-                updateWorkflow(); // Load initial workflow
-
+                // Load workflow for default school
+                updateWorkflow();
             } catch (error) {
                 console.error("❌ Error loading school data:", error);
             }
         }
 
         function updateWorkflow() {
-            let selectedSchool = document.getElementById("schoolSelector").value;
             let utilization = parseInt(document.getElementById("utilizationSlider").value);
+            let toggleState = document.getElementById("toggleSwitch").checked;
             document.getElementById("utilizationValue").textContent = utilization;
 
-            if (!selectedSchool || !schoolData[selectedSchool]) {
-                console.error("❌ Invalid school selection:", selectedSchool);
+            if (!schoolData[selectedSchool]) {
+                console.error("❌ School data not found:", selectedSchool);
                 return;
             }
 
             let school = schoolData[selectedSchool];
 
-            // Determine workflow based on utilization
+            // Determine workflow based on utilization and toggle switch
             let workflowType = school.defaultWorkflow;
-            if (utilization <= 50) {
+            if (toggleState) {
+                workflowType = "decisionTree"; // Special workflow if toggle is ON
+            } else if (utilization <= 50) {
                 workflowType = school.workflows.low;
             } else if (utilization > 50 && utilization <= 70) {
                 workflowType = school.workflows.medium;
@@ -86,7 +69,7 @@
                 workflowType = school.workflows.high;
             }
 
-            console.log(`🎯 Selected School: ${school.name}, Utilization: ${utilization}, Workflow: ${workflowType}`);
+            console.log(`🎯 Utilization: ${utilization}, Toggle: ${toggleState}, Workflow: ${workflowType}`);
 
             fetch("data.json")
                 .then(response => response.json())
@@ -96,7 +79,7 @@
                 .catch(error => console.error("❌ Error fetching workflow data:", error));
         }
 
-        // ✅ Load the data when the page starts
+        // ✅ Load data when the page starts
         loadData();
     </script>
 
