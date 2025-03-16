@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic NHPS Workflows</title>
+    <title>NHPS Dynamic Workflow Viewer</title>
 </head>
 <body>
 
@@ -19,10 +19,7 @@
     <label for="utilizationSlider">Utilization: <span id="utilizationValue">50</span>%</label>
     <input type="range" id="utilizationSlider" min="30" max="100" step="5" value="50" oninput="updateWorkflow()">
 
-    <!-- Button to toggle Q1 shape -->
-    <button onclick="toggleShapeVisibility()">Toggle Q1</button>
-
-    <!-- Display selected workflow -->
+    <!-- Display the Draw.io workflow -->
     <iframe id="flowchart" width="100%" height="600px"></iframe>
 
     <script>
@@ -32,19 +29,23 @@
             try {
                 console.log("Fetching data.json...");
                 let response = await fetch("data.json");
-                
-                // Check if response is ok
+
                 if (!response.ok) {
-                    throw new Error("Failed to load data.json");
+                    throw new Error(`Failed to load data.json: ${response.status} ${response.statusText}`);
                 }
-                
+
                 let data = await response.json();
                 schoolData = data.schools;
 
-                console.log("Loaded schools:", schoolData);
+                console.log("✅ Loaded school data:", schoolData);
 
                 let schoolSelector = document.getElementById("schoolSelector");
-                schoolSelector.innerHTML = ""; // Clear existing options
+                schoolSelector.innerHTML = ""; // Clear previous options
+
+                if (!schoolData || Object.keys(schoolData).length === 0) {
+                    console.error("❌ No schools found in data.json!");
+                    return;
+                }
 
                 // Populate dropdown with schools
                 for (let school in schoolData) {
@@ -54,31 +55,29 @@
                     schoolSelector.appendChild(option);
                 }
 
-                // Set default selection to the first school
-                schoolSelector.selectedIndex = 0;
-
-                updateWorkflow(); // Load workflow based on default selection
+                console.log("✅ Schools added to dropdown!");
+                schoolSelector.selectedIndex = 0; // Set default selection
+                updateWorkflow(); // Load initial workflow
 
             } catch (error) {
-                console.error("Error loading data.json:", error);
+                console.error("❌ Error loading school data:", error);
             }
         }
 
         function updateWorkflow() {
-            let schoolSelector = document.getElementById("schoolSelector");
-            let selectedSchool = schoolSelector.value;
+            let selectedSchool = document.getElementById("schoolSelector").value;
             let utilization = parseInt(document.getElementById("utilizationSlider").value);
-            document.getElementById("utilizationValue").textContent = utilization; // Update displayed value
+            document.getElementById("utilizationValue").textContent = utilization;
 
             if (!selectedSchool || !schoolData[selectedSchool]) {
-                console.error("Invalid school selection:", selectedSchool);
+                console.error("❌ Invalid school selection:", selectedSchool);
                 return;
             }
 
             let school = schoolData[selectedSchool];
 
             // Determine workflow based on utilization
-            let workflowType = school.defaultWorkflow; // Default
+            let workflowType = school.defaultWorkflow;
             if (utilization <= 50) {
                 workflowType = school.workflows.low;
             } else if (utilization > 50 && utilization <= 70) {
@@ -87,57 +86,17 @@
                 workflowType = school.workflows.high;
             }
 
-            console.log(`Selected School: ${school.name}, Utilization: ${utilization}, Workflow: ${workflowType}`);
+            console.log(`🎯 Selected School: ${school.name}, Utilization: ${utilization}, Workflow: ${workflowType}`);
 
-            // Get the workflow URL
             fetch("data.json")
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById("flowchart").src = data.workflows[workflowType].url;
                 })
-                .catch(error => console.error("Error fetching workflow data:", error));
+                .catch(error => console.error("❌ Error fetching workflow data:", error));
         }
 
-        function toggleShapeVisibility() {
-            const frame = document.getElementById("flowchart").contentWindow;
-
-            // Request diagram data
-            frame.postMessage(JSON.stringify({ action: "get" }), "*");
-
-            window.addEventListener("message", function(event) {
-                try {
-                    const data = JSON.parse(event.data);
-                    if (data.action === "load") {
-                        const cells = data.diagram.cells;
-
-                        // Find the shape with Unique ID "Q1"
-                        const shape = cells.find(cell => cell.id === "Q1");
-
-                        if (shape) {
-                            // Check if shape is already hidden (opacity=0)
-                            const isHidden = shape.style && shape.style.includes("opacity=0");
-                            const newStyle = isHidden ? shape.style.replace("opacity=0", "") : shape.style + ";opacity=0";
-
-                            // Send command to modify the shape style
-                            frame.postMessage(JSON.stringify({
-                                action: "execute",
-                                value: {
-                                    action: "style",
-                                    cells: [shape.id],
-                                    value: newStyle
-                                }
-                            }), "*");
-                        } else {
-                            console.warn("Shape with ID 'Q1' not found.");
-                        }
-                    }
-                } catch (error) {
-                    console.error("Error processing message:", error);
-                }
-            }, { once: true });
-        }
-
-        // Load data when the page loads
+        // ✅ Load the data when the page starts
         loadData();
     </script>
 
