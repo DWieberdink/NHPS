@@ -1,0 +1,16 @@
+{
+    "workflows": {
+        "facility": {
+            "name": "Facility Workflow",
+            "url": "https://viewer.diagrams.net/?url=https://raw.githubusercontent.com/DWieberdink/NHPS/main/NHPS_Facility_Workflow.drawio"
+        },
+        "school": {
+            "name": "School Workflow",
+            "url": "https://viewer.diagrams.net/?url=https://raw.githubusercontent.com/DWieberdink/NHPS/main/NHPS_School_Workflow.drawio"
+        },
+        "decisionTree": {
+            "name": "Decision Tree",
+            "url": "https://viewer.diagrams.net/?url=https://raw.githubusercontent.com/DWieberdink/NHPS/main/NHPSDecisionTree.drawio"
+        }
+    }
+}
