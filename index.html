@@ -3,19 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NHPS Flowchart Viewer</title>
+    <title>Dynamic NHPS Workflows</title>
 </head>
 <body>
 
-    <h2>NHPS Facility Workflow</h2>
+    <h2>NHPS Dynamic Workflow Viewer</h2>
+
+    <!-- Dropdown to select workflow -->
+    <label for="workflowSelector">Choose a workflow:</label>
+    <select id="workflowSelector" onchange="loadFlowchart()">
+        <option value="facility">Facility Workflow</option>
+        <option value="school">School Workflow</option>
+        <option value="decisionTree">Decision Tree</option>
+    </select>
+
+    <!-- Flowchart Display -->
     <iframe id="flowchart" width="100%" height="600px"></iframe>
 
     <script>
-        function loadFlowchart() {
-            const flowchartUrl = "https://viewer.diagrams.net/?url=https://raw.githubusercontent.com/DWieberdink/NHPS/main/NHPS_Facility_Workflow.drawio";
-            document.getElementById("flowchart").src = flowchartUrl;
+        async function loadFlowchart() {
+            try {
+                // Fetch workflow data from JSON file
+                let response = await fetch("data.json");
+                let data = await response.json();
+
+                // Get selected workflow from dropdown
+                let selectedWorkflow = document.getElementById("workflowSelector").value;
+
+                // Set the iframe source to the selected workflow
+                document.getElementById("flowchart").src = data.workflows[selectedWorkflow].url;
+
+            } catch (error) {
+                console.error("Error loading workflow:", error);
+            }
         }
 
+        // Load the default workflow on page load
         loadFlowchart();
     </script>
 
