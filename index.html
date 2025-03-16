@@ -1,38 +1,82 @@
-<h3>Workflow Steps</h3>
-<table id="dataTable" border="1">
-    <thead>
-        <tr>
-            <th>Step</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-</table>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic NHPS Workflows</title>
+</head>
+<body>
 
-<script>
-    async function loadFlowchart() {
-        try {
-            let response = await fetch("data.json");
-            let data = await response.json();
-            let selectedWorkflow = document.getElementById("workflowSelector").value;
+    <h2>NHPS Dynamic Workflow Viewer</h2>
 
-            // Update the iframe with the selected workflow
-            document.getElementById("flowchart").src = data.workflows[selectedWorkflow].url;
+    <!-- Dropdown to select school -->
+    <label for="schoolSelector">Choose a school:</label>
+    <select id="schoolSelector" onchange="updateWorkflow()">
+        <!-- Schools will be populated dynamically -->
+    </select>
 
-            // Populate the table
-            let tbody = document.getElementById("dataTable").querySelector("tbody");
-            tbody.innerHTML = ""; // Clear previous data
-            data.workflows[selectedWorkflow].steps.forEach(row => {
-                let tr = document.createElement("tr");
-                tr.innerHTML = `<td>${row.step}</td><td>${row.description}</td>`;
-                tbody.appendChild(tr);
-            });
+    <!-- Slider to change utilization -->
+    <label for="utilizationSlider">Utilization: <span id="utilizationValue">50</span>%</label>
+    <input type="range" id="utilizationSlider" min="30" max="100" step="5" value="50" oninput="updateWorkflow()">
 
-        } catch (error) {
-            console.error("Error loading workflow:", error);
+    <!-- Display selected workflow -->
+    <iframe id="flowchart" width="100%" height="600px"></iframe>
+
+    <script>
+        let schoolData = {}; // Store school data from JSON
+
+        async function loadData() {
+            try {
+                let response = await fetch("data.json");
+                let data = await response.json();
+                schoolData = data.schools;
+
+                let schoolSelector = document.getElementById("schoolSelector");
+                schoolSelector.innerHTML = ""; // Clear existing options
+
+                // Populate the dropdown with schools
+                for (let school in schoolData) {
+                    let option = document.createElement("option");
+                    option.value = school;
+                    option.textContent = schoolData[school].name;
+                    schoolSelector.appendChild(option);
+                }
+
+                updateWorkflow(); // Load initial workflow
+
+            } catch (error) {
+                console.error("Error loading data:", error);
+            }
         }
-    }
 
-    // Load the default workflow on page load
-    loadFlowchart();
-</script>
+        function updateWorkflow() {
+            let selectedSchool = document.getElementById("schoolSelector").value;
+            let utilization = parseInt(document.getElementById("utilizationSlider").value);
+            document.getElementById("utilizationValue").textContent = utilization; // Update displayed value
+
+            let school = schoolData[selectedSchool];
+
+            // Determine workflow based on utilization
+            let workflowType = school.defaultWorkflow; // Default
+            if (utilization <= 50) {
+                workflowType = school.workflows.low;
+            } else if (utilization > 50 && utilization <= 70) {
+                workflowType = school.workflows.medium;
+            } else {
+                workflowType = school.workflows.high;
+            }
+
+            // Get the workflow URL
+            fetch("data.json")
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("flowchart").src = data.workflows[workflowType].url;
+                });
+        }
+
+        // Load data on page start
+        loadData();
+    </script>
+
+</body>
+</html>
