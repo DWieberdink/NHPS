@@ -1,22 +1,62 @@
 {
+    "schools": {
+        "Lincoln High": {
+            "name": "Lincoln High School",
+            "utilization": 55,
+            "defaultWorkflow": "facility",
+            "workflows": {
+                "low": "school",
+                "medium": "facility",
+                "high": "decisionTree"
+            }
+        },
+        "Washington Middle": {
+            "name": "Washington Middle School",
+            "utilization": 75,
+            "defaultWorkflow": "decisionTree",
+            "workflows": {
+                "low": "school",
+                "medium": "decisionTree",
+                "high": "facility"
+            }
+        }
+    },
     "workflows": {
         "facility": {
             "name": "Facility Workflow",
-            "url": "https://viewer.diagrams.net/?url=https://raw.githubusercontent.com/DWieberdink/NHPS/main/NHPS_Facility_Workflow.drawio",
-            "steps": [
-                {"step": "Start", "description": "Facility process begins"},
-                {"step": "Assessment", "description": "Evaluate facility conditions"},
-                {"step": "Approval", "description": "Management reviews decision"}
-            ]
+            "url": "https://viewer.diagrams.net/?url=https://raw.githubusercontent.com/DWieberdink/NHPS/main/NHPS_Facility_Workflow.drawio"
         },
         "school": {
             "name": "School Workflow",
-            "url": "https://viewer.diagrams.net/?url=https://raw.githubusercontent.com/DWieberdink/NHPS/main/NHPS_School_Workflow.drawio",
-            "steps": [
-                {"step": "Start", "description": "School planning starts"},
-                {"step": "Funding", "description": "Budget allocation"},
-                {"step": "Construction", "description": "School construction begins"}
-            ]
+            "url": "https://viewer.diagrams.net/?url=https://raw.githubusercontent.com/DWieberdink/NHPS/main/NHPS_School_Work
+{
+    "schools": {
+        "Lincoln High": {
+            "name": "Lincoln High School",
+            "utilization": 55,
+            "defaultWorkflow": "facility",
+            "workflows": {
+                "low": "school",
+                "medium": "facility",
+                "high": "decisionTree"
+            }
+        },
+        "Washington Middle": {
+            "name": "Washington Middle School",
+            "utilization": 75,
+            "defaultWorkflow": "decisionTree",
+            "workflows": {
+                "low": "school",
+                "medium": "decisionTree",
+                "high": "facility"
+            }
         }
-    }
-}
+    },
+    "workflows": {
+        "facility": {
+            "name": "Facility Workflow",
+            "url": "https://viewer.diagrams.net/?url=https://raw.githubusercontent.com/DWieberdink/NHPS/main/NHPS_Facility_Workflow.drawio"
+        },
+        "school": {
+            "name": "School Workflow",
+            "url": "https://viewer.diagrams.net/?url=https://raw.githubusercontent.com/DWieberdink/NHPS/main/NHPS_School_Work
