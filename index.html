@@ -1,5 +1,3 @@
-<button onclick="toggleShapeVisibility()">Toggle Q1</button>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,6 +18,9 @@
     <!-- Slider to change utilization -->
     <label for="utilizationSlider">Utilization: <span id="utilizationValue">50</span>%</label>
     <input type="range" id="utilizationSlider" min="30" max="100" step="5" value="50" oninput="updateWorkflow()">
+
+    <!-- Button to toggle Q1 shape -->
+    <button onclick="toggleShapeVisibility()">Toggle Q1</button>
 
     <!-- Display selected workflow -->
     <iframe id="flowchart" width="100%" height="600px"></iframe>
@@ -95,6 +96,45 @@
                     document.getElementById("flowchart").src = data.workflows[workflowType].url;
                 })
                 .catch(error => console.error("Error fetching workflow data:", error));
+        }
+
+        function toggleShapeVisibility() {
+            const frame = document.getElementById("flowchart").contentWindow;
+
+            // Request diagram data
+            frame.postMessage(JSON.stringify({ action: "get" }), "*");
+
+            window.addEventListener("message", function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.action === "load") {
+                        const cells = data.diagram.cells;
+
+                        // Find the shape with Unique ID "Q1"
+                        const shape = cells.find(cell => cell.id === "Q1");
+
+                        if (shape) {
+                            // Check if shape is already hidden (opacity=0)
+                            const isHidden = shape.style && shape.style.includes("opacity=0");
+                            const newStyle = isHidden ? shape.style.replace("opacity=0", "") : shape.style + ";opacity=0";
+
+                            // Send command to modify the shape style
+                            frame.postMessage(JSON.stringify({
+                                action: "execute",
+                                value: {
+                                    action: "style",
+                                    cells: [shape.id],
+                                    value: newStyle
+                                }
+                            }), "*");
+                        } else {
+                            console.warn("Shape with ID 'Q1' not found.");
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error processing message:", error);
+                }
+            }, { once: true });
         }
 
         // Load data when the page loads
