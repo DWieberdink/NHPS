@@ -12,7 +12,7 @@
     <!-- Dropdown to select school -->
     <label for="schoolSelector">Choose a school:</label>
     <select id="schoolSelector" onchange="updateWorkflow()">
-        <!-- Schools will be populated dynamically -->
+        <option value="" disabled selected>Loading schools...</option>
     </select>
 
     <!-- Slider to change utilization -->
@@ -27,14 +27,23 @@
 
         async function loadData() {
             try {
+                console.log("Fetching data.json...");
                 let response = await fetch("data.json");
+                
+                // Check if response is ok
+                if (!response.ok) {
+                    throw new Error("Failed to load data.json");
+                }
+                
                 let data = await response.json();
                 schoolData = data.schools;
+
+                console.log("Loaded schools:", schoolData);
 
                 let schoolSelector = document.getElementById("schoolSelector");
                 schoolSelector.innerHTML = ""; // Clear existing options
 
-                // Populate the dropdown with schools
+                // Populate dropdown with schools
                 for (let school in schoolData) {
                     let option = document.createElement("option");
                     option.value = school;
@@ -42,17 +51,26 @@
                     schoolSelector.appendChild(option);
                 }
 
-                updateWorkflow(); // Load initial workflow
+                // Set default selection to the first school
+                schoolSelector.selectedIndex = 0;
+
+                updateWorkflow(); // Load workflow based on default selection
 
             } catch (error) {
-                console.error("Error loading data:", error);
+                console.error("Error loading data.json:", error);
             }
         }
 
         function updateWorkflow() {
-            let selectedSchool = document.getElementById("schoolSelector").value;
+            let schoolSelector = document.getElementById("schoolSelector");
+            let selectedSchool = schoolSelector.value;
             let utilization = parseInt(document.getElementById("utilizationSlider").value);
             document.getElementById("utilizationValue").textContent = utilization; // Update displayed value
+
+            if (!selectedSchool || !schoolData[selectedSchool]) {
+                console.error("Invalid school selection:", selectedSchool);
+                return;
+            }
 
             let school = schoolData[selectedSchool];
 
@@ -66,15 +84,18 @@
                 workflowType = school.workflows.high;
             }
 
+            console.log(`Selected School: ${school.name}, Utilization: ${utilization}, Workflow: ${workflowType}`);
+
             // Get the workflow URL
             fetch("data.json")
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById("flowchart").src = data.workflows[workflowType].url;
-                });
+                })
+                .catch(error => console.error("Error fetching workflow data:", error));
         }
 
-        // Load data on page start
+        // Load data when the page loads
         loadData();
     </script>
 
