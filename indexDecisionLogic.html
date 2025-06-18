@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>School Decision Evaluator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://d3js.org/d3.v7.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" defer></script>
+  
+  >
+  <style>
+    body { font-family: 'Franklin Gothic Book', 'Franklin Gothic Medium'; padding: 1rem; margin: 0; }
+    label { display: block; margin-top: 1rem; }
+    label[for="schoolSelect"] { margin-bottom: 0.5rem;}
+    table { border-collapse: collapse; margin-top: 1rem; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
+    th { background-color: #f2f2f2; }
+    tr.ProgramInvestment { background-color: #d1f7e1; }
+    tr.BuildingInvestment { background-color: #d1e7f7; }
+    tr.BuildingProgramInvestment { background-color: #f7d1f1; }
+    tr.BuildingAddition { background-color: #f9f9d1; }
+    tr.Evaluation { background-color: #e6d1f7; }
+    tr.Unknown { background-color: #fdd; }
+    input[type=range] { width: 100%; }
+
+    #main { max-width: 1200px; margin: 0 auto; }
+    #container { display: flex; gap: 2rem; flex-wrap: wrap; }
+    #sliders { flex: 1; min-width: 300px; }
+    #summary { flex: 1; }
+    #flowchart-container { width: 100%; height: 500px; margin: 0rem; }
+    svg { width: 100%; height: 100%; margin-top: 0;  }
+    #schoolSelect {margin-top: 0.5rem; font-size: 18px; padding: 6px;}
+    .ellipse-node {fill: #fbdbdb;stroke: #ccc; stroke-width: 1.5;}
+    .node rect { fill: #fff; stroke: #999; stroke-width: 1.5px; }
+    .node.highlight rect { fill: #ffeeba; stroke: #f0ad4e; }
+    .node.special-highlight rect { fill: #dd00ff; stroke: #9900cc; }
+    .node.special-highlight ellipse,
+    .node.special-highlight rect {stroke: #000000; stroke-width: 3; fill: #eb77fd;}
+    .link { stroke: #ccc; fill: none; stroke-width: 2px; }
+    .link.active { stroke: #f0ad4e; stroke-width: 3px; marker-end: url(#arrow-active); }
+    .link-label.active-label { fill: red; font-size: 14px; font-family: Franklin Gothic Book; font-weight: bold; pointer-events: none;}
+    tfoot tr th { font-weight: bold; background-color: #e8e8e8;
+}
+  </style>
+</head>
+<body>
+  <div id="main">
+    <h2>School Decision Evaluation</h2>
+
+    <div id="container">
+      <div id="sliders">
+        <label>Utilization Threshold: <span id="utilOut">0.65</span>
+          <input type="range" id="utilSlider" min="0" max="1" step="0.01" value="0.65">
+        </label>
+        <label>High Utilization Threshold: <span id="utilHighOut">0.95</span>
+          <input type="range" id="utilHighSlider" min="0" max="1.2" step="0.01" value="0.95">
+        </label>
+        <label>Enrollment Growth Threshold: <span id="growthOut">0</span>
+          <input type="range" id="growthSlider" min="-3" max="3" step="0.01" value="0">
+        </label>
+        <label>Projected Utilization Threshold: <span id="projUtilOut">0.95</span>
+          <input type="range" id="projUtilSlider" min="0" max="1.5" step="0.01" value="0.95">
+        </label>
+        <label>Distance to Underutilized Schools: <span id="distOut">1.0</span>
+          <input type="range" id="distSlider" min="0" max="5" step="0.1" value="1.0">
+        </label>
+        <label>Building Threshold: <span id="buildOut">1.5</span>
+          <input type="range" id="buildSlider" min="0" max="3" step="0.1" value="1.5">
+        </label>
+        <label>Adequate Program Offer Minimum: <span id="progOut">2</span>
+          <input type="range" id="progSlider" min="0" max="10" step="1" value="2">
+        </label>
+        
+      </div>
+      <div id="summary"></div>
+    </div>
+    <div id="flowchart-container">
+      <label for="schoolSelect">Select School:
+          <select id="schoolSelect">
+              <option value="">-- Select School --</option>
+          </select>
+      </label>
+      <svg viewBox="0 0 650 1000" preserveAspectRatio="xMidYMid meet"></svg>
+  </div>
+
+    <div id="results"></div>
+  </div>
+
+  <script defer src="FlowchartLogic.js"></script>
+  <script defer src="DecisionLogic.js"></script>
+  <script defer src="iframeMessaging.js"></script>
+  
+</body>
+</html>

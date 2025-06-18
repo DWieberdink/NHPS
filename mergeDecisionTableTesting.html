@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Merge Real Data</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="mergeDecisionMap.js" defer></script>
+
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #eee; }
+  </style>
+</head>
+
+<body>
+<h1>Testing Merge of Real Decision Data + Map Export</h1>
+
+<!-- Result table -->
+<div id="results"></div>
+
+<script>
+let popupWindow = null;
+
+function openPopupAndRequestData() {
+  popupWindow = window.open('indexDecisionLogic.html', '_blank', 'width=1200,height=800');
+
+  popupWindow.onload = () => {
+    console.log('✅ Popup loaded, requesting schoolData...');
+    setTimeout(() => {
+      popupWindow.postMessage({ action: "requestSchoolData" }, "*");
+    }, 500); // give it a little time to settle
+  };
+}
+
+// On page ready, open popup
+window.addEventListener("DOMContentLoaded", () => {
+  console.log("🚀 Page ready, opening popup...");
+  openPopupAndRequestData();
+});
+
+// Listen for incoming schoolData updates
+window.addEventListener("message", (event) => {
+  const { from, schoolData } = event.data || {};
+
+  console.log("📨 [mergeDecisionTableTesting] Received message:", event.data);
+
+  if (from === "DecisionLogic-A" && Array.isArray(schoolData)) {
+    console.log("✅ [mergeDecisionTableTesting] Updating table with new schoolData:", schoolData);
+    window.schoolData = schoolData;
+
+    clearPreviousMergedSummary();
+    startMerging(window.schoolData);
+  }
+});
+</script>
+
+</body>
+</html>

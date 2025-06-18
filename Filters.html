@@ -1,0 +1,38 @@
+<!-- filters.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Filters Panel</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.css" rel="stylesheet" />
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; padding: 10px; margin: 0; }
+    h3 { margin-top: 20px; }
+    select, input { width: 100%; margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <h3>School Type</h3>
+  <select id="schoolTypeFilter" multiple size="4">
+    <option value="Elementary and K-8 Schools">ES & K8</option>
+    <option value="Middle School">MS</option>
+    <option value="High School">HS</option>
+    <option value="Early Childhood Program">ECP</option>
+  </select>
+
+  <h3>Enrollment Range</h3>
+  <div id="enrollmentRange"></div>
+  <div>Min: <span id="minEnrollDisplay">0</span> – Max: <span id="maxEnrollDisplay">2000</span></div>
+
+  <h3>Available Seats</h3>
+  <div id="seatsRange"></div>
+  <div>Min: <span id="minSeatsDisplay">0</span> – Max: <span id="maxSeatsDisplay">500</span></div>
+
+  <h3>Show Size by Seats</h3>
+  <button id="toggleYes">Yes</button>
+  <button id="toggleNo">No</button>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js"></script>
+  <script src="filters.js"></script>
+</body>
+</html>

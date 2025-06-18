@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NHPS Schools Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- CSS Libraries -->
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.css" rel="stylesheet" />
+
+  <!-- JS Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js" defer></script>
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js" defer></script>
+
+  <style>
+    /* General Layout */
+   
+    body {
+      margin: 0;
+      display: flex;
+      height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    #container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+    #sidebar { width: 30%; padding: 20px; background: #f9f9f9; border-right: 1px solid #ddd; overflow-y: auto; box-sizing: border-box; }
+    
+    #map-container {
+  flex-grow: 1;
+  height: 100vh;
+  position: relative;
+  transition: margin-right 0.3s ease;
+}
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Sidebar Elements */
+    #sidebar h3 { margin-top: 20px; font-size: 16px; font-weight: bold; color: #333; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
+    select, input[type="range"], input[type="number"] {
+      width: 100%; padding: 8px; margin: 6px 0 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; box-sizing: border-box;
+    }
+    button {
+      padding: 6px 12px; margin-top: 4px; margin-right: 6px;
+      font-size: 14px; border: none; border-radius: 4px; cursor: pointer;
+      background-color: #007cbf; color: white;
+    }
+    button:hover { background-color: #005e93; }
+
+    /* Map Legend */
+    .legend {
+  position: absolute;
+  bottom: 60px;
+  left: 20px;
+  background: white;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 13px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  
+  display: flex;
+  flex-wrap: wrap; /* allow wrapping if space is tight */
+  gap: 12px;
+  align-items: center;
+}
+
+.legend h4 {
+  display: none; /* Hide the vertical header if desired */
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.legend-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  border: 1px solid #ccc;
+}
+
+
+
+    /* Map Sidebar */
+    #map-sidebar {
+  width: 1000px;
+  height: 100%;
+  background: white;
+  border-left: 1px solid #ccc;
+  transition: transform 0.3s ease;
+  z-index: 1000;
+  flex-shrink: 0;
+  position: relative; /* no longer absolute */
+}
+
+/*map resizing based on user*/
+#map-sidebar.hidden {
+  width: 0 !important;
+  padding: 0;
+  overflow: hidden;
+}
+
+    #map-sidebar-toggle { position: absolute; top: 10px; right: 10px; z-index: 1001; transition: right 0.3s ease; }
+    #map-sidebar-toggle.hidden { right: 10px; }
+ 
+   #map-sidebar {
+  width: 400px;
+  flex-shrink: 0;
+} 
+
+    /* Table & Range Sliders */
+    #enrollmentRange, #seatsRange { margin: 10px 0; }
+    #isoTable { width: 100%; overflow-x: auto; display: block; }
+    #isoTable th, #isoTable td { padding: 6px; border: 1px solid #ccc; text-align: center; }
+    .percent-cell { display: flex; justify-content: center; align-items: center; gap: 4px; }
+    .assign-percent { width: 50px; padding: 4px; font-size: 14px; text-align: center; }
+
+    /* Loading Modal */
+    #loadingModal {
+      display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgba(255, 255, 255, 0.8);
+      justify-content: center; align-items: center;
+      font-size: 20px; font-weight: bold; color: #333;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="sidebar">
+  <h2>New Haven Public Schools Facility Planning Webtool</h2>
+  <h4>This tool is intended to support NHPS facility planning initiatives. Users can explore conditions data and model school choice scenarios to better understand the potential impact of facility decisions.</h4>
+
+  
+  <script>
+  function switchControlIframe(url) {
+    document.getElementById('controlIframe').src = url;
+  }
+  </script>
+  
+
+  <details closed>
+    <summary><strong>Scenario Modeling</strong></summary>
+    <h4>Use this section to test and evaluate the impact of portfolio decisions. Users can manually assign student changes or run a simulation model.</h4>
+
+    <h3>Filter by Decision Type</h3>
+    <select id="decisionFilter">
+      <option value="">-- All Decisions --</option>
+    </select>
+
+    <h3>Select a School for Evaluation</h3>
+    <select id="schoolSelect">
+      <option value="">-- Select --</option>
+    </select>
+
+    <h3>Assignment Mode</h3>
+    <div id="modeToggle">
+      <button id="manualBtn" class="active">Manual Entry</button>
+      <button id="modelBtn">Model Simulation</button>
+    </div>
+
+    <!-- Manual Entry View -->
+    <div id="manualView">
+      <h3>Select Distance Threshold for Analysis</h3>
+      <select id="isoDistance">
+        <option value="2413">1.5 miles</option>
+        <option value="1609">1 mile</option>
+        <option value="804">0.5 mile</option>
+      </select>
+
+      <h3>Schools within Distance Threshold</h3>
+      <table id="isoTable" border="1">
+        <thead>
+          <tr>
+            <th>School Name</th>
+            <th>% Assigned</th>
+            <th># Assigned</th>
+            <th>Available Seats</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- Model Simulation View -->
+    <div id="modelView" style="display: none;">
+      <h4>Rate the importance of each factor (1 = not important, 10 = very important)</h4>
+      <h3>Distance Weighting</h3>
+      <input type="range" id="distanceWeightSlider" min="0" max="10" value="5" />
+      <span id="distanceWeightLabel">5</span>
+
+      <h3>Enrollment Demand Weighting</h3>
+      <input type="range" id="enrollmentWeightSlider" min="0" max="10" value="5" />
+      <span id="enrollmentWeightLabel">5</span>
+
+      <h3>Building Quality Weighting</h3>
+      <input type="range" id="buildingWeightSlider" min="0" max="10" value="5" />
+      <span id="buildingWeightLabel">5</span>
+
+      <br /><br />
+      <button id="assignButton">Assign Students</button>
+    </div>
+  </details>
+
+  <details closed>
+    <summary><strong>Model Output: Impact Analysis</strong></summary>
+    <div id="assignmentSummary" style="margin-top: 10px;"></div>
+    <h3>Enrollment and Utilization Impact</h3>
+    <canvas id="assignmentChart" width="100%" height="180"></canvas>
+    <h3>Travel Distance Impact</h3>
+    <canvas id="distanceCompareChart" width="100%" height="50"></canvas>
+  </details>
+</div>
+
+<div id="container">
+  
+  <div id="map-container">
+    <div id="map"></div>
+
+     <div id="map-legend" class="legend">
+      <h4>Legend</h4>
+      <div id="legend-content"></div>
+    </div>
+   
+    <!-- 👇 NEW Toggle Button -->
+    <button id="toggleView" style="position: absolute; bottom: 10px; left: 10px; z-index: 999;">Show Decisions</button>
+    
+    
+    <!-- Right Sidebar -->
+    <button id="map-sidebar-toggle">Toggle Panel</button>
+  </div>
+
+  <div id="map-sidebar">
+  
+
+    <div style="padding: 10px;">
+      <h3>Flowchart Panel</h3>
+      <p>Adjust the dynamic controls or data here.</p>
+
+      <button onclick="openPopup()">Open Decision Logic in Separate Window</button>
+
+  <!-- Control Selection for Dropdown -->
+  <select onchange="switchControlIframe(this.value)">
+    <option value="filters.html">Filters</option>
+    <option value="indexDecisionLogic.html">Decisions</option>
+  </select>
+
+
+  <!-- Insert Iframe -->
+  <iframe 
+  id="controlIframe"
+  src="indexDecisionLogic.html"
+  width="100%" 
+  height="820px"
+  frameborder="0"
+  style="border: 1px solid #ccc; margin-top: 10px;"
+  title="Decision Flow"
+  allowfullscreen>
+  </iframe>
+</div> <!-- end of style="padding:10px;" -->
+</div> <!-- end of #map-sidebar -->
+
+<!-- Trigger Dropdown Choice -->
+<script>
+  function switchControlIframe(url) {
+    document.getElementById('controlIframe').src = url;
+  }
+</script>
+
+</div> <!-- end of #container -->
+
+
+<!-- Student Assignment Count Popup (overlay) -->
+<div id="assignmentProgress" style="
+  display: none;
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.85);
+  color: white;
+  padding: 40px 60px;
+  border-radius: 12px;
+  font-size: 32px;
+  font-weight: bold;
+  z-index: 2001;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+">
+  Running Student Assignment Scenarios<br/>
+  <span id="assignedCount" style="font-size: 48px; display: block; margin-top: 12px;">0</span>
+</div>
+
+<!-- Outside: Loading Modal -->
+<div id="loadingModal">Please wait, assignment algorithm is running...</div>
+
+<!-- Scripts -->
+<script defer src="script.js"></script>
+<script defer src="iframeControl.js"></script>
+
+<script defer>
+  let allSchoolData = [];
+
+  window.addEventListener("message", (event) => {
+    const { from, schoolData } = event.data || {};
+
+    if (from === "DecisionLogic-A" && Array.isArray(schoolData)) {
+      console.log("📨 Received schoolData from iframe:", schoolData);
+
+      allSchoolData = schoolData;
+
+      const decisionFilter = document.getElementById("decisionFilter");
+      const schoolSelect = document.getElementById("schoolSelect");
+
+      if (!decisionFilter || !schoolSelect) {
+        console.warn("⚠️ Missing #decisionFilter or #schoolSelect element.");
+        return;
+      }
+
+      const uniqueDecisions = [...new Set(
+        allSchoolData.map(row => row.decision || "Unknown")
+      )].sort();
+
+      decisionFilter.innerHTML = '<option value="">-- All Decisions --</option>';
+      uniqueDecisions.forEach(decision => {
+        const option = document.createElement("option");
+        option.value = decision;
+        option.textContent = decision;
+        decisionFilter.appendChild(option);
+      });
+
+      function updateSchoolSelect(filterDecision = "") {
+        schoolSelect.innerHTML = '<option value="">-- Select --</option>';
+        allSchoolData.forEach(row => {
+          if (!filterDecision || row.decision === filterDecision) {
+            const option = document.createElement("option");
+            option.value = row["Building Name"];
+            option.textContent = row["Building Name"];
+            schoolSelect.appendChild(option);
+          }
+        });
+      }
+
+      updateSchoolSelect();
+
+      decisionFilter.addEventListener("change", () => {
+        const selectedDecision = decisionFilter.value;
+        updateSchoolSelect(selectedDecision);
+        console.log("🎯 Updated school list for decision:", selectedDecision);
+      });
+    }
+  });
+
+  window.addEventListener("DOMContentLoaded", () => {
+    const iframe = document.querySelector("#map-sidebar iframe");
+    if (iframe?.contentWindow) {
+      iframe.contentWindow.postMessage({ action: "requestSchoolData" }, "*");
+      console.log("📤 Parent sent 'requestSchoolData' to iframe!");
+    } else {
+      console.warn("⚠️ Iframe not found inside #map-sidebar!");
+    }
+  });
+</script>
+
+</body>
+</html>
