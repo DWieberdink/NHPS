@@ -70,6 +70,24 @@ map.on('load', () => {
     .then(data => {
       geojsonData = data;
 
+const excludeSelect = document.getElementById("excludedSchools");
+
+// Populate options
+geojsonData.features.forEach(f => {
+  const option = document.createElement("option");
+  option.value = normalize(f.properties["Building Name"]);
+  option.textContent = f.properties["Building Name"];
+  excludeSelect.appendChild(option);
+});
+
+// Enhance with Choices.js
+const choices = new Choices(excludeSelect, {
+  removeItemButton: true,
+  placeholder: true,
+  placeholderValue: 'Select schools to exclude',
+  searchPlaceholderValue: 'Search schools'
+});
+
        geojsonData.features.forEach(f => {
       if (!f.properties["Decision Type"]) {
         f.properties["Decision Type"] = "Unknown";
@@ -254,6 +272,7 @@ map.on('load', () => {
   }, 300);
 });
 
+
 // ✅ Inject decisions into geojson features
 function normalizeName(name) {
   return name?.toLowerCase().replace(/\s+/g, ' ').trim();
@@ -428,7 +447,8 @@ document.addEventListener('DOMContentLoaded', function() {
     odData = [];
 
     console.log("About to start PapaParse");
-    Papa.parse("OD_Draft.csv", {
+    //odmatrix
+    Papa.parse("https://raw.githubusercontent.com/DWieberdink/NHPS/main/OD_Draft.csv" , {
       download: true,
       header: true,
       delimiter: ",",
@@ -533,11 +553,17 @@ const liveAssignedStudents = new Set(); // ✅ Track unique students assigned
             normalize(d.DestinationSchoolName) !== normalize(d.CurrentSchoolName)
           );
   
-          const weighted = choices.map(d => {
+          const excluded = Array.from(document.getElementById("excludedSchools").selectedOptions)
+                      .map(opt => normalize(opt.value));
+
+        const weighted = choices
+          .filter(d => !excluded.includes(normalize(d.DestinationSchoolName)))
+          .map(d => {
             const distance = parseFloat((d.Distance || "").replace(/[^\d.-]/g, ""));
             const weight = 1 / Math.pow(distance + 1, weightPower);
             return { school: d.DestinationSchoolName, weight };
           });
+
   
           const totalWeight = weighted.reduce((sum, d) => sum + d.weight, 0);
           let rand = Math.random() * totalWeight;
