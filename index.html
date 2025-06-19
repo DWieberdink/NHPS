@@ -8,13 +8,18 @@
   <!-- CSS Libraries -->
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 
   <!-- JS Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js" defer></script>
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js" defer></script>
+  <script src="FlowchartLogic.js"></script>
+  
+
 
   <style>
     /* General Layout */
@@ -32,7 +37,7 @@
   width: 100vw;
 }
 
-    #sidebar { width: 30%; padding: 20px; background: #f9f9f9; border-right: 1px solid #ddd; overflow-y: auto; box-sizing: border-box; }
+    #sidebar { width: 35%; padding: 10px; background: #f9f9f9; border-right: 1px solid #ddd; overflow-y: auto; box-sizing: border-box; }
     
     #map-container {
   flex-grow: 1;
@@ -210,6 +215,11 @@
       <h3>Building Quality Weighting</h3>
       <input type="range" id="buildingWeightSlider" min="0" max="10" value="5" />
       <span id="buildingWeightLabel">5</span>
+
+        <h3>Exclude Schools from Assignment</h3>
+        <select id="excludedSchools" multiple style="height: 100px;">
+          <!-- Options will be dynamically added -->
+        </select>
 
       <br /><br />
       <button id="assignButton">Assign Students</button>
