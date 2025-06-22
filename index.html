@@ -18,8 +18,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js" defer></script>
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js" defer></script>
   <script src="https://d3js.org/d3.v7.min.js" defer></script>
-  <script src="FlowchartLogic.js"></script>
   <script src="DecisionLogic.js" defer></script>
+  <script src="FlowchartLogic.js" defer></script>
+  <script src="script.js" defer></script>
   
 
 
@@ -966,9 +967,7 @@
 <div id="loadingModal">Please wait, assignment algorithm is running...</div>
 
 <!-- Scripts -->
-<script defer src="script.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-<script src="DecisionLogic.js" defer></script>
+<!-- The script tags have been moved to the <head> for better dependency management -->
 
 <!-- Assignment Results Modal -->
 <div id="assignmentResultsModal" style="display:none; position:fixed; top:20%; left:50%; transform:translate(-50%,0); background:white; border:2px solid #333; padding:30px; z-index:2000; min-width:350px; box-shadow:0 4px 24px rgba(0,0,0,0.2);">
