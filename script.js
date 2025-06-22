@@ -1245,6 +1245,9 @@ document.addEventListener("DOMContentLoaded", function() {
         adequateProgramsMin: parseInt(document.getElementById("progSlider").value, 10),
       };
       
+      // Store thresholds globally for flowchart access
+      window.thresholds = thresholds;
+      
       if (window.decisionLogic) {
         window.decisionLogic.updateThresholds(thresholds);
         const updatedSchoolData = window.decisionLogic.schoolData;
@@ -1257,15 +1260,32 @@ document.addEventListener("DOMContentLoaded", function() {
       } else {
         console.warn("⚠️ DecisionLogic not ready, cannot send slider data.");
       }
+
+      // ✅ Update flowchart node labels with new threshold values
+      if (typeof window.FlowUtils !== 'undefined' && typeof window.FlowUtils.updateNodeLabels === 'function') {
+        window.FlowUtils.updateNodeLabels();
+      }
+      
+      // ✅ Update flowchart path for currently selected school
+      const flowchartSelect = document.getElementById('mainFlowchartSchoolSelect');
+      if (flowchartSelect && flowchartSelect.value && typeof window.updateFlowForSchool === 'function') {
+        window.updateFlowForSchool(flowchartSelect.value, thresholds);
+      }
     }
 
     sliders.forEach(slider => {
       if (slider) {
+        // Use 'input' for real-time updates
         slider.addEventListener("input", () => {
           const outSpan = document.getElementById(slider.id.replace("Slider", "Out"));
           if (outSpan) outSpan.textContent = slider.value;
+          sendSliderData(); // Call the main update function
         });
-        slider.addEventListener("change", sendSliderData);
       }
     });
+
+    // Set initial values on load
+    if (sliders.every(s => s)) {
+      sendSliderData();
+    }
 });

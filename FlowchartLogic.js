@@ -2,7 +2,7 @@
 let g;
 let svg; // ✅ Make svg globally accessible
 let nodes = []; 
-const FlowUtils = {};
+window.FlowUtils = {};
 let links = []; 
 let schoolData = [];
 
