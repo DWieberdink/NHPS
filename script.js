@@ -302,6 +302,82 @@ map.on('load', () => {
       });
       
       setupAssignmentPopup();
+
+      // Populate excludedSchools select with all school names
+      const excludedSchoolsSelect = document.getElementById('excludedSchools');
+      if (excludedSchoolsSelect) {
+        excludedSchoolsSelect.innerHTML = '';
+        geojsonData.features.forEach(f => {
+          const name = f.properties['Building Name'];
+          const option = document.createElement('option');
+          option.value = name;
+          option.textContent = name;
+          excludedSchoolsSelect.appendChild(option);
+        });
+        // Initialize Choices.js for a better multi-select dropdown
+        if (window.Choices) {
+          if (excludedSchoolsSelect.choicesInstance) {
+            excludedSchoolsSelect.choicesInstance.destroy();
+          }
+          excludedSchoolsSelect.choicesInstance = new Choices(excludedSchoolsSelect, {
+            removeItemButton: true,
+            searchResultLimit: 20,
+            placeholder: true,
+            placeholderValue: 'Select schools to exclude',
+            shouldSort: false
+          });
+        }
+      }
+
+      // --- Blinking Halo for Sending School ---
+      let haloInterval = null;
+      let haloRadius = 15;
+      let haloGrowing = true;
+
+      function startBlinkingHalo() {
+        if (haloInterval) clearInterval(haloInterval);
+        haloRadius = 15;
+        haloGrowing = true;
+        haloInterval = setInterval(() => {
+          if (!map.getLayer('sending-school-halo')) return;
+          map.setPaintProperty('sending-school-halo', 'circle-radius', haloRadius);
+          map.setPaintProperty('sending-school-halo', 'circle-opacity', 0.5 + 0.5 * Math.sin(Date.now() / 300));
+          if (haloGrowing) {
+            haloRadius += 1;
+            if (haloRadius >= 30) haloGrowing = false;
+          } else {
+            haloRadius -= 1;
+            if (haloRadius <= 15) haloGrowing = true;
+          }
+        }, 50);
+      }
+
+      function stopBlinkingHalo() {
+        if (haloInterval) {
+          clearInterval(haloInterval);
+          haloInterval = null;
+        }
+        if (map.getLayer('sending-school-halo')) {
+          map.setPaintProperty('sending-school-halo', 'circle-opacity', 0);
+        }
+      }
+
+      // Add the sending-school-halo layer on map load
+      map.addSource('sending-school', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] }
+      });
+      map.addLayer({
+        id: 'sending-school-halo',
+        type: 'circle',
+        source: 'sending-school',
+        paint: {
+          'circle-radius': 15,
+          'circle-color': '#FFD700',
+          'circle-opacity': 0.8,
+          'circle-blur': 0.6
+        }
+      });
     })
     .catch(error => {
       console.error("❌ Failed to load initial map data:", error);
@@ -602,11 +678,17 @@ function normalizeName(name) {
 function injectDecisionsIntoGeoJSON(geojson, decisions) {
   const decisionMap = new Map(decisions.map(row => [normalizeName(row["Building Name"]), row["decision"] || "Unknown"]));
   const scorecardMap = new Map(decisions.map(row => [normalizeName(row["Building Name"]), parseFloat(row["Scorecard"] || "0")]));
+  const buildingQualityMap = new Map(decisions.map(row => [normalizeName(row["Building Name"]), parseFloat(row["BuildingTreshhold"] || "0")]));
+  // Add a map for Utilization
+  const utilizationMap = new Map(decisions.map(row => [normalizeName(row["Building Name"]), parseFloat(row["Utilization"] || "0")]));
 
   geojson.features.forEach(f => {
     const name = normalizeName(f.properties["Building Name"]);
     f.properties["Decision Type"] = decisionMap.get(name) || "Unknown";
     f.properties["Scorecard"] = scorecardMap.get(name) || 0;
+    f.properties["Building Quality"] = buildingQualityMap.get(name) || 0;
+    // Inject Utilization
+    f.properties["Utilization"] = utilizationMap.get(name) || 0;
   });
 }
 
@@ -767,6 +849,21 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error("❌ Failed to load OD matrix:", err);
       }
     });
+
+    // --- Blinking Halo Logic ---
+    const sendingSource = map.getSource('sending-school');
+    if (sendingSource) {
+      if (selectedFeatureForIsochrone) {
+        sendingSource.setData({
+          type: 'FeatureCollection',
+          features: [selectedFeatureForIsochrone]
+        });
+        startBlinkingHalo();
+      } else {
+        sendingSource.setData({ type: 'FeatureCollection', features: [] });
+        stopBlinkingHalo();
+      }
+    }
   });
 
   isoDistanceSelect.addEventListener('change', triggerIsochroneUpdate);
@@ -891,9 +988,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // ✅ Calculate normalization factors for better scoring
         let maxDistance = 0;
-        let maxEnrollment = 0;
         let maxQuality = 0;
         let maxScorecard = 0;
+        let minScorecard = Infinity;
+        let maxUtilization = 0;
         
         // Find max values for normalization
         for (const d of odData) {
@@ -907,16 +1005,25 @@ document.addEventListener('DOMContentLoaded', function() {
           const enrollment = parseInt(feature.properties["Enrollment"]) || 0;
           const quality = parseFloat(feature.properties["Building Quality"]) || 0;
           const scorecard = parseFloat(feature.properties["Scorecard"]) || 0;
+          const utilization = parseFloat(feature.properties["Utilization"]) || 0;
           
           maxEnrollment = Math.max(maxEnrollment, enrollment);
           maxQuality = Math.max(maxQuality, quality);
           maxScorecard = Math.max(maxScorecard, scorecard);
+          minScorecard = Math.min(minScorecard, scorecard);
+          maxUtilization = Math.max(maxUtilization, utilization);
         }
         
-        console.log("📊 Normalization factors - Max Distance:", maxDistance, "Max Enrollment:", maxEnrollment, "Max Quality:", maxQuality, "Max Scorecard:", maxScorecard);
+        console.log("📊 Normalization factors - Max Distance:", maxDistance, "Max Enrollment:", maxEnrollment, "Max Quality:", maxQuality, "Max Scorecard:", maxScorecard, "Min Scorecard:", minScorecard, "Max Utilization:", maxUtilization);
         
         const finalAssignments = {};
         console.log("🔄 Starting assignment algorithm...");
+        
+        // ✅ Track assigned counts for each school to enforce seat limits
+        const assignedCounts = {};
+        geojsonData.features.forEach(f => {
+            assignedCounts[normalize(f.properties["Building Name"])] = 0;
+        });
         
         // ✅ Process students with progress tracking
         let processedCount = 0;
@@ -944,15 +1051,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 const destProperties = schoolLookup.get(destName);
                 if (!destProperties) continue;
 
+                // ✅ Check seat availability (capacity constraint)
                 const enrollment = parseInt(destProperties["Enrollment"]) || 0;
+                const capacity = parseInt(destProperties["Capacity"]) || 0;
+                const assignedSoFar = assignedCounts[destName] || 0;
+                if ((enrollment + assignedSoFar) >= capacity) {
+                    continue; // Skip if assigning would exceed capacity
+                }
+
+                const availableSeats = parseInt(destProperties["Available Seats"]) || 0;
                 const quality = parseFloat(destProperties["Building Quality"]) || 0;
                 const scorecard = parseFloat(destProperties["Scorecard"]) || 0;
+                const utilization = parseFloat(destProperties["Utilization"]) || 0;
 
-                // ✅ Normalized scoring with better handling of edge cases
+                // Lower Building Quality (BuildingTreshhold) is better
+                const qualityScore = maxQuality > 0 ? (1 - (quality / maxQuality)) : 0; // Lower is better
                 const distanceScore = maxDistance > 0 ? (1 - (distance / maxDistance)) : 0; // Closer is better
-                const enrollmentScore = maxEnrollment > 0 ? (1 - (enrollment / maxEnrollment)) : 0; // Lower enrollment is better
-                const qualityScore = maxQuality > 0 ? (quality / maxQuality) : 0; // Higher quality is better
-                const scorecardScore = maxScorecard > 0 ? (scorecard / maxScorecard) : 0; // Higher scorecard is better
+                const enrollmentScore = maxUtilization > 0 ? (utilization / maxUtilization) : 0; // Higher utilization is better
+                // Lower scorecard is better, but 1 is best and 5 is worst
+                // Normalize so that 1 gets highest score, 5 gets lowest
+                let scorecardScore = 0;
+                if (maxScorecard > minScorecard) {
+                  scorecardScore = (maxScorecard - scorecard) / (maxScorecard - minScorecard);
+                } else {
+                  scorecardScore = 1; // If all scorecards are the same
+                }
 
                 const score =
                   (weightDistance * distanceScore) +
@@ -961,9 +1084,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   (weightScorecard * scorecardScore);
 
                 // Debug logging for first few choices
-                if (student.StudentID === studentsToAssign[0].StudentID && choices.indexOf(d) < 3) {
-                  console.log(`🏫 ${destName}: Distance=${distance}(${distanceScore.toFixed(3)}), Enrollment=${enrollment}(${enrollmentScore.toFixed(3)}), Quality=${quality}(${qualityScore.toFixed(3)}), Scorecard=${scorecard}(${scorecardScore.toFixed(3)}), Total=${score.toFixed(3)}`);
-                }
+                console.log(`🏫 ${destName}: Student=${student.StudentID}, Distance=${distance}(${distanceScore.toFixed(3)}), Utilization=${(utilization * 100).toFixed(1)}%(${enrollmentScore.toFixed(3)}), Quality=${quality}(${qualityScore.toFixed(3)}), Scorecard=${scorecard}(${scorecardScore.toFixed(3)}), Total=${score.toFixed(3)}`);
 
                 if (score > bestScore) {
                   bestScore = score;
@@ -973,6 +1094,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (bestSchool) {
                 finalAssignments[student.StudentID] = bestSchool;
+                // ✅ Increment assigned count for the chosen school
+                assignedCounts[normalize(bestSchool)]++;
             }
             
             // ✅ Update progress
@@ -1236,10 +1359,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function sendSliderData() {
       const thresholds = {
-        utilization: parseFloat(document.getElementById("utilSlider").value),
-        utilizationHigh: parseFloat(document.getElementById("utilHighSlider").value),
-        enrollmentGrowth: parseFloat(document.getElementById("growthSlider").value),
-        projectedUtilization: parseFloat(document.getElementById("projUtilSlider").value),
+        utilization: parseFloat(document.getElementById("utilSlider").value)/100,
+        utilizationHigh: parseFloat(document.getElementById("utilHighSlider").value)/100,
+        enrollmentGrowth: parseFloat(document.getElementById("growthSlider").value)/100,
+        projectedUtilization: parseFloat(document.getElementById("projUtilSlider").value)/100,
         distanceUnderutilized: parseFloat(document.getElementById("distSlider").value),
         buildingThreshold: parseFloat(document.getElementById("buildSlider").value),
         adequateProgramsMin: parseInt(document.getElementById("progSlider").value, 10),
