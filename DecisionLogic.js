@@ -238,6 +238,29 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     summaryDiv.innerHTML = results.summaryHTML;
+
+    // Add Download CSV link
+    if (results.assignments && Object.keys(results.assignments).length > 0) {
+      const downloadBtn = document.createElement('button');
+      downloadBtn.textContent = 'Download CSV';
+      downloadBtn.style = 'margin-top:16px;padding:8px 18px;background:#007cbf;color:white;border:none;border-radius:4px;cursor:pointer;';
+      downloadBtn.onclick = function() {
+        const rows = [['StudentID', 'Assigned School', 'Original School']];
+        for (const [studentId, assignedSchool] of Object.entries(results.assignments)) {
+          rows.push([studentId, assignedSchool, results.selectedSchoolName]);
+        }
+        const csvContent = rows.map(r => r.map(x => '"' + String(x).replace(/"/g, '""') + '"').join(',')).join('\r\n');
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'assignment_results.csv';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+      };
+      summaryDiv.appendChild(downloadBtn);
+    }
   }
 
   function renderEnrollmentChart(chartData) {
