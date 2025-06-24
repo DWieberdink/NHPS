@@ -32,6 +32,19 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Focus on password input when popup loads
   passwordInput.focus();
+
+  // Auto-open "School Decision Evaluation: Results" when "School Decision Evaluation" is opened
+  const decisionInputPanel = document.getElementById('decision-input-panel');
+  const decisionOutputPanel = document.getElementById('decision-output-panel');
+  
+  if (decisionInputPanel && decisionOutputPanel) {
+    decisionInputPanel.addEventListener('toggle', function() {
+      if (this.open) {
+        // When the input panel opens, also open the results panel
+        decisionOutputPanel.open = true;
+      }
+    });
+  }
 });
 
 const map = new mapboxgl.Map({
@@ -621,10 +634,10 @@ map.on('load', () => {
   }
 
   // Add event listeners for all toggle buttons
-  toggleMapFlowchartMap.addEventListener('click', switchToFlowchart);
+  toggleMapFlowchartMap.addEventListener('click', switchToMap);
   toggleMapFlowchartFlowchart.addEventListener('click', switchToFlowchart);
   toggleMapFlowchartMap2.addEventListener('click', switchToMap);
-  toggleMapFlowchartFlowchart2.addEventListener('click', switchToMap);
+  toggleMapFlowchartFlowchart2.addEventListener('click', switchToFlowchart);
 
   function initializeFlowchart() {
     console.log("🎯 Initializing flowchart...");
@@ -1188,8 +1201,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <th style="border:1px solid #ccc;padding:6px;text-align:left;"># Students</th></tr>
                     </thead><tbody>`;
         for (const [school, count] of sortedSummary) {
-            output += `<tr><td style="border:1px solid #ccc;padding:6px;">${school}</td>
+            output += `<tr><td class="truncate-cell" data-tooltip="${school}">${school}</td>
                     <td style="border:1px solid #ccc;padding:6px;text-align:center;">${count}</td></tr>`;
+        //  output += `<tr><td class=\"truncate-cell\">${school}</td>
+                // <td style=\"border:1px solid #ccc;padding:6px;text-align:center;\">${count}</td></tr>`;
         }
         output += `</tbody></table>`;
         
@@ -1258,6 +1273,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // ✅ Hide the modal when assignment completes
         hideModal();
         console.log("✅ Assignment process completed successfully!");
+
+        // Open the Model Output: Impact Analysis section
+        const scenarioOutputPanel = document.getElementById('scenario-output-panel');
+        if (scenarioOutputPanel) {
+          scenarioOutputPanel.open = true;
+        }
 
     } catch (error) {
         console.error('❌ Error in assignment process:', error);

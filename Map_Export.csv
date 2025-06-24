@@ -1,10 +1,11 @@
 Building Name,School Level,Latitude,Longitude,Capacity,Enrollment,Available Seats,BuildingScore
+Augusta Lewis Troup School,Elementary and K-8 Schools,41.313256,-72.9422382,552,300,252,1.75297619
 Barack H. Obama Magnet University School,Elementary and K-8 Schools,41.32899609,-72.95416394,476,343,133,0.089285714
 Barnard Environment Studies Interdistrict Magnet School,Elementary and K-8 Schools,41.3096543,-72.9524168,673,496,177,1.541666667
 Benjamin Jepson Magnet,Elementary and K-8 Schools,41.2992489,-72.8867215,540,483,57,1.782738095
 Betsy Ross Arts and Design Academy,Middle School,41.2891784,-72.9342738,711.45,348,363.45,2.044642857
 Bishop Woods Architecture & Design Magnet,Elementary and K-8 Schools,41.3262779,-72.8668955,490,408,82,1.556547619
-Brennan Rogers School of Communication and Media ,Elementary and K-8 Schools,41.344398,-72.9588302,273,203,70,1.87202381
+Brennan Rogers School of Communication and Media,Elementary and K-8 Schools,41.344398,-72.9588302,273,203,70,1.87202381
 Celentano Biotech Health & Medical Magnet,Elementary and K-8 Schools,41.3245332,-72.921934,540,328,212,1.75
 Clemente Leadership Academy,Elementary and K-8 Schools,41.2967749,-72.936413,650,434,216,1.94047619
 Clinton Avenue School,Elementary and K-8 Schools,41.3187495,-72.8919138,676,446,230,1.964285714
@@ -24,8 +25,8 @@ James Hillhouse High School,High School,41.3214517,-72.9404057,1615,1124,491,2.0
 John C. Daniels School of International Communication,Elementary and K-8 Schools,41.3006112,-72.9384062,560,522,38,1.758928571
 John S. Martinez Sea & Sky STEM Magnet School,Elementary and K-8 Schools,41.3052219,-72.9033854,540,486,54,1.87202381
 King Robinson Interdistrict Magnet School,Elementary and K-8 Schools,41.32927494,-72.94198552,520,412,108,1.916666667
-LW Beecher Museum School of Arts & Sciences Interdistrict Magnet,Elementary and K-8 Schools,41.325913,-72.9534499,560,462,98,1.776785714
 Lincoln Bassett Community School,Elementary and K-8 Schools,41.3303694,-72.9313439,521,236,285,2.43452381
+LW Beecher Museum School of Arts & Sciences Interdistrict Magnet,Elementary and K-8 Schools,41.325913,-72.9534499,560,462,98,1.776785714
 "Mauro Sheridan Science, Technology & Communications School",Elementary and K-8 Schools,41.3275807,-72.9658555,673,482,191,1.744047619
 Metropolitan Business Academy,High School,41.30109589,-72.91953259,619.65,380,239.65,1.25
 Nathan Hale School,Elementary and K-8 Schools,41.2697141,-72.8975076,604,506,98,1.892857143
@@ -33,7 +34,6 @@ New Haven Academy Magnet,High School,41.31313672,-72.91885315,481.95,321,160.95,
 Riverside Academy,High School,41.28556749,-72.9292969,229.5,78,151.5,1.523809524
 Ross Woodward Classical Studies Magnet School,Elementary and K-8 Schools,41.3236629,-72.8780599,859,562,297,1.678571429
 Sound School,Sounds School,41.28195234,-72.92864495,619.65,322,297.65,2.066666667
-Augusta Lewis Troup School,Elementary and K-8 Schools,41.313256,-72.9422382,552,300,252,1.75297619
 Truman School,Elementary and K-8 Schools,41.2928811,-72.9410789,655,460,195,1.800595238
 Wexler Grant School,Elementary and K-8 Schools,41.3193433,-72.9308938,490,194,296,2.157738095
 Wilbur Cross High School,High School,41.324718,-72.9079853,1784.15,1742,42.15,1.866071429

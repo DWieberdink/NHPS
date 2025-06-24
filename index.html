@@ -194,6 +194,22 @@
       border-bottom-left-radius: 0;
       border-bottom-right-radius: 0;
     }
+    
+    /* Move triangle right and question mark left for specific sections */
+    #decision-input-panel > summary.custom-summary {
+      padding-left: 0.6em; 
+    }
+    #decision-input-panel .help-icon {
+      margin-left: -30px; 
+    }
+    
+    #scenario-input-panel > summary.custom-summary {
+      padding-left: 0.6em; 
+    }
+    #scenario-input-panel .help-icon {
+      margin-left: -30px; 
+    }
+    
     .nested-details {
       margin-left: 1rem;
       border: none;
@@ -248,7 +264,7 @@
     #main-flowchart-container {
       flex-grow: 1;
       position: relative;
-      background: #fdfdfd; /* A very light grey, almost white */
+      background: #fdfdfd; 
       display: none;
       flex-direction: column; /* Arrange header and SVG vertically */
       padding: 1rem; /* Give some spacing around the content */
@@ -419,17 +435,37 @@
 
     /* Custom colors for Map/Flowchart toggle */
     .toggle-buttons.map-flowchart-toggle {
-      border-color: #28a745;
+      border-color: #007cbf;
     }
     .toggle-buttons.map-flowchart-toggle button {
-      color: #28a745;
+      color: #007cbf;
+      background-color: #fff;
+      transition: background 0.2s, color 0.2s;
     }
-    .toggle-buttons.map-flowchart-toggle button.active {
-      background-color: #28a745;
-      color: white;
+    .toggle-buttons.map-flowchart-toggle button#toggleMapFlowchartMap,
+    .toggle-buttons.map-flowchart-toggle button#toggleMapFlowchartMap2 {
+      background-color: #fff5f5;
+      color: #c0392b;
+    }
+    .toggle-buttons.map-flowchart-toggle button#toggleMapFlowchartMap.active,
+    .toggle-buttons.map-flowchart-toggle button#toggleMapFlowchartMap2.active {
+      background-color: #fff5f5;
+      color: #c0392b;
+      font-weight: bold;
+    }
+    .toggle-buttons.map-flowchart-toggle button#toggleMapFlowchartFlowchart,
+    .toggle-buttons.map-flowchart-toggle button#toggleMapFlowchartFlowchart2 {
+      background-color: #fff;
+      color: #007cbf;
+    }
+    .toggle-buttons.map-flowchart-toggle button#toggleMapFlowchartFlowchart.active,
+    .toggle-buttons.map-flowchart-toggle button#toggleMapFlowchartFlowchart2.active {
+      background-color: #007cbf;
+      color: #fff;
+      font-weight: bold;
     }
     .toggle-buttons.map-flowchart-toggle button:hover {
-      background-color: #f0fff0;
+      filter: brightness(0.97);
     }
 
     /* Style for the "How to use" section */
@@ -590,20 +626,7 @@
     .decision-panel-body #results { margin-top: 1rem; }
     .decision-panel-body tfoot tr th { font-weight: bold; background-color: #e8e8e8; }
     .decision-panel-body details { margin-top: 1rem; border: 1px solid #ddd; border-radius: 4px; padding: 0; }
-    .decision-panel-body details summary {
-      font-weight: bold;
-      cursor: pointer;
-      padding: 0.5rem;
-      margin: 0;
-      background-color: #f7f7f7;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-    }
-    .decision-panel-body details summary strong {
-      display: flex;
-      font-weight: bold;
-    }
+    .decision-panel-body details summary { font-weight: bold; cursor: pointer; padding: 0.5rem; margin: 0; background-color: #f7f7f7; border-radius: 4px; }
     .decision-panel-body details[open] > summary { border-bottom: 1px solid #ddd; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
     .decision-panel-body #summary table { margin-top: 0; border: none; }
     .decision-panel-body #summary th { background-color: #f7f7f7; }
@@ -611,6 +634,7 @@
     .truncate-cell { max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; }
     .truncate-cell:hover { overflow: visible; white-space: normal; height: auto; }
     .truncate-cell:hover::after { content: attr(data-tooltip); position: absolute; left: 0; top: 100%; background-color: #333; color: white; padding: 5px; border-radius: 4px; z-index: 100; white-space: normal; width: max-content; max-width: 300px; }
+    /* .truncate-cell:hover::after { content: none !important; } */
     .decision-panel-body th.sortable-header { cursor: pointer; position: relative; }
     .decision-panel-body th.sortable-header:hover { background-color: #e2e2e2; }
     .decision-panel-body th.sortable-header::after { content: ''; position: absolute; right: 8px; top: 50%; margin-top: -8px; border-left: 5px solid transparent; border-right: 5px solid transparent; }
@@ -667,7 +691,7 @@
   <!-- Welcome Popup -->
   <div id="welcomePopup" class="welcome-popup-overlay">
     <div class="welcome-popup">
-      <h2>NHPS Facility Planning Tool</h2>
+      <h2>New Haven Public Schools<br>Facility Planning Tool</h2>
       <p>This tool is intended to support NHPS facility planning initiatives. Users can explore conditions data and model school choice scenarios to better understand the potential impact of facility decisions.</p>
       <input type="password" id="passwordInput" class="password-input" placeholder="Enter password" />
       <button id="enterBtn" class="enter-btn">Enter</button>
@@ -688,21 +712,21 @@
     document.getElementById('controlIframe').src = url;
   }
   </script>
-  
 
   <details id="decision-input-panel">
-    <summary>
-      <span style="display: flex; align-items: center; gap: 8px; width: 100%; justify-content: space-between;">
+      <summary class="custom-summary">
+  <span class="summary-text">
         <strong>School Decision Evaluation</strong>
-        <span style="position: relative; display: flex; align-items: center;">
-          <span id="decision-help-icon" style="display:inline-block;vertical-align:middle;cursor:pointer;">
-            <svg width="18" height="18" viewBox="0 0 20 20" style="border-radius:50%;background:#007cbf;" xmlns="http://www.w3.org/2000/svg">
+        </span>
+          <span class = "help-container">
+          <span id = "decision-help-icon" class = "help-icon">
+            <svg width="18" height="18" viewBox="0 0 20 20"  xmlns="http://www.w3.org/2000/svg">
               <circle cx="10" cy="10" r="10" fill="#007cbf"/>
               <text x="10" y="15" text-anchor="middle" font-size="13" font-family="Arial" fill="white" font-weight="bold">?</text>
             </svg>
           </span>
-          <span id="decision-help-tooltip" style="display:none;position:absolute;z-index:1000;background:#fff;color:#222;border:1px solid #007cbf;border-radius:6px;padding:10px;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-size:14px;max-width:400px;right:0;top:28px;">
-            Adjust sliders to see how thresholds change decision evaluations shown on the flow chart.
+          <span id="decision-help-tooltip" class ="tooltip">
+           Flow chart on center console illustrates how different factors affect decision evaluations.
           </span>
         </span>
       </span>
@@ -733,8 +757,23 @@
   </details>
 
   <details id="scenario-input-panel">
-    <summary><strong>Scenario Modeling</strong></summary>
-    <div style="padding: 10px 0;">
+      <summary class="custom-summary">
+  <span class="summary-text">
+        <strong>Scenario Modeling</strong>
+        </span>
+        <span class= "help-container">
+          <span id="scenario-help-icon" class= "help-icon">
+            <svg width="18" height="18" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" padding= 20px>
+              <circle cx="10" cy="10" r="10" fill="#007cbf"/>
+              <text x="10" y="15" text-anchor="middle" font-size="13" font-family="Arial" fill="white" font-weight="bold">?</text>
+            </svg>
+          </span>
+          <span id="scenario-help-tooltip" class = "tooltip";>
+            Use this section to test and evaluate the impact of portfolio decisions. Adjust settings and run simulations to see scenario outcomes.
+          </span>
+        </span>
+      </summary>
+    <div class="details-content-wrapper" style="padding: 0.5rem;">
       <h4>Use this section to test and evaluate the impact of portfolio decisions. Users can manually assign student changes or run a simulation model.</h4>
 
       <h3>Filter by Decision Type</h3>
@@ -889,13 +928,28 @@
   <!-- 👇 Flowchart Container - Centered with Flexbox -->
   <div id="main-flowchart-container">
       <div class="flowchart-header">
-        <div class="school-select-container">
+        <div class="school-select-container" style="display: flex; align-items: center; gap: 8px;">
           <label for="mainFlowchartSchoolSelect">Select School:</label>
           <select id="mainFlowchartSchoolSelect">
             <option value="">-- Select School --</option>
           </select>
+             <span style="position: relative; display: flex; align-items: center;">
+            <span id="flowchart-help-icon" style="display:inline-block;vertical-align:middle;cursor:pointer;">
+              <svg width="18" height="18" viewBox="0 0 20 20" style="border-radius:50%;background:#007cbf;" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="10" cy="10" r="10" fill="#007cbf"/>
+                <text x="10" y="15" text-anchor="middle" font-size="13" font-family="Arial" fill="white" font-weight="bold">?</text>
+              </svg>
+            </span>
+            <span id="flowchart-help-tooltip" style="display:none;position:absolute;z-index:1000;background:#fff;color:#222;border:1px solid #007cbf;border-radius:6px;padding:10px;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-size:14px;width:300px;right:0;top:28px;font-weight:bold;">
+              Select a school to view its decision flowchart. The flowchart visualizes how the evaluation criteria lead to the recommended action for the selected school.
+            </span>
+          </span>
         </div>
-        <button id="flowchart-sidebar-toggle" class="sidebar-toggle-btn">Toggle Panel</button>
+        <div class="sidebar-toggle-group" id="flowchart-toggle-group" style="margin-left: 16px;">
+          <button id="flowchart-sidebar-wide-btn" class="sidebar-toggle-btn">Wide</button>
+          <button id="flowchart-sidebar-normal-btn" class="sidebar-toggle-btn active">Normal</button>
+          <button id="flowchart-sidebar-hidden-btn" class="sidebar-toggle-btn">Hidden</button>
+        </div>
       </div>
       
       <div class="flowchart-svg-container">
@@ -926,13 +980,25 @@
       <!-- Content from DecisionPanel.html -->
       <div id="decision-panel-content" class="decision-panel-body">
         <div id="main">
-          <details id="decision-output-panel" open>
-            <summary>
-              <span style="display: flex; align-items: center; width: 100%;">
-                <strong>School Decision Evaluation: Results</strong>
-                <!-- Optional: Add a help icon or other elements here if needed -->
-              </span>
-            </summary>
+          <details id="decision-output-panel">
+
+        <summary class="custom-summary">
+        <span class="summary-text">
+           <strong>School Decision Evaluation: Results</strong>
+         </span>
+         <span class="help-container">
+         <span id="decision-results-help-icon" class="help-icon">
+           <svg width="18" height="18" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="10" cy="10" r="10" fill="#007cbf"/>
+        <text x="10" y="15" text-anchor="middle" font-size="13" font-family="Arial" fill="white" font-weight="bold">?</text>
+           </svg>
+        </span>
+       <span id="decision-results-help-tooltip" class="tooltip";>
+       This section shows the results of the school decision evaluation based on your selected criteria.
+        </span>
+         </span>
+        </summary>
+
             <div class="details-content-wrapper" style="padding: 0.5rem;">
               <details open>
                 <summary><strong>Summary Table</strong></summary>
@@ -948,8 +1014,24 @@
               </details>
             </div>
           </details>
-          <details id="scenario-output-panel" open>
-            <summary><strong>Model Output: Impact Analysis</strong></summary>
+          <details id="scenario-output-panel">
+                   <summary class="custom-summary">
+  <span class="summary-text">
+              <span style="display: flex; align-items: center; gap: 8px; width: 100%; justify-content: space-between;">
+                <strong>Model Output: Impact Analysis</strong>
+                <span style="position: relative; display: flex; align-items: center;">
+                  <span id="model-output-help-icon" style="display:inline-block;vertical-align:middle;cursor:pointer;">
+                    <svg width="18" height="18" viewBox="0 0 20 20" style="border-radius:50%;background:#007cbf;" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="10" cy="10" r="10" fill="#007cbf"/>
+                      <text x="10" y="15" text-anchor="middle" font-size="13" font-family="Arial" fill="white" font-weight="bold">?</text>
+                    </svg>
+                  </span>
+                  <span id="model-output-help-tooltip" style="display:none;position:absolute;z-index:1000;background:#fff;color:#222;border:1px solid #007cbf;border-radius:6px;padding:10px;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-size:14px;width:300px;right:0;top:28px;">
+                    This section displays the impact analysis of your scenario, including enrollment, utilization, and travel distance changes.
+                  </span>
+                </span>
+              </span>
+            </summary>
             <div class="details-content-wrapper" style="padding: 1rem;">
                 <h3>Enrollment and Utilization Impact</h3>
                 <canvas id="assignmentChart" width="100%" height="180"></canvas>
@@ -1015,6 +1097,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var helpTooltip = document.getElementById('decision-help-tooltip');
   if (helpIcon && helpTooltip) {
     helpIcon.addEventListener('click', function(e) {
+      e.preventDefault();
       e.stopPropagation();
       if (helpTooltip.style.display === 'none' || helpTooltip.style.display === '') {
         helpTooltip.style.display = 'block';
@@ -1022,15 +1105,158 @@ document.addEventListener('DOMContentLoaded', function() {
         helpTooltip.style.display = 'none';
       }
     });
-    // Hide tooltip when clicking elsewhere
     document.addEventListener('click', function(e) {
       if (helpTooltip.style.display === 'block' && !helpTooltip.contains(e.target) && e.target !== helpIcon) {
         helpTooltip.style.display = 'none';
       }
     });
   }
+   // Scenario Modeling help icon logic
+  var scenarioHelpIcon = document.getElementById('scenario-help-icon');
+  var scenarioHelpTooltip = document.getElementById('scenario-help-tooltip');
+  if (scenarioHelpIcon && scenarioHelpTooltip) {
+    scenarioHelpIcon.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (scenarioHelpTooltip.style.display === 'none' || scenarioHelpTooltip.style.display === '') {
+        scenarioHelpTooltip.style.display = 'block';
+      } else {
+        scenarioHelpTooltip.style.display = 'none';
+      }
+    });
+    document.addEventListener('click', function(e) {
+      if (scenarioHelpTooltip.style.display === 'block' && !scenarioHelpTooltip.contains(e.target) && e.target !== scenarioHelpIcon) {
+        scenarioHelpTooltip.style.display = 'none';
+      }
+    });
+  }
+  // Decision Results help icon logic
+  var decisionResultsHelpIcon = document.getElementById('decision-results-help-icon');
+  var decisionResultsHelpTooltip = document.getElementById('decision-results-help-tooltip');
+  if (decisionResultsHelpIcon && decisionResultsHelpTooltip) {
+    decisionResultsHelpIcon.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (decisionResultsHelpTooltip.style.display === 'none' || decisionResultsHelpTooltip.style.display === '') {
+        decisionResultsHelpTooltip.style.display = 'block';
+      } else {
+        decisionResultsHelpTooltip.style.display = 'none';
+      }
+    });
+    document.addEventListener('click', function(e) {
+      if (decisionResultsHelpTooltip.style.display === 'block' && !decisionResultsHelpTooltip.contains(e.target) && e.target !== decisionResultsHelpIcon) {
+        decisionResultsHelpTooltip.style.display = 'none';
+      }
+    });
+  }
+  // Model Output help icon logic
+  var modelOutputHelpIcon = document.getElementById('model-output-help-icon');
+  var modelOutputHelpTooltip = document.getElementById('model-output-help-tooltip');
+  if (modelOutputHelpIcon && modelOutputHelpTooltip) {
+    modelOutputHelpIcon.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (modelOutputHelpTooltip.style.display === 'none' || modelOutputHelpTooltip.style.display === '') {
+        modelOutputHelpTooltip.style.display = 'block';
+      } else {
+        modelOutputHelpTooltip.style.display = 'none';
+      }
+    });
+    document.addEventListener('click', function(e) {
+      if (modelOutputHelpTooltip.style.display === 'block' && !modelOutputHelpTooltip.contains(e.target) && e.target !== modelOutputHelpIcon) {
+        modelOutputHelpTooltip.style.display = 'none';
+      }
+    });
+  }
+  // Flowchart help icon logicp
+  var flowchartHelpIcon = document.getElementById('flowchart-help-icon');
+  var flowchartHelpTooltip = document.getElementById('flowchart-help-tooltip');
+  if (flowchartHelpIcon && flowchartHelpTooltip) {
+    flowchartHelpIcon.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (flowchartHelpTooltip.style.display === 'none' || flowchartHelpTooltip.style.display === '') {
+        flowchartHelpTooltip.style.display = 'block';
+      } else {
+        flowchartHelpTooltip.style.display = 'none';
+      }
+    });
+    document.addEventListener('click', function(e) {
+      if (flowchartHelpTooltip.style.display === 'block' && !flowchartHelpTooltip.contains(e.target) && e.target !== flowchartHelpIcon) {
+        flowchartHelpTooltip.style.display = 'none';
+      }
+    });
+  }
 });
 </script>
+
+
+<style>
+/* Make the summary a horizontal flex container */
+.custom-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  position: relative;
+  list-style: none;
+  padding: 0.5em 0;
+}
+
+/* Add triangle arrow before text */
+.custom-summary::before {
+  content: '▶';
+  transition: transform 0.2s ease;
+  font-size: 0.8em;
+  margin-right: 6px;
+}
+
+/* Rotate arrow when open */
+details[open] > .custom-summary::before {
+  content: '▼';
+}
+
+/* Wrap the main header text */
+.summary-text {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+}
+
+/* Position help icon & tooltip to the far right */
+.help-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+/* Icon style */
+.help-icon {
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Tooltip style */
+.tooltip {
+  display: none;
+  position: absolute;
+  z-index: 1000;
+  background: #fff;
+  color: #222;
+  border: 1px solid #007cbf;
+  border-radius: 6px;
+  padding: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  font-size: 14px;
+  width: 300px;
+  right: 0;
+  top: 28px;
+}
+</style>
+
+
 
 </body>
 </html>

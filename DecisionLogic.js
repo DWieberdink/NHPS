@@ -283,8 +283,21 @@ document.addEventListener("DOMContentLoaded", () => {
       options: {
         responsive: true,
         indexAxis: 'y',
-        layout: { padding: { top: 0, bottom: 0 } },
-        scales: { x: { stacked: true, title: { display: true, text: 'Students' } }, y: { stacked: true } },
+        layout: { padding: { top: 0, bottom: 0, left: 20 } },
+        scales: {
+          x: { stacked: true, title: { display: true, text: 'Students' } },
+          y: {
+            stacked: true,
+            position: 'left',
+            ticks: {
+              align: 'end',
+              padding: 10,
+              maxWidth: 120,
+              overflow: 'truncate',
+              clip: false
+            }
+          }
+        },
         plugins: { legend: { position: 'bottom' } }
       }
     });
