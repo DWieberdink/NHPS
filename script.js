@@ -14,7 +14,14 @@ document.addEventListener('DOMContentLoaded', function() {
       errorMessage.style.display = 'none';
       passwordInput.value = '';
       // Start onboarding walkthrough after successful login
-      startOnboardingWalkthrough();
+      // Wait for DOM to be fully ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          setTimeout(startOnboardingWalkthrough, 500);
+        });
+      } else {
+        setTimeout(startOnboardingWalkthrough, 500);
+      }
     } else {
       errorMessage.style.display = 'block';
       passwordInput.value = '';
@@ -34,6 +41,23 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Focus on password input when popup loads
   passwordInput.focus();
+
+  // Add manual tour trigger button
+  const tourButton = document.createElement('button');
+  tourButton.textContent = '📋 Start Tour';
+  tourButton.style.position = 'fixed';
+  tourButton.style.top = '10px';
+  tourButton.style.right = '10px';
+  tourButton.style.zIndex = '1000';
+  tourButton.style.background = '#007cbf';
+  tourButton.style.color = '#fff';
+  tourButton.style.border = 'none';
+  tourButton.style.borderRadius = '4px';
+  tourButton.style.padding = '8px 16px';
+  tourButton.style.fontSize = '14px';
+  tourButton.style.cursor = 'pointer';
+  tourButton.onclick = startOnboardingWalkthrough;
+  document.body.appendChild(tourButton);
 
   // Auto-open "School Decision Evaluation: Results" when "School Decision Evaluation" is opened
   const decisionInputPanel = document.getElementById('decision-input-panel');
@@ -1555,6 +1579,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
 // --- ONBOARDING WALKTHROUGH LOGIC ---
 function startOnboardingWalkthrough() {
+  console.log('🚀 Starting onboarding walkthrough...');
+  
   const steps = [
     {
       target: 'body',
@@ -1604,168 +1630,194 @@ function startOnboardingWalkthrough() {
   let popup = null;
 
   function showStep(stepIdx) {
-    // Remove previous overlay/popup
-    if (overlay) overlay.remove();
-    if (popup) popup.remove();
+    console.log(`📋 Showing step ${stepIdx}: ${steps[stepIdx].target}`);
+    
+    try {
+      // Remove previous overlay/popup
+      if (overlay) overlay.remove();
+      if (popup) popup.remove();
 
-    const step = steps[stepIdx];
-    let target = document.querySelector(step.target);
-    // Open dropdown <details> if the step is for a details section
-    const detailsIds = ['#decision-input-panel', '#scenario-input-panel', '#decision-output-panel', '#scenario-output-panel'];
-    if (detailsIds.includes(step.target) && target && !target.open) {
-      target.open = true;
-    }
-
-    // --- ADD THIS: If the step is the flowchart, switch to flowchart view ---
-    if (step.target === '#main-flowchart-container') {
-      // This is the flowchart step; show the flowchart view
-      const flowchartBtn = document.getElementById('toggleMapFlowchartFlowchart');
-      if (flowchartBtn && !flowchartBtn.classList.contains('active')) {
-        flowchartBtn.click();
+      const step = steps[stepIdx];
+      let target = document.querySelector(step.target);
+      
+      console.log(`🎯 Target element found:`, target);
+      
+      // Open dropdown <details> if the step is for a details section
+      const detailsIds = ['#decision-input-panel', '#scenario-input-panel', '#decision-output-panel', '#scenario-output-panel'];
+      if (detailsIds.includes(step.target) && target && !target.open) {
+        console.log(`📂 Opening details element: ${step.target}`);
+        target.open = true;
       }
-    }
 
-    // For scenario/model output, wait for the section to open before highlighting
-    if ((step.target === '#scenario-input-panel' || step.target === '#scenario-output-panel') && target) {
-      // Scroll into view
-      target.scrollIntoView({behavior: 'smooth', block: 'center'});
-      setTimeout(() => {
-        drawHighlight(target, step, stepIdx);
-      }, 200);
-      // Draw popup after highlight
-      setTimeout(() => {
-        drawPopup(target, step, stepIdx);
-      }, 210);
-      return;
-    }
+      // --- ADD THIS: If the step is the flowchart, switch to flowchart view ---
+      if (step.target === '#main-flowchart-container') {
+        // This is the flowchart step; show the flowchart view
+        const flowchartBtn = document.getElementById('toggleMapFlowchartFlowchart');
+        if (flowchartBtn && !flowchartBtn.classList.contains('active')) {
+          console.log('🔄 Switching to flowchart view');
+          flowchartBtn.click();
+        }
+      }
 
-    if (!target) {
+      // For scenario/model output, wait for the section to open before highlighting
+      if ((step.target === '#scenario-input-panel' || step.target === '#scenario-output-panel') && target) {
+        // Scroll into view
+        target.scrollIntoView({behavior: 'smooth', block: 'center'});
+        setTimeout(() => {
+          drawHighlight(target, step, stepIdx);
+        }, 200);
+        // Draw popup after highlight
+        setTimeout(() => {
+          drawPopup(target, step, stepIdx);
+        }, 210);
+        return;
+      }
+
+      if (!target) {
+        console.warn(`⚠️ Target element not found: ${step.target}, skipping to next step`);
+        nextStep();
+        return;
+      }
+
+      // Default: draw highlight and popup immediately
+      drawHighlight(target, step, stepIdx);
+      drawPopup(target, step, stepIdx);
+    } catch (error) {
+      console.error('❌ Error in showStep:', error);
+      // Continue to next step on error
       nextStep();
-      return;
     }
-
-    // Default: draw highlight and popup immediately
-    drawHighlight(target, step, stepIdx);
-    drawPopup(target, step, stepIdx);
   }
 
   function drawHighlight(target, step, stepIdx) {
-    // Create overlay
-    overlay = document.createElement('div');
-    overlay.style.position = 'fixed';
-    overlay.style.top = '0';
-    overlay.style.left = '0';
-    overlay.style.width = '100vw';
-    overlay.style.height = '100vh';
-    overlay.style.background = 'rgba(0,0,0,0.1)';
-    overlay.style.zIndex = '20000';
-    overlay.style.pointerEvents = 'auto';
-    document.body.appendChild(overlay);
+    try {
+      console.log(`🎨 Drawing highlight for step ${stepIdx}`);
+      
+      // Create overlay
+      overlay = document.createElement('div');
+      overlay.style.position = 'fixed';
+      overlay.style.top = '0';
+      overlay.style.left = '0';
+      overlay.style.width = '100vw';
+      overlay.style.height = '100vh';
+      overlay.style.background = 'rgba(0,0,0,0.1)';
+      overlay.style.zIndex = '20000';
+      overlay.style.pointerEvents = 'auto';
+      document.body.appendChild(overlay);
 
-    // Highlight target (skip for intro step)
-    let rect = {left: 0, top: 0, width: 0, height: 0};
-    let highlight = null;
-    if (!step.isIntro) {
-      rect = target.getBoundingClientRect();
-      highlight = document.createElement('div');
-      highlight.style.position = 'fixed';
-      highlight.style.left = rect.left + 'px';
-      highlight.style.top = rect.top + 'px';
-      highlight.style.width = rect.width + 'px';
-      highlight.style.height = rect.height + 'px';
-      highlight.style.border = '3px solid #FFD600';
-      highlight.style.borderRadius = '10px';
-      highlight.style.boxShadow = '0 0 0 9999px rgba(0,0,0,0.7)';
-      highlight.style.zIndex = '20001';
-      highlight.style.pointerEvents = 'none';
-      document.body.appendChild(highlight);
-      overlay.appendChild(highlight);
+      // Highlight target (skip for intro step)
+      let rect = {left: 0, top: 0, width: 0, height: 0};
+      let highlight = null;
+      if (!step.isIntro) {
+        rect = target.getBoundingClientRect();
+        highlight = document.createElement('div');
+        highlight.style.position = 'fixed';
+        highlight.style.left = rect.left + 'px';
+        highlight.style.top = rect.top + 'px';
+        highlight.style.width = rect.width + 'px';
+        highlight.style.height = rect.height + 'px';
+        highlight.style.border = '3px solid #FFD600';
+        highlight.style.borderRadius = '10px';
+        highlight.style.boxShadow = '0 0 0 9999px rgba(0,0,0,0.7)';
+        highlight.style.zIndex = '20001';
+        highlight.style.pointerEvents = 'none';
+        document.body.appendChild(highlight);
+        overlay.appendChild(highlight);
+      }
+    } catch (error) {
+      console.error('❌ Error in drawHighlight:', error);
     }
   }
 
   function drawPopup(target, step, stepIdx) {
-    // Create popup
-    popup = document.createElement('div');
-    popup.style.position = 'fixed';
-    if (step.isIntro) {
-      popup.style.left = '50%';
-      popup.style.top = '20%';
-      popup.style.transform = 'translate(-50%, 0)';
-    } else if (step.target === '#decision-output-panel' || step.target === '#scenario-output-panel') {
-      // Position to the left of the panel, with a larger gap
-      const rect = target.getBoundingClientRect();
-      const popupWidth = 340;
-      const gap = 100; // Consistent gap for both panels
-      popup.style.left = (rect.left - popupWidth - gap > 20 ? rect.left - popupWidth - gap : 20) + 'px';
-      popup.style.top = rect.top + 'px';
-      popup.style.right = '';
-      popup.style.transform = '';
-    } else {
-      const rect = target.getBoundingClientRect();
-      popup.style.left = (rect.left + rect.width + 20) + 'px';
-      popup.style.top = rect.top + 'px';
-      popup.style.transform = '';
+    try {
+      console.log(`💬 Drawing popup for step ${stepIdx}`);
+      
+      // Create popup
+      popup = document.createElement('div');
+      popup.style.position = 'fixed';
+      if (step.isIntro) {
+        popup.style.left = '50%';
+        popup.style.top = '20%';
+        popup.style.transform = 'translate(-50%, 0)';
+      } else if (step.target === '#decision-output-panel' || step.target === '#scenario-output-panel') {
+        // Position to the left of the panel, with a larger gap
+        const rect = target.getBoundingClientRect();
+        const popupWidth = 340;
+        const gap = 100; // Consistent gap for both panels
+        popup.style.left = (rect.left - popupWidth - gap > 20 ? rect.left - popupWidth - gap : 20) + 'px';
+        popup.style.top = rect.top + 'px';
+        popup.style.right = '';
+        popup.style.transform = '';
+      } else {
+        const rect = target.getBoundingClientRect();
+        popup.style.left = (rect.left + rect.width + 20) + 'px';
+        popup.style.top = rect.top + 'px';
+        popup.style.transform = '';
+      }
+      popup.style.background = '#fff';
+      popup.style.color = '#222';
+      popup.style.border = '2px solid #007cbf';
+      popup.style.borderRadius = '8px';
+      popup.style.boxShadow = '0 4px 24px rgba(0,0,0,0.2)';
+      popup.style.padding = '24px 32px';
+      popup.style.zIndex = '20002';
+      popup.style.maxWidth = '340px';
+      popup.style.fontSize = '16px';
+      popup.innerHTML = `<h3 style='margin-top:0;color:#007cbf;'>${step.title}</h3><p>${step.text}</p>`;
+      // Next/Close/Skip button(s)
+      if (step.isIntro) {
+        // Skip button
+        const skipBtn = document.createElement('button');
+        skipBtn.textContent = 'Skip';
+        skipBtn.style.marginTop = '18px';
+        skipBtn.style.background = '#e74c3c';
+        skipBtn.style.color = '#fff';
+        skipBtn.style.border = 'none';
+        skipBtn.style.borderRadius = '4px';
+        skipBtn.style.padding = '8px 20px';
+        skipBtn.style.fontSize = '16px';
+        skipBtn.style.cursor = 'pointer';
+        skipBtn.style.marginRight = '12px';
+        skipBtn.onclick = endWalkthrough;
+        popup.appendChild(skipBtn);
+        // Start button
+        const startBtn = document.createElement('button');
+        startBtn.textContent = 'Start Tour';
+        startBtn.style.marginTop = '18px';
+        startBtn.style.background = '#007cbf';
+        startBtn.style.color = '#fff';
+        startBtn.style.border = 'none';
+        startBtn.style.borderRadius = '4px';
+        startBtn.style.padding = '8px 20px';
+        startBtn.style.fontSize = '16px';
+        startBtn.style.cursor = 'pointer';
+        startBtn.onclick = nextStep;
+        popup.appendChild(startBtn);
+      } else {
+        const btn = document.createElement('button');
+        btn.textContent = (stepIdx === steps.length - 1) ? 'Finish' : 'Next';
+        btn.style.marginTop = '18px';
+        btn.style.background = '#007cbf';
+        btn.style.color = '#fff';
+        btn.style.border = 'none';
+        btn.style.borderRadius = '4px';
+        btn.style.padding = '8px 20px';
+        btn.style.fontSize = '16px';
+        btn.style.cursor = 'pointer';
+        btn.onclick = () => {
+          if (stepIdx === steps.length - 1) {
+            endWalkthrough();
+          } else {
+            nextStep();
+          }
+        };
+        popup.appendChild(btn);
+      }
+      document.body.appendChild(popup);
+    } catch (error) {
+      console.error('❌ Error in drawPopup:', error);
     }
-    popup.style.background = '#fff';
-    popup.style.color = '#222';
-    popup.style.border = '2px solid #007cbf';
-    popup.style.borderRadius = '8px';
-    popup.style.boxShadow = '0 4px 24px rgba(0,0,0,0.2)';
-    popup.style.padding = '24px 32px';
-    popup.style.zIndex = '20002';
-    popup.style.maxWidth = '340px';
-    popup.style.fontSize = '16px';
-    popup.innerHTML = `<h3 style='margin-top:0;color:#007cbf;'>${step.title}</h3><p>${step.text}</p>`;
-    // Next/Close/Skip button(s)
-    if (step.isIntro) {
-      // Skip button
-      const skipBtn = document.createElement('button');
-      skipBtn.textContent = 'Skip';
-      skipBtn.style.marginTop = '18px';
-      skipBtn.style.background = '#e74c3c';
-      skipBtn.style.color = '#fff';
-      skipBtn.style.border = 'none';
-      skipBtn.style.borderRadius = '4px';
-      skipBtn.style.padding = '8px 20px';
-      skipBtn.style.fontSize = '16px';
-      skipBtn.style.cursor = 'pointer';
-      skipBtn.style.marginRight = '12px';
-      skipBtn.onclick = endWalkthrough;
-      popup.appendChild(skipBtn);
-      // Start button
-      const startBtn = document.createElement('button');
-      startBtn.textContent = 'Start Tour';
-      startBtn.style.marginTop = '18px';
-      startBtn.style.background = '#007cbf';
-      startBtn.style.color = '#fff';
-      startBtn.style.border = 'none';
-      startBtn.style.borderRadius = '4px';
-      startBtn.style.padding = '8px 20px';
-      startBtn.style.fontSize = '16px';
-      startBtn.style.cursor = 'pointer';
-      startBtn.onclick = nextStep;
-      popup.appendChild(startBtn);
-    } else {
-      const btn = document.createElement('button');
-      btn.textContent = (stepIdx === steps.length - 1) ? 'Finish' : 'Next';
-      btn.style.marginTop = '18px';
-      btn.style.background = '#007cbf';
-      btn.style.color = '#fff';
-      btn.style.border = 'none';
-      btn.style.borderRadius = '4px';
-      btn.style.padding = '8px 20px';
-      btn.style.fontSize = '16px';
-      btn.style.cursor = 'pointer';
-      btn.onclick = () => {
-        if (stepIdx === steps.length - 1) {
-          endWalkthrough();
-        } else {
-          nextStep();
-        }
-      };
-      popup.appendChild(btn);
-    }
-    document.body.appendChild(popup);
   }
 
   function nextStep() {
@@ -1778,9 +1830,13 @@ function startOnboardingWalkthrough() {
   }
 
   function endWalkthrough() {
+    console.log('🏁 Ending walkthrough');
     if (overlay) overlay.remove();
     if (popup) popup.remove();
   }
 
-  showStep(currentStep);
+  // Add a small delay to ensure DOM is ready
+  setTimeout(() => {
+    showStep(currentStep);
+  }, 100);
 }
