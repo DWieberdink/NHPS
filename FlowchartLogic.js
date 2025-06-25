@@ -83,7 +83,7 @@ function initializeFlowchartData() {
 
     // Outcomes (shifted to the right a bit)
     //Sixth Row
-    { id: "5", label: "Building Investment", fx: 550, fy: 500 }, 
+    { id: "5", label: "Building Investment", fx: 600, fy: 500 }, 
     { id: "20", label: "School-Specific Evaluation", fx: -50, fy: 500},
 
     // Seventh Row 
@@ -145,11 +145,13 @@ function renderFlowchart() {
       const ellipseIds = ["1","4", "5", "2", "3", "20", "21"];
   
       if (ellipseIds.includes(d.id)) {
-        group.append("ellipse")
-          .attr("cx", 0)
-          .attr("cy", 0)
-          .attr("rx", 90)
-          .attr("ry", 40)
+        group.append("rect")
+          .attr("width", 150)
+          .attr("height", 65)
+          .attr("x", -75)
+          .attr("y", -32.5)
+          .attr("rx", 20)
+          .attr("ry", 20)
           .attr("class", "ellipse-node");
       } else {
         group.append("rect")
@@ -172,15 +174,19 @@ function renderFlowchart() {
       }
   
       group.append("foreignObject")
-        .attr("x", -80)
-        .attr("y", -10)
-        .attr("width", 160)
-        .attr("height", 35)
+        .attr("x", -75)
+        .attr("y", -32.5)
+        .attr("width", 150)
+        .attr("height", 65)
         .append("xhtml:div")
+        .style("display", "flex")
+        .style("align-items", "center")
+        .style("justify-content", "center")
+        .style("height", "100%")
+        .style("width", "100%")
         .style("font", "16px franklin-gothic")
         .style("text-align", "center")
         .style("word-wrap", "break-word")
-        .style("width", "100%")
         .text(text);
     });
 

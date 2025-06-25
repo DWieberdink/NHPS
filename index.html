@@ -250,7 +250,9 @@
     }
 
     /* Flowchart Styles */
-    .ellipse-node {fill: #fbdbdb;stroke: #ccc; stroke-width: 1.5;}
+    .ellipse-node {fill: #007cbf; stroke: #ccc; stroke-width: 1.5;}
+    .node rect.ellipse-node { fill: #007cbf; stroke: #ccc; stroke-width: 1.5; }
+    .node .ellipse-node + foreignObject div { color: #fff; }
     .node rect { fill: #fff; stroke: #999; stroke-width: 1.5px; }
     .node.highlight rect { fill: #ffeeba; stroke: #f0ad4e; }
     .node.special-highlight rect { fill: #dd00ff; stroke: #9900cc; }
@@ -684,6 +686,92 @@
     #summary table {
       margin-top: 0;
     }
+
+    .tooltip.draggable-tooltip {
+      cursor: grab;
+      z-index: 10000;
+    }
+
+    /* Make the summary a horizontal flex container */
+    .custom-summary {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      position: relative;
+      list-style: none;
+      padding: 0.5em 0;
+    }
+
+    /* Add triangle arrow before text */
+    .custom-summary::before {
+      content: '▶';
+      transition: transform 0.2s ease;
+      font-size: 0.8em;
+      margin-right: 6px;
+    }
+
+    /* Rotate arrow when open */
+    details[open] > .custom-summary::before {
+      content: '▼';
+    }
+
+    /* Wrap the main header text */
+    .summary-text {
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Position help icon & tooltip to the far right */
+    .help-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      margin-left: auto;
+    }
+
+    /* Icon style */
+    .help-icon {
+      cursor: pointer;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    /* Tooltip style */
+    .tooltip {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      background: #fff;
+      color: #222;
+      border: 1px solid #007cbf;
+      border-radius: 6px;
+      padding: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      font-size: 14px;
+      width: 300px;
+      right: 0;
+      top: 28px;
+    }
+
+    .tooltip .close-tooltip-btn {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      background: transparent;
+      border: none;
+      color: #007cbf;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 10001;
+      padding: 0;
+      line-height: 1;
+    }
+    .tooltip .close-tooltip-btn:hover {
+      color: #e74c3c;
+    }
   </style>
 </head>
 
@@ -726,7 +814,26 @@
             </svg>
           </span>
           <span id="decision-help-tooltip" class ="tooltip">
-           Flow chart on center console illustrates how different factors affect decision evaluations.
+            <button class="close-tooltip-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+            School Decision Evaluation: Results<br>
+            The sliders below adjust how schools are evaluated across multiple factors, which is reflected in <strong>School Decision Evaluation: Results</strong> on the right side of the screen.<br>
+            The flowchart allows you to explore the decision logic dynamically by school.<br><br>
+            <ul style="text-align:left; margin-left: 0.5em; padding-left: 1em;">
+              <li><strong>Utilization Threshold</strong><br>
+              Sets the minimum percentage of a school's capacity that should be used before it's considered underutilized.</li>
+              <li><strong>High Utilization Threshold</strong><br>
+              Defines when a school is considered highly utilized or potentially overcrowded.</li>
+              <li><strong>Enrollment Growth Threshold</strong><br>
+              Minimum expected change in student enrollment (as a percentage).</li>
+              <li><strong>Projected Utilization Threshold</strong><br>
+              Target for future utilization based on projected enrollment.</li>
+              <li><strong>Distance to Underutilized Schools</strong><br>
+              Maximum distance to look for nearby underutilized schools for reassignment.</li>
+              <li><strong>Building Threshold</strong><br>
+              Minimum required building condition score.</li>
+              <li><strong>Adequate Program Offer Minimum</strong><br>
+              Minimum number of programs (academic or extracurricular) a school should offer.</li>
+            </ul>
           </span>
         </span>
       </span>
@@ -769,25 +876,29 @@
             </svg>
           </span>
           <span id="scenario-help-tooltip" class = "tooltip";>
+            <button class="close-tooltip-btn" onclick="this.parentElement.style.display='none'">&times;</button>
             Use this section to test and evaluate the impact of portfolio decisions. Adjust settings and run simulations to see scenario outcomes.
           </span>
         </span>
       </summary>
     <div class="details-content-wrapper" style="padding: 0.5rem;">
-      <h4>Use this section to test and evaluate the impact of portfolio decisions. Users can manually assign student changes or run a simulation model.</h4>
-
       <h3>Filter by Decision Type</h3>
       <select id="decisionFilter">
         <option value="">-- All Decisions --</option>
       </select>
 
+      <div id="scenarioOptionsContainer" style="display:none;">
+        <div id="ongoingMonitoringContainer" style="display:none; margin-bottom: 1em;">
+          <div id="ongoingMonitoringMessage" style="font-weight: bold; margin-bottom: 0.5em;"></div>
+          <ul id="ongoingMonitoringList" style="margin:0; padding-left: 1.2em;"></ul>
+        </div>
       <h3>Select a School for Evaluation</h3>
       <select id="schoolSelect">
         <option value="">-- Select --</option>
       </select>
     </div>
 
-    <details open class="nested-details">
+    <details open class="nested-details" id="assignmentModeDetails" style="display:none;">
       <summary><strong>Assignment Mode</strong></summary>
 
       <div id="modeToggle" style="padding-top: 10px;">
@@ -822,26 +933,26 @@
 
       <!-- Model Simulation View -->
       <div id="modelView" style="display: none;">
-        <h4>Rate the importance of each factor (1 = not important, 10 = very important)</h4>
+        <h4>Rate the importance of each factor (0 = not important, 10 = very important)</h4>
         
         <div class="slider-container">
-          <label for="distanceWeightSlider">Distance Weighting <span id="distanceWeightLabel">5</span></label>
-          <input type="range" id="distanceWeightSlider" min="1" max="10" value="5" />
+          <label for="distanceWeightSlider">Distance Weighting (0 = not important, 10 = very important) <span id="distanceWeightLabel">5</span></label>
+          <input type="range" id="distanceWeightSlider" min="0" max="10" value="5" />
         </div>
 
         <div class="slider-container">
-          <label for="enrollmentWeightSlider">Enrollment Demand <span id="enrollmentWeightLabel">5</span></label>
-          <input type="range" id="enrollmentWeightSlider" min="1" max="10" value="5" />
+          <label for="enrollmentWeightSlider">Enrollment Demand (0 = not important, 10 = very important) <span id="enrollmentWeightLabel">5</span></label>
+          <input type="range" id="enrollmentWeightSlider" min="0" max="10" value="5" />
         </div>
 
         <div class="slider-container">
-          <label for="buildingWeightSlider">Building Quality <span id="buildingWeightLabel">5</span></label>
-          <input type="range" id="buildingWeightSlider" min="1" max="10" value="5" />
+          <label for="buildingWeightSlider">Building Quality (0 = not important, 10 = very important) <span id="buildingWeightLabel">5</span></label>
+          <input type="range" id="buildingWeightSlider" min="0" max="10" value="5" />
         </div>
         
         <div class="slider-container">
-          <label for="scorecardWeightSlider">Scorecard Weighting <span id="scorecardWeightLabel">5</span></label>
-          <input type="range" id="scorecardWeightSlider" min="1" max="10" value="5" />
+          <label for="scorecardWeightSlider">Scorecard Weighting (0 = not important, 10 = very important) <span id="scorecardWeightLabel">5</span></label>
+          <input type="range" id="scorecardWeightSlider" min="0" max="10" value="5" />
         </div>
 
           <h3>Exclude Schools from Assignment</h3>
@@ -853,6 +964,7 @@
         <button id="assignButton" onclick="console.log('🔘 Assign button clicked via inline handler!')">Assign Students</button>
       </div>
     </details>
+  </div>
   </details>
 
   <div class="sidebar-footer">
@@ -941,6 +1053,7 @@
               </svg>
             </span>
             <span id="flowchart-help-tooltip" style="display:none;position:absolute;z-index:1000;background:#fff;color:#222;border:1px solid #007cbf;border-radius:6px;padding:10px;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-size:14px;width:300px;right:0;top:28px;font-weight:bold;">
+              <button class="close-tooltip-btn" onclick="this.parentElement.style.display='none'">&times;</button>
               Select a school to view its decision flowchart. The flowchart visualizes how the evaluation criteria lead to the recommended action for the selected school.
             </span>
           </span>
@@ -994,7 +1107,8 @@
            </svg>
         </span>
        <span id="decision-results-help-tooltip" class="tooltip";>
-       This section shows the results of the school decision evaluation based on your selected criteria.
+         <button class="close-tooltip-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+         This section shows the results of the school decision evaluation based on your selected criteria.
         </span>
          </span>
         </summary>
@@ -1027,6 +1141,7 @@
                     </svg>
                   </span>
                   <span id="model-output-help-tooltip" style="display:none;position:absolute;z-index:1000;background:#fff;color:#222;border:1px solid #007cbf;border-radius:6px;padding:10px;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-size:14px;width:300px;right:0;top:28px;">
+                    <button class="close-tooltip-btn" onclick="this.parentElement.style.display='none'">&times;</button>
                     This section displays the impact analysis of your scenario, including enrollment, utilization, and travel distance changes.
                   </span>
                 </span>
@@ -1096,10 +1211,16 @@ document.addEventListener('DOMContentLoaded', function() {
   var helpIcon = document.getElementById('decision-help-icon');
   var helpTooltip = document.getElementById('decision-help-tooltip');
   if (helpIcon && helpTooltip) {
+    helpTooltip.classList.add('draggable-tooltip');
     helpIcon.addEventListener('click', function(e) {
       e.preventDefault();
       e.stopPropagation();
       if (helpTooltip.style.display === 'none' || helpTooltip.style.display === '') {
+        // Position the tooltip near the help icon
+        const iconRect = helpIcon.getBoundingClientRect();
+        helpTooltip.style.left = (iconRect.right + 10) + 'px';
+        helpTooltip.style.top = (iconRect.top - 10) + 'px';
+        helpTooltip.style.right = 'auto';
         helpTooltip.style.display = 'block';
       } else {
         helpTooltip.style.display = 'none';
@@ -1110,15 +1231,42 @@ document.addEventListener('DOMContentLoaded', function() {
         helpTooltip.style.display = 'none';
       }
     });
+    // --- DRAGGABLE LOGIC ---
+    let isMouseDown = false, offset = [0, 0];
+    helpTooltip.addEventListener('mousedown', function(e) {
+      isMouseDown = true;
+      offset = [
+        helpTooltip.offsetLeft - e.clientX,
+        helpTooltip.offsetTop - e.clientY
+      ];
+      helpTooltip.style.cursor = 'move';
+      e.preventDefault();
+    }, true);
+    document.addEventListener('mouseup', function() {
+      isMouseDown = false;
+      helpTooltip.style.cursor = '';
+    }, true);
+    document.addEventListener('mousemove', function(e) {
+      if (!isMouseDown) return;
+      helpTooltip.style.left = (e.clientX + offset[0]) + 'px';
+      helpTooltip.style.top = (e.clientY + offset[1]) + 'px';
+      helpTooltip.style.right = 'auto';
+    }, true);
   }
    // Scenario Modeling help icon logic
   var scenarioHelpIcon = document.getElementById('scenario-help-icon');
   var scenarioHelpTooltip = document.getElementById('scenario-help-tooltip');
   if (scenarioHelpIcon && scenarioHelpTooltip) {
+    scenarioHelpTooltip.classList.add('draggable-tooltip');
     scenarioHelpIcon.addEventListener('click', function(e) {
       e.preventDefault();
       e.stopPropagation();
       if (scenarioHelpTooltip.style.display === 'none' || scenarioHelpTooltip.style.display === '') {
+        // Position the tooltip near the help icon
+        const iconRect = scenarioHelpIcon.getBoundingClientRect();
+        scenarioHelpTooltip.style.left = (iconRect.right + 10) + 'px';
+        scenarioHelpTooltip.style.top = (iconRect.top - 10) + 'px';
+        scenarioHelpTooltip.style.right = 'auto';
         scenarioHelpTooltip.style.display = 'block';
       } else {
         scenarioHelpTooltip.style.display = 'none';
@@ -1129,6 +1277,27 @@ document.addEventListener('DOMContentLoaded', function() {
         scenarioHelpTooltip.style.display = 'none';
       }
     });
+    // --- DRAGGABLE LOGIC ---
+    let isMouseDown2 = false, offset2 = [0, 0];
+    scenarioHelpTooltip.addEventListener('mousedown', function(e) {
+      isMouseDown2 = true;
+      offset2 = [
+        scenarioHelpTooltip.offsetLeft - e.clientX,
+        scenarioHelpTooltip.offsetTop - e.clientY
+      ];
+      scenarioHelpTooltip.style.cursor = 'move';
+      e.preventDefault();
+    }, true);
+    document.addEventListener('mouseup', function() {
+      isMouseDown2 = false;
+      scenarioHelpTooltip.style.cursor = '';
+    }, true);
+    document.addEventListener('mousemove', function(e) {
+      if (!isMouseDown2) return;
+      scenarioHelpTooltip.style.left = (e.clientX + offset2[0]) + 'px';
+      scenarioHelpTooltip.style.top = (e.clientY + offset2[1]) + 'px';
+      scenarioHelpTooltip.style.right = 'auto';
+    }, true);
   }
   // Decision Results help icon logic
   var decisionResultsHelpIcon = document.getElementById('decision-results-help-icon');
@@ -1189,74 +1358,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 </script>
-
-
-<style>
-/* Make the summary a horizontal flex container */
-.custom-summary {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  position: relative;
-  list-style: none;
-  padding: 0.5em 0;
-}
-
-/* Add triangle arrow before text */
-.custom-summary::before {
-  content: '▶';
-  transition: transform 0.2s ease;
-  font-size: 0.8em;
-  margin-right: 6px;
-}
-
-/* Rotate arrow when open */
-details[open] > .custom-summary::before {
-  content: '▼';
-}
-
-/* Wrap the main header text */
-.summary-text {
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
-}
-
-/* Position help icon & tooltip to the far right */
-.help-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  margin-left: auto;
-}
-
-/* Icon style */
-.help-icon {
-  cursor: pointer;
-  display: inline-block;
-  vertical-align: middle;
-}
-
-/* Tooltip style */
-.tooltip {
-  display: none;
-  position: absolute;
-  z-index: 1000;
-  background: #fff;
-  color: #222;
-  border: 1px solid #007cbf;
-  border-radius: 6px;
-  padding: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  font-size: 14px;
-  width: 300px;
-  right: 0;
-  top: 28px;
-}
-</style>
-
-
 
 </body>
 </html>

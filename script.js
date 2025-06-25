@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
       welcomePopup.style.display = 'none';
       errorMessage.style.display = 'none';
       passwordInput.value = '';
+      // Start onboarding walkthrough after successful login
+      startOnboardingWalkthrough();
     } else {
       errorMessage.style.display = 'block';
       passwordInput.value = '';
@@ -44,6 +46,123 @@ document.addEventListener('DOMContentLoaded', function() {
         decisionOutputPanel.open = true;
       }
     });
+  }
+
+  // --- Scenario Modeling: Show options only after decision type is selected ---
+  const decisionFilter = document.getElementById('decisionFilter');
+  const scenarioOptionsContainer = document.getElementById('scenarioOptionsContainer');
+  const assignmentModeDetails = document.getElementById('assignmentModeDetails');
+
+  if (decisionFilter && scenarioOptionsContainer && assignmentModeDetails) {
+    // --- Add a container for the investments table ---
+    let investmentsTableContainer = document.getElementById('investmentsTableContainer');
+    if (!investmentsTableContainer) {
+      investmentsTableContainer = document.createElement('div');
+      investmentsTableContainer.id = 'investmentsTableContainer';
+      investmentsTableContainer.style.marginTop = '1em';
+      scenarioOptionsContainer.parentNode.insertBefore(investmentsTableContainer, scenarioOptionsContainer.nextSibling);
+    }
+
+    function updateScenarioOptionsVisibility() {
+      const ongoingContainer = document.getElementById('ongoingMonitoringContainer');
+      const ongoingMessage = document.getElementById('ongoingMonitoringMessage');
+      const ongoingList = document.getElementById('ongoingMonitoringList');
+      // Hide all by default
+      scenarioOptionsContainer.style.display = 'none';
+      assignmentModeDetails.style.display = 'none';
+      if (ongoingContainer) ongoingContainer.style.display = 'none';
+      // Hide investments table by default
+      investmentsTableContainer.style.display = 'none';
+      investmentsTableContainer.innerHTML = '';
+
+      if (decisionFilter.value === 'Ongoing Monitoring & Evaluation') {
+        // Show only the message and list
+        if (scenarioOptionsContainer) scenarioOptionsContainer.style.display = '';
+        if (ongoingContainer && ongoingMessage && ongoingList) {
+          ongoingContainer.style.display = '';
+          ongoingMessage.textContent = 'These schools are in good condition and no immediate action is required.';
+          // Get list of schools in this category
+          let schools = [];
+          if (window.decisionLogic && window.decisionLogic.schoolData) {
+            schools = window.decisionLogic.schoolData.filter(row => row.decision === 'Ongoing Monitoring & Evaluation').map(row => row['Building Name']);
+          }
+          ongoingList.innerHTML = schools.length ? schools.map(s => `<li>${s}</li>`).join('') : '<li>No schools found.</li>';
+        }
+      }
+      // --- Show investments table for Building & Programmatic Investments, Programmatic Investment, or Building Investment ---
+      if (
+        decisionFilter.value === 'Building & Programmatic Investments' ||
+        decisionFilter.value === 'Programmatic Investment' ||
+        decisionFilter.value === 'Building Investment'
+      ) {
+        if (scenarioOptionsContainer) scenarioOptionsContainer.style.display = '';
+        if (assignmentModeDetails) assignmentModeDetails.style.display = '';
+        // Build the table
+        if (window.decisionLogic && window.decisionLogic.schoolData) {
+          const data = window.decisionLogic.schoolData;
+          // Helper to format square footage with 'K' for thousands
+          function formatSquareFt(value) {
+            if (!value) return '';
+            const num = parseFloat(value.toString().replace(/,/g, ''));
+            if (isNaN(num)) return value;
+            if (num >= 1000) return (num / 1000).toLocaleString(undefined, {maximumFractionDigits: 0}) + 'K';
+            return num.toLocaleString();
+          }
+          // Helper to format cost (optional: add $ and commas)
+          function formatCost(value) {
+            if (!value) return '';
+            const num = parseFloat(value.toString().replace(/,/g, ''));
+            if (isNaN(num)) return value;
+            return '$' + num.toLocaleString();
+          }
+          // Helper to build rows for a category
+          function buildRows(decisionType) {
+            return data.filter(row => row.decision === decisionType)
+              .map(row => `<tr><td>${row['Building Name']}</td><td>${formatSquareFt(row['SquareFt'])}</td><td>${formatCost(row['Cost'])}</td></tr>`)
+              .join('');
+          }
+          let tableHTML = `<table class=\"data-table\"><thead><tr><th>School Name</th><th>Square Footage</th><th>Cost</th></tr></thead><tbody>`;
+          // Determine order based on selected filter
+          let sectionOrder;
+          if (decisionFilter.value === 'Programmatic Investment') {
+            sectionOrder = [
+              {type: 'Programmatic Investment', label: 'Programmatic Investment', color: '#27ae60'},
+              {type: 'Building & Programmatic Investments', label: 'Building & Programmatic Investments', color: '#1abc9c'},
+              {type: 'Building Investment', label: 'Building Investment', color: '#2ecc71'}
+            ];
+          } else if (decisionFilter.value === 'Building Investment') {
+            sectionOrder = [
+              {type: 'Building Investment', label: 'Building Investment', color: '#2ecc71'},
+              {type: 'Building & Programmatic Investments', label: 'Building & Programmatic Investments', color: '#1abc9c'},
+              {type: 'Programmatic Investment', label: 'Programmatic Investment', color: '#27ae60'}
+            ];
+          } else {
+            sectionOrder = [
+              {type: 'Building & Programmatic Investments', label: 'Building & Programmatic Investments', color: '#1abc9c'},
+              {type: 'Programmatic Investment', label: 'Programmatic Investment', color: '#27ae60'},
+              {type: 'Building Investment', label: 'Building Investment', color: '#2ecc71'}
+            ];
+          }
+          sectionOrder.forEach(section => {
+            const rows = buildRows(section.type);
+            if (rows) {
+              tableHTML += `<tr><td colspan=\"2\" style=\"font-weight:bold;background:${section.color};color:#fff;\">${section.label}</td></tr>` + rows;
+            }
+          });
+          tableHTML += '</tbody></table>';
+          investmentsTableContainer.innerHTML = tableHTML;
+          investmentsTableContainer.style.display = '';
+        }
+        return;
+      }
+      // Show normal options
+      if (scenarioOptionsContainer) scenarioOptionsContainer.style.display = '';
+      if (ongoingContainer) ongoingContainer.style.display = 'none';
+      if (assignmentModeDetails) assignmentModeDetails.style.display = '';
+    }
+    decisionFilter.addEventListener('change', updateScenarioOptionsVisibility);
+    // Initial state
+    updateScenarioOptionsVisibility();
   }
 });
 
@@ -1433,3 +1552,235 @@ document.addEventListener("DOMContentLoaded", function() {
       sendSliderData();
     }
 });
+
+// --- ONBOARDING WALKTHROUGH LOGIC ---
+function startOnboardingWalkthrough() {
+  const steps = [
+    {
+      target: 'body',
+      title: 'How to use this Tool',
+      text: 'We will walk you through the main features of this tool. You can skip this explanation at any time.',
+      isIntro: true
+    },
+    {
+      target: '#sidebar',
+      title: 'Sidebar',
+      text: 'This is the main sidebar. It contains navigation and controls for the planning tool.'
+    },
+    {
+      target: '#decision-input-panel',
+      title: 'School Decision Evaluation',
+      text: 'Adjust how schools are evaluated using these sliders. This affects the results and recommendations.'
+    },
+    {
+      target: '#scenario-input-panel',
+      title: 'Scenario Modeling',
+      text: 'Test and evaluate the impact of different portfolio decisions here.'
+    },
+    {
+      target: '#map-container',
+      title: 'Map',
+      text: 'The map shows all schools and their current status. You can interact with the map to explore data.'
+    },
+    {
+      target: '#main-flowchart-container',
+      title: 'Flowchart',
+      text: 'The flowchart visualizes the decision logic for a selected school.'
+    },
+    {
+      target: '#decision-output-panel',
+      title: 'School Decision Evaluation: Results',
+      text: 'This section shows the results of your evaluation. It summarizes recommended actions for each school based on the criteria you set on the left. You can view both a summary and detailed results for each school.'
+    },
+    {
+      target: '#scenario-output-panel',
+      title: 'Model Output: Impact Analysis',
+      text: 'After running a scenario or simulation, this section displays the impact analysis, including changes in enrollment, utilization, and travel distances for students. Use this to understand the effects of your decisions on the school system.'
+    }
+  ];
+
+  let currentStep = 0;
+  let overlay = null;
+  let popup = null;
+
+  function showStep(stepIdx) {
+    // Remove previous overlay/popup
+    if (overlay) overlay.remove();
+    if (popup) popup.remove();
+
+    const step = steps[stepIdx];
+    let target = document.querySelector(step.target);
+    // Open dropdown <details> if the step is for a details section
+    const detailsIds = ['#decision-input-panel', '#scenario-input-panel', '#decision-output-panel', '#scenario-output-panel'];
+    if (detailsIds.includes(step.target) && target && !target.open) {
+      target.open = true;
+    }
+
+    // --- ADD THIS: If the step is the flowchart, switch to flowchart view ---
+    if (step.target === '#main-flowchart-container') {
+      // This is the flowchart step; show the flowchart view
+      const flowchartBtn = document.getElementById('toggleMapFlowchartFlowchart');
+      if (flowchartBtn && !flowchartBtn.classList.contains('active')) {
+        flowchartBtn.click();
+      }
+    }
+
+    // For scenario/model output, wait for the section to open before highlighting
+    if ((step.target === '#scenario-input-panel' || step.target === '#scenario-output-panel') && target) {
+      // Scroll into view
+      target.scrollIntoView({behavior: 'smooth', block: 'center'});
+      setTimeout(() => {
+        drawHighlight(target, step, stepIdx);
+      }, 200);
+      // Draw popup after highlight
+      setTimeout(() => {
+        drawPopup(target, step, stepIdx);
+      }, 210);
+      return;
+    }
+
+    if (!target) {
+      nextStep();
+      return;
+    }
+
+    // Default: draw highlight and popup immediately
+    drawHighlight(target, step, stepIdx);
+    drawPopup(target, step, stepIdx);
+  }
+
+  function drawHighlight(target, step, stepIdx) {
+    // Create overlay
+    overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100vw';
+    overlay.style.height = '100vh';
+    overlay.style.background = 'rgba(0,0,0,0.1)';
+    overlay.style.zIndex = '20000';
+    overlay.style.pointerEvents = 'auto';
+    document.body.appendChild(overlay);
+
+    // Highlight target (skip for intro step)
+    let rect = {left: 0, top: 0, width: 0, height: 0};
+    let highlight = null;
+    if (!step.isIntro) {
+      rect = target.getBoundingClientRect();
+      highlight = document.createElement('div');
+      highlight.style.position = 'fixed';
+      highlight.style.left = rect.left + 'px';
+      highlight.style.top = rect.top + 'px';
+      highlight.style.width = rect.width + 'px';
+      highlight.style.height = rect.height + 'px';
+      highlight.style.border = '3px solid #FFD600';
+      highlight.style.borderRadius = '10px';
+      highlight.style.boxShadow = '0 0 0 9999px rgba(0,0,0,0.7)';
+      highlight.style.zIndex = '20001';
+      highlight.style.pointerEvents = 'none';
+      document.body.appendChild(highlight);
+      overlay.appendChild(highlight);
+    }
+  }
+
+  function drawPopup(target, step, stepIdx) {
+    // Create popup
+    popup = document.createElement('div');
+    popup.style.position = 'fixed';
+    if (step.isIntro) {
+      popup.style.left = '50%';
+      popup.style.top = '20%';
+      popup.style.transform = 'translate(-50%, 0)';
+    } else if (step.target === '#decision-output-panel' || step.target === '#scenario-output-panel') {
+      // Position to the left of the panel, with a larger gap
+      const rect = target.getBoundingClientRect();
+      const popupWidth = 340;
+      const gap = 100; // Consistent gap for both panels
+      popup.style.left = (rect.left - popupWidth - gap > 20 ? rect.left - popupWidth - gap : 20) + 'px';
+      popup.style.top = rect.top + 'px';
+      popup.style.right = '';
+      popup.style.transform = '';
+    } else {
+      const rect = target.getBoundingClientRect();
+      popup.style.left = (rect.left + rect.width + 20) + 'px';
+      popup.style.top = rect.top + 'px';
+      popup.style.transform = '';
+    }
+    popup.style.background = '#fff';
+    popup.style.color = '#222';
+    popup.style.border = '2px solid #007cbf';
+    popup.style.borderRadius = '8px';
+    popup.style.boxShadow = '0 4px 24px rgba(0,0,0,0.2)';
+    popup.style.padding = '24px 32px';
+    popup.style.zIndex = '20002';
+    popup.style.maxWidth = '340px';
+    popup.style.fontSize = '16px';
+    popup.innerHTML = `<h3 style='margin-top:0;color:#007cbf;'>${step.title}</h3><p>${step.text}</p>`;
+    // Next/Close/Skip button(s)
+    if (step.isIntro) {
+      // Skip button
+      const skipBtn = document.createElement('button');
+      skipBtn.textContent = 'Skip';
+      skipBtn.style.marginTop = '18px';
+      skipBtn.style.background = '#e74c3c';
+      skipBtn.style.color = '#fff';
+      skipBtn.style.border = 'none';
+      skipBtn.style.borderRadius = '4px';
+      skipBtn.style.padding = '8px 20px';
+      skipBtn.style.fontSize = '16px';
+      skipBtn.style.cursor = 'pointer';
+      skipBtn.style.marginRight = '12px';
+      skipBtn.onclick = endWalkthrough;
+      popup.appendChild(skipBtn);
+      // Start button
+      const startBtn = document.createElement('button');
+      startBtn.textContent = 'Start Tour';
+      startBtn.style.marginTop = '18px';
+      startBtn.style.background = '#007cbf';
+      startBtn.style.color = '#fff';
+      startBtn.style.border = 'none';
+      startBtn.style.borderRadius = '4px';
+      startBtn.style.padding = '8px 20px';
+      startBtn.style.fontSize = '16px';
+      startBtn.style.cursor = 'pointer';
+      startBtn.onclick = nextStep;
+      popup.appendChild(startBtn);
+    } else {
+      const btn = document.createElement('button');
+      btn.textContent = (stepIdx === steps.length - 1) ? 'Finish' : 'Next';
+      btn.style.marginTop = '18px';
+      btn.style.background = '#007cbf';
+      btn.style.color = '#fff';
+      btn.style.border = 'none';
+      btn.style.borderRadius = '4px';
+      btn.style.padding = '8px 20px';
+      btn.style.fontSize = '16px';
+      btn.style.cursor = 'pointer';
+      btn.onclick = () => {
+        if (stepIdx === steps.length - 1) {
+          endWalkthrough();
+        } else {
+          nextStep();
+        }
+      };
+      popup.appendChild(btn);
+    }
+    document.body.appendChild(popup);
+  }
+
+  function nextStep() {
+    currentStep++;
+    if (currentStep < steps.length) {
+      showStep(currentStep);
+    } else {
+      endWalkthrough();
+    }
+  }
+
+  function endWalkthrough() {
+    if (overlay) overlay.remove();
+    if (popup) popup.remove();
+  }
+
+  showStep(currentStep);
+}
