@@ -1,5 +1,6 @@
 mapboxgl.accessToken = 'pk.eyJ1IjoicGF0d2QwNSIsImEiOiJjbTZ2bGVhajIwMTlvMnFwc2owa3BxZHRoIn0.moDNfqMUolnHphdwsIF87w';
 
+
 // Welcome Popup Password Functionality
 document.addEventListener('DOMContentLoaded', function() {
   const welcomePopup = document.getElementById('welcomePopup');
@@ -14,14 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
       errorMessage.style.display = 'none';
       passwordInput.value = '';
       // Start onboarding walkthrough after successful login
-      // Wait for DOM to be fully ready
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-          setTimeout(startOnboardingWalkthrough, 500);
-        });
-      } else {
-        setTimeout(startOnboardingWalkthrough, 500);
-      }
+      startOnboardingWalkthrough();
     } else {
       errorMessage.style.display = 'block';
       passwordInput.value = '';
@@ -41,23 +35,6 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Focus on password input when popup loads
   passwordInput.focus();
-
-  // Add manual tour trigger button
-  const tourButton = document.createElement('button');
-  tourButton.textContent = '📋 Start Tour';
-  tourButton.style.position = 'fixed';
-  tourButton.style.top = '10px';
-  tourButton.style.right = '10px';
-  tourButton.style.zIndex = '1000';
-  tourButton.style.background = '#007cbf';
-  tourButton.style.color = '#fff';
-  tourButton.style.border = 'none';
-  tourButton.style.borderRadius = '4px';
-  tourButton.style.padding = '8px 16px';
-  tourButton.style.fontSize = '14px';
-  tourButton.style.cursor = 'pointer';
-  tourButton.onclick = startOnboardingWalkthrough;
-  document.body.appendChild(tourButton);
 
   // Auto-open "School Decision Evaluation: Results" when "School Decision Evaluation" is opened
   const decisionInputPanel = document.getElementById('decision-input-panel');
@@ -112,15 +89,47 @@ document.addEventListener('DOMContentLoaded', function() {
           }
           ongoingList.innerHTML = schools.length ? schools.map(s => `<li>${s}</li>`).join('') : '<li>No schools found.</li>';
         }
+        if (assignmentModeDetails) assignmentModeDetails.style.display = 'none';
+        // Hide school select and header
+        const schoolSelectHeader = scenarioOptionsContainer.querySelector('h3');
+        const schoolSelectDropdown = document.getElementById('schoolSelect');
+        if (schoolSelectHeader) schoolSelectHeader.style.display = 'none';
+        if (schoolSelectDropdown) schoolSelectDropdown.style.display = 'none';
+        return;
+      }
+      // --- Show message and list for School-specific evaluation of alternative options ---
+      if (decisionFilter.value === 'School-specific evaluation of alternative options') {
+        if (scenarioOptionsContainer) scenarioOptionsContainer.style.display = '';
+        if (ongoingContainer && ongoingMessage && ongoingList) {
+          ongoingContainer.style.display = '';
+          ongoingMessage.textContent = 'The uniqueness of these schools require school specific evaluation.';
+          // Get list of schools in this category
+          let schools = [];
+          if (window.decisionLogic && window.decisionLogic.schoolData) {
+            schools = window.decisionLogic.schoolData.filter(row => row.decision === 'School-specific evaluation of alternative options').map(row => row['Building Name']);
+          }
+          ongoingList.innerHTML = schools.length ? schools.map(s => `<li>${s}</li>`).join('') : '<li>No schools found.</li>';
+        }
+        if (assignmentModeDetails) assignmentModeDetails.style.display = 'none';
+        // Hide school select and header
+        const schoolSelectHeader = scenarioOptionsContainer.querySelector('h3');
+        const schoolSelectDropdown = document.getElementById('schoolSelect');
+        if (schoolSelectHeader) schoolSelectHeader.style.display = 'none';
+        if (schoolSelectDropdown) schoolSelectDropdown.style.display = 'none';
+        return;
       }
       // --- Show investments table for Building & Programmatic Investments, Programmatic Investment, or Building Investment ---
       if (
         decisionFilter.value === 'Building & Programmatic Investments' ||
-        decisionFilter.value === 'Programmatic Investment' ||
         decisionFilter.value === 'Building Investment'
       ) {
         if (scenarioOptionsContainer) scenarioOptionsContainer.style.display = '';
-        if (assignmentModeDetails) assignmentModeDetails.style.display = '';
+        if (assignmentModeDetails) assignmentModeDetails.style.display = 'none';
+        // Hide school select and header
+        const schoolSelectHeader = scenarioOptionsContainer.querySelector('h3');
+        const schoolSelectDropdown = document.getElementById('schoolSelect');
+        if (schoolSelectHeader) schoolSelectHeader.style.display = 'none';
+        if (schoolSelectDropdown) schoolSelectDropdown.style.display = 'none';
         // Build the table
         if (window.decisionLogic && window.decisionLogic.schoolData) {
           const data = window.decisionLogic.schoolData;
@@ -133,49 +142,143 @@ document.addEventListener('DOMContentLoaded', function() {
             return num.toLocaleString();
           }
           // Helper to format cost (optional: add $ and commas)
+          let costMultiplier = 300; // Default multiplier
           function formatCost(value) {
             if (!value) return '';
             const num = parseFloat(value.toString().replace(/,/g, ''));
             if (isNaN(num)) return value;
-            return '$' + num.toLocaleString();
+            // Multiply square footage by the selected multiplier to get cost
+            const cost = num * costMultiplier;
+            if (cost >= 1_000_000) {
+              return '$' + (cost / 1_000_000).toLocaleString(undefined, {maximumFractionDigits: 2}) + 'M';
+            }
+            return '$' + cost.toLocaleString();
           }
+          
+          // Function to update cost display when multiplier changes
+          function updateCostDisplay() {
+            if (window.decisionLogic && window.decisionLogic.schoolData) {
+              const data = window.decisionLogic.schoolData;
+              // Calculate total cost
+              const totalSquareFt = data.filter(row => 
+                row.decision === 'Building & Programmatic Investments' || 
+                row.decision === 'Building Investment'
+              ).reduce((sum, row) => sum + (parseFloat(row['SquareFt']) || 0), 0);
+              const totalCost = totalSquareFt * costMultiplier;
+              
+              // Rebuild the table with new multiplier
+              let tableHTML = `<table class=\"data-table\"><thead><tr><th>School Name</th><th>Square Footage</th><th>Cost <div style=\"display:flex; gap:5px; margin-top:5px; justify-content:center;\">
+                <span class=\"dollar-sign-tooltip\" style=\"cursor:pointer; padding:2px 4px; border-radius:3px; background:${costMultiplier === 300 ? '#007cbf' : '#e0e0e0'}; color:${costMultiplier === 300 ? 'white' : 'black'};\" onclick=\"updateCostMultiplier(300)\" data-tooltip=\"Low renovation\">$</span>
+                <span class=\"dollar-sign-tooltip\" style=\"cursor:pointer; padding:2px 4px; border-radius:3px; background:${costMultiplier === 600 ? '#007cbf' : '#e0e0e0'}; color:${costMultiplier === 600 ? 'white' : 'black'};\" onclick=\"updateCostMultiplier(600)\" data-tooltip=\"Medium renovation\">$$</span>
+                <span class=\"dollar-sign-tooltip\" style=\"cursor:pointer; padding:2px 4px; border-radius:3px; background:${costMultiplier === 1200 ? '#007cbf' : '#e0e0e0'}; color:${costMultiplier === 1200 ? 'white' : 'black'};\" onclick=\"updateCostMultiplier(1200)\" data-tooltip=\"High renovation\">$$$</span>
+              </div></th></tr></thead><tbody>`;
+              
+              // Add total row at the top
+              tableHTML += `<tr style=\"font-weight:bold; background:#cccccc;\"><td style='border:1px solid #888;'>Total</td><td style='border:1px solid #888;'>${formatSquareFt(totalSquareFt)}</td><td style='border:1px solid #888;'>${formatCost(totalSquareFt)}</td></tr>`;
+              
+              // Determine order based on selected filter
+              let sectionOrder;
+              if (decisionFilter.value === 'Building Investment') {
+                sectionOrder = [
+                  {type: 'Building Investment', label: 'Building Investment', color: '#2ecc71'},
+                  {type: 'Building & Programmatic Investments', label: 'Building & Programmatic Investments', color: '#1abc9c'},
+                ];
+              } else {
+                sectionOrder = [
+                  {type: 'Building & Programmatic Investments', label: 'Building & Programmatic Investments', color: '#1abc9c'},
+                  {type: 'Building Investment', label: 'Building Investment', color: '#2ecc71'},
+                ];
+              }
+              sectionOrder.forEach(section => {
+                const rows = buildRows(section.type);
+                if (rows) {
+                  tableHTML += `<tr><td colspan=\"3\" style=\"font-weight:bold;background:#f2f2f2;color:#000;\">${section.label}</td></tr>` + rows;
+                }
+              });
+              tableHTML += '</tbody></table>';
+              investmentsTableContainer.innerHTML = tableHTML;
+              investmentsTableContainer.style.display = '';
+              setupDollarSignTooltips(); // <-- Add this line
+            }
+          }
+          
+          // Global function to update cost multiplier
+          window.updateCostMultiplier = function(multiplier) {
+            costMultiplier = multiplier;
+            updateCostDisplay();
+          };
+          
           // Helper to build rows for a category
           function buildRows(decisionType) {
             return data.filter(row => row.decision === decisionType)
-              .map(row => `<tr><td>${row['Building Name']}</td><td>${formatSquareFt(row['SquareFt'])}</td><td>${formatCost(row['Cost'])}</td></tr>`)
+              .map(row => `<tr><td class="truncate-cell" data-tooltip="${row['Building Name']}">${row['Building Name']}</td><td>${formatSquareFt(row['SquareFt'])}</td><td>${formatCost(row['SquareFt'])}</td></tr>`)
               .join('');
           }
-          let tableHTML = `<table class=\"data-table\"><thead><tr><th>School Name</th><th>Square Footage</th><th>Cost</th></tr></thead><tbody>`;
+          let tableHTML = `<table class=\"data-table\"><thead><tr><th>School Name</th><th>Square Footage</th><th>Cost <div style=\"display:flex; gap:5px; margin-top:5px; justify-content:center;\">
+            <span class=\"dollar-sign-tooltip\" style=\"cursor:pointer; padding:2px 4px; border-radius:3px; background:${costMultiplier === 300 ? '#007cbf' : '#e0e0e0'}; color:${costMultiplier === 300 ? 'white' : 'black'};\" onclick=\"updateCostMultiplier(300)\" data-tooltip=\"Low renovation\">$</span>
+            <span class=\"dollar-sign-tooltip\" style=\"cursor:pointer; padding:2px 4px; border-radius:3px; background:${costMultiplier === 600 ? '#007cbf' : '#e0e0e0'}; color:${costMultiplier === 600 ? 'white' : 'black'};\" onclick=\"updateCostMultiplier(600)\" data-tooltip=\"Medium renovation\">$$</span>
+            <span class=\"dollar-sign-tooltip\" style=\"cursor:pointer; padding:2px 4px; border-radius:3px; background:${costMultiplier === 1200 ? '#007cbf' : '#e0e0e0'}; color:${costMultiplier === 1200 ? 'white' : 'black'};\" onclick=\"updateCostMultiplier(1200)\" data-tooltip=\"High renovation\">$$$</span>
+          </div></th></tr></thead><tbody>`;
+          
+          // Calculate total cost for initial display
+          const totalSquareFt = data.filter(row => 
+            row.decision === 'Building & Programmatic Investments' || 
+            row.decision === 'Building Investment'
+          ).reduce((sum, row) => sum + (parseFloat(row['SquareFt']) || 0), 0);
+          const totalCost = totalSquareFt * costMultiplier;
+          
+          // Add total row at the top
+          tableHTML += `<tr style=\"font-weight:bold; background:#cccccc;\"><td style='border:1px solid #888;'>Total</td><td style='border:1px solid #888;'>${formatSquareFt(totalSquareFt)}</td><td style='border:1px solid #888;'>${formatCost(totalSquareFt)}</td></tr>`;
+          
           // Determine order based on selected filter
           let sectionOrder;
-          if (decisionFilter.value === 'Programmatic Investment') {
-            sectionOrder = [
-              {type: 'Programmatic Investment', label: 'Programmatic Investment', color: '#27ae60'},
-              {type: 'Building & Programmatic Investments', label: 'Building & Programmatic Investments', color: '#1abc9c'},
-              {type: 'Building Investment', label: 'Building Investment', color: '#2ecc71'}
-            ];
-          } else if (decisionFilter.value === 'Building Investment') {
+          if (decisionFilter.value === 'Building Investment') {
             sectionOrder = [
               {type: 'Building Investment', label: 'Building Investment', color: '#2ecc71'},
               {type: 'Building & Programmatic Investments', label: 'Building & Programmatic Investments', color: '#1abc9c'},
-              {type: 'Programmatic Investment', label: 'Programmatic Investment', color: '#27ae60'}
             ];
           } else {
             sectionOrder = [
               {type: 'Building & Programmatic Investments', label: 'Building & Programmatic Investments', color: '#1abc9c'},
-              {type: 'Programmatic Investment', label: 'Programmatic Investment', color: '#27ae60'},
-              {type: 'Building Investment', label: 'Building Investment', color: '#2ecc71'}
+              {type: 'Building Investment', label: 'Building Investment', color: '#2ecc71'},
             ];
           }
           sectionOrder.forEach(section => {
             const rows = buildRows(section.type);
             if (rows) {
-              tableHTML += `<tr><td colspan=\"2\" style=\"font-weight:bold;background:${section.color};color:#fff;\">${section.label}</td></tr>` + rows;
+              tableHTML += `<tr><td colspan=\"3\" style=\"font-weight:bold;background:#f2f2f2;color:#000;\">${section.label}</td></tr>` + rows;
             }
           });
           tableHTML += '</tbody></table>';
           investmentsTableContainer.innerHTML = tableHTML;
           investmentsTableContainer.style.display = '';
+          setupDollarSignTooltips(); // <-- Add this line
+        }
+        return;
+      }
+      // --- Show message and list for Programmatic Investment ---
+      if (decisionFilter.value === 'Programmatic Investment') {
+        if (scenarioOptionsContainer) scenarioOptionsContainer.style.display = '';
+        if (ongoingContainer && ongoingMessage && ongoingList) {
+          ongoingContainer.style.display = '';
+          ongoingMessage.textContent = 'These schools need academic investments.';
+          // Get list of schools in this category
+          let schools = [];
+          if (window.decisionLogic && window.decisionLogic.schoolData) {
+            schools = window.decisionLogic.schoolData.filter(row => row.decision === 'Programmatic Investment').map(row => row['Building Name']);
+          }
+          ongoingList.innerHTML = schools.length ? schools.map(s => `<li>${s}</li>`).join('') : '<li>No schools found.</li>';
+        }
+        if (assignmentModeDetails) assignmentModeDetails.style.display = 'none';
+        // Hide school select and header
+        const schoolSelectHeader = scenarioOptionsContainer.querySelector('h3');
+        const schoolSelectDropdown = document.getElementById('schoolSelect');
+        if (schoolSelectHeader) schoolSelectHeader.style.display = 'none';
+        if (schoolSelectDropdown) schoolSelectDropdown.style.display = 'none';
+        // Hide the investments table
+        if (investmentsTableContainer) {
+          investmentsTableContainer.style.display = 'none';
+          investmentsTableContainer.innerHTML = '';
         }
         return;
       }
@@ -183,10 +286,17 @@ document.addEventListener('DOMContentLoaded', function() {
       if (scenarioOptionsContainer) scenarioOptionsContainer.style.display = '';
       if (ongoingContainer) ongoingContainer.style.display = 'none';
       if (assignmentModeDetails) assignmentModeDetails.style.display = '';
+      // Show school select and header
+      const schoolSelectHeader = scenarioOptionsContainer.querySelector('h3');
+      const schoolSelectDropdown = document.getElementById('schoolSelect');
+      if (schoolSelectHeader) schoolSelectHeader.style.display = '';
+      if (schoolSelectDropdown) schoolSelectDropdown.style.display = '';
     }
     decisionFilter.addEventListener('change', updateScenarioOptionsVisibility);
     // Initial state
     updateScenarioOptionsVisibility();
+    // Expose globally so it can be called from elsewhere
+    window.updateScenarioOptionsVisibility = updateScenarioOptionsVisibility;
   }
 });
 
@@ -824,6 +934,49 @@ map.on('load', () => {
 
     window.flowchartInitialized = true;
   }
+
+  // --- Render blank/zeroed graphs in model output section on first load ---
+  function renderBlankModelOutputCharts() {
+    // Enrollment/Utilization Impact: blank chart
+    if (window.decisionLogic && typeof window.decisionLogic.handleAssignmentResults === 'function') {
+      const blankResults = {
+        summaryHTML: '',
+        enrollmentChartData: {
+          labels: [],
+          datasets: [
+            { label: 'Current Enrollment', data: [], backgroundColor: '#0033A0', barThickness: 12 },
+            { label: 'New Assignments', data: [], backgroundColor: '#FFC72C', barThickness: 12 },
+            { label: 'Capacity', data: [], type: 'line', borderColor: '#FF530D', borderWidth: 3, pointStyle: 'line', pointRadius: 7, rotation: 90, fill: false, showLine: false, yAxisID: 'y' }
+          ]
+        },
+        distanceChartData: {
+          labels: ['Current School', 'Assigned School'],
+          datasets: [{ label: 'Avg Distance (mi)', data: [0, 0], backgroundColor: ['#0033A0', '#ffcc00'] }]
+        },
+        assignments: {},
+        selectedSchoolName: ''
+      };
+      window.decisionLogic.handleAssignmentResults(blankResults);
+    }
+    // Show placeholders
+    const enrollPlaceholder = document.getElementById('enrollmentChartPlaceholder');
+    if (enrollPlaceholder) enrollPlaceholder.style.display = '';
+    const distancePlaceholder = document.getElementById('distanceChartPlaceholder');
+    if (distancePlaceholder) distancePlaceholder.style.display = '';
+  }
+
+  // Call this after DOM is ready and decisionLogic is loaded
+  if (window.decisionLogic && typeof window.decisionLogic.handleAssignmentResults === 'function') {
+    renderBlankModelOutputCharts();
+  } else {
+    // If decisionLogic isn't ready yet, wait for it
+    const interval = setInterval(() => {
+      if (window.decisionLogic && typeof window.decisionLogic.handleAssignmentResults === 'function') {
+        renderBlankModelOutputCharts();
+        clearInterval(interval);
+      }
+    }, 100);
+  }
 });
 
 // ✅ Inject decisions into geojson features
@@ -889,6 +1042,9 @@ function initializeDropdownFilters(schoolData) {
     updateSchoolSelect(selectedDecision);
     console.log("🎯 Updated school list for decision:", selectedDecision);
   });
+
+  // Expose globally so it can be called after slider changes
+  window.updateSchoolSelect = updateSchoolSelect;
 }
 
 // ✅ Move slider setup inside DOMContentLoaded to ensure elements are loaded
@@ -1337,7 +1493,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateLegend();
         
         const sortedSummary = Object.entries(summaryCounts).sort((a, b) => b[1] - a[1]);
-        let output = `<strong>Most Representative Assignment (Deterministic)</strong><br/>`;
+        let output = `<strong>Student Assignments</strong><br/>`;
         output += `<table style="width:100%;margin-top:8px;border-collapse:collapse;">`;
         output += `<thead><tr style="background-color:#f2f2f2;">
                     <th style="border:1px solid #ccc;padding:6px;text-align:left;">School Name</th>
@@ -1346,8 +1502,6 @@ document.addEventListener('DOMContentLoaded', function() {
         for (const [school, count] of sortedSummary) {
             output += `<tr><td class="truncate-cell" data-tooltip="${school}">${school}</td>
                     <td style="border:1px solid #ccc;padding:6px;text-align:center;">${count}</td></tr>`;
-        //  output += `<tr><td class=\"truncate-cell\">${school}</td>
-                // <td style=\"border:1px solid #ccc;padding:6px;text-align:center;\">${count}</td></tr>`;
         }
         output += `</tbody></table>`;
         
@@ -1394,7 +1548,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 datasets: [
                     { label: 'Current Enrollment', data: baseEnrollment, backgroundColor: '#0033A0', barThickness: 12 },
                     { label: 'New Assignments', data: simulatedAdds, backgroundColor: '#FFC72C', barThickness: 12 },
-                    { label: 'Capacity', data: capacity, type: 'line', borderColor: '#FF530D', borderWidth: 2, pointStyle: 'diamond', pointRadius: 7, showLine: false, fill: '#FF530D', yAxisID: 'y' }
+                    { label: 'Capacity', data: capacity, type: 'line', borderColor: '#FF530D', borderWidth: 3, pointStyle: 'line', pointRadius: 7, rotation: 90, fill: false, showLine: false, yAxisID: 'y' }
                 ]
             },
             distanceChartData: {
@@ -1422,6 +1576,26 @@ document.addEventListener('DOMContentLoaded', function() {
         if (scenarioOutputPanel) {
           scenarioOutputPanel.open = true;
         }
+
+        // Update the travel distance impact chart with real data
+        if (window.distanceChartInstance) {
+          window.distanceChartInstance.data = {
+            labels: ['Current School', 'Assigned School'],
+            datasets: [{
+              label: 'Avg Distance (mi)',
+              data: [avgOriginal.toFixed(2), avgAssigned.toFixed(2)],
+              backgroundColor: ['#0033A0', '#ffcc00']
+            }]
+          };
+          window.distanceChartInstance.update();
+          // Hide the placeholder text
+          const placeholder = document.getElementById('distanceChartPlaceholder');
+          if (placeholder) placeholder.style.display = 'none';
+        }
+
+        // Hide the enrollment chart placeholder as well
+        const enrollPlaceholder = document.getElementById('enrollmentChartPlaceholder');
+        if (enrollPlaceholder) enrollPlaceholder.style.display = 'none';
 
     } catch (error) {
         console.error('❌ Error in assignment process:', error);
@@ -1473,7 +1647,37 @@ function filterSchoolsInIsochrone(polygon) {
   const isoTableBody = document.querySelector("#isoTable tbody");
   if (!isoTableBody) return;
 
-  const visibleFeatures = geojsonData.features.filter(f => turf.booleanPointInPolygon(f.geometry, polygon));
+  let visibleFeatures = geojsonData.features.filter(f => turf.booleanPointInPolygon(f.geometry, polygon));
+  // Exclude the selected school if decision type is 'Possibility of Closure/Merger'
+  const decisionFilter = document.getElementById('decisionFilter');
+  const schoolSelect = document.getElementById('schoolSelect');
+  if (decisionFilter && schoolSelect && decisionFilter.value === 'Possibility of Closure/Merger') {
+    const selectedSchool = schoolSelect.value;
+    visibleFeatures = visibleFeatures.filter(f => f.properties['Building Name'] !== selectedSchool);
+    // --- Add info above the table ---
+    const manualView = document.getElementById('manualView');
+    const isoTable = document.getElementById('isoTable');
+    if (manualView && isoTable && selectedSchool) {
+      // Find the selected school in geojsonData
+      const selectedFeature = geojsonData.features.find(
+        f => f.properties['Building Name'] === selectedSchool
+      );
+      const enrollment = selectedFeature ? (selectedFeature.properties['Enrollment'] || 0) : 0;
+      // Create or update the info div above the table
+      let infoDiv = document.getElementById('closureMergerInfo');
+      if (!infoDiv) {
+        infoDiv = document.createElement('div');
+        infoDiv.id = 'closureMergerInfo';
+        infoDiv.style.marginBottom = '10px';
+        isoTable.parentNode.insertBefore(infoDiv, isoTable);
+      }
+      infoDiv.innerHTML = `<strong>Selected School:</strong> ${selectedSchool}<br><strong>Number of students to be assigned:</strong> ${enrollment}`;
+    }
+  } else {
+    // Remove the info div if it exists
+    const infoDiv = document.getElementById('closureMergerInfo');
+    if (infoDiv) infoDiv.remove();
+  }
 
   isoTableBody.innerHTML = '';
   visibleFeatures.forEach(f => {
@@ -1508,6 +1712,28 @@ function addPercentageListeners(visibleFeatures) {
 
       assignedCell.textContent = assignedStudents;
       updatedCell.textContent = remainingSeats;
+
+      // --- Update number of students to be assigned in closure/merger info ---
+      const decisionFilter = document.getElementById('decisionFilter');
+      const infoDiv = document.getElementById('closureMergerInfo');
+      if (infoDiv && decisionFilter && decisionFilter.value === 'Possibility of Closure/Merger') {
+        // Sum all assigned students
+        let totalAssigned = 0;
+        document.querySelectorAll('.assign-percent').forEach(input2 => {
+          const percent2 = parseFloat(input2.value) || 0;
+          totalAssigned += Math.round((percent2 / 100) * selectedEnrollment);
+        });
+        // Find the original enrollment from the infoDiv (parse from the HTML)
+        const match = infoDiv.innerHTML.match(/Number of students to be assigned:<\/strong> (\d+)/);
+        let originalEnrollment = selectedEnrollment;
+        if (match) {
+          // If the number has already been updated, recalculate from selectedEnrollment
+          originalEnrollment = selectedEnrollment;
+        }
+        const remaining = Math.max(0, originalEnrollment - totalAssigned);
+        // Update only the number in the infoDiv
+        infoDiv.innerHTML = infoDiv.innerHTML.replace(/(Number of students to be assigned:<\/strong> )\d+/, `$1${remaining}`);
+      }
     });
   });
 }
@@ -1544,6 +1770,15 @@ document.addEventListener("DOMContentLoaded", function() {
           map.getSource('schools').setData(geojsonData);
           updateLegend();
         }
+        // Update scenario modeling table/lists if present
+        if (typeof window.updateScenarioOptionsVisibility === 'function') {
+          window.updateScenarioOptionsVisibility();
+        }
+        // Update school select dropdown live as decision types change
+        const decisionFilter = document.getElementById('decisionFilter');
+        if (typeof window.updateSchoolSelect === 'function' && decisionFilter) {
+          window.updateSchoolSelect(decisionFilter.value);
+        }
       } else {
         console.warn("⚠️ DecisionLogic not ready, cannot send slider data.");
       }
@@ -1579,8 +1814,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
 // --- ONBOARDING WALKTHROUGH LOGIC ---
 function startOnboardingWalkthrough() {
-  console.log('🚀 Starting onboarding walkthrough...');
-  
   const steps = [
     {
       target: 'body',
@@ -1630,194 +1863,222 @@ function startOnboardingWalkthrough() {
   let popup = null;
 
   function showStep(stepIdx) {
-    console.log(`📋 Showing step ${stepIdx}: ${steps[stepIdx].target}`);
-    
-    try {
-      // Remove previous overlay/popup
-      if (overlay) overlay.remove();
-      if (popup) popup.remove();
+    // Remove previous overlay/popup
+    if (overlay) overlay.remove();
+    if (popup) popup.remove();
 
-      const step = steps[stepIdx];
-      let target = document.querySelector(step.target);
-      
-      console.log(`🎯 Target element found:`, target);
-      
-      // Open dropdown <details> if the step is for a details section
-      const detailsIds = ['#decision-input-panel', '#scenario-input-panel', '#decision-output-panel', '#scenario-output-panel'];
-      if (detailsIds.includes(step.target) && target && !target.open) {
-        console.log(`📂 Opening details element: ${step.target}`);
-        target.open = true;
-      }
-
-      // --- ADD THIS: If the step is the flowchart, switch to flowchart view ---
-      if (step.target === '#main-flowchart-container') {
-        // This is the flowchart step; show the flowchart view
-        const flowchartBtn = document.getElementById('toggleMapFlowchartFlowchart');
-        if (flowchartBtn && !flowchartBtn.classList.contains('active')) {
-          console.log('🔄 Switching to flowchart view');
-          flowchartBtn.click();
-        }
-      }
-
-      // For scenario/model output, wait for the section to open before highlighting
-      if ((step.target === '#scenario-input-panel' || step.target === '#scenario-output-panel') && target) {
-        // Scroll into view
-        target.scrollIntoView({behavior: 'smooth', block: 'center'});
-        setTimeout(() => {
-          drawHighlight(target, step, stepIdx);
-        }, 200);
-        // Draw popup after highlight
-        setTimeout(() => {
-          drawPopup(target, step, stepIdx);
-        }, 210);
-        return;
-      }
-
-      if (!target) {
-        console.warn(`⚠️ Target element not found: ${step.target}, skipping to next step`);
-        nextStep();
-        return;
-      }
-
-      // Default: draw highlight and popup immediately
-      drawHighlight(target, step, stepIdx);
-      drawPopup(target, step, stepIdx);
-    } catch (error) {
-      console.error('❌ Error in showStep:', error);
-      // Continue to next step on error
-      nextStep();
+    const step = steps[stepIdx];
+    let target = document.querySelector(step.target);
+    // Open dropdown <details> if the step is for a details section
+    const detailsIds = ['#decision-input-panel', '#scenario-input-panel', '#decision-output-panel', '#scenario-output-panel'];
+    if (detailsIds.includes(step.target) && target && !target.open) {
+      target.open = true;
     }
+
+    // --- ADD THIS: If the step is the flowchart, switch to flowchart view ---
+    if (step.target === '#main-flowchart-container') {
+      // This is the flowchart step; show the flowchart view
+      const flowchartBtn = document.getElementById('toggleMapFlowchartFlowchart');
+      if (flowchartBtn && !flowchartBtn.classList.contains('active')) {
+        flowchartBtn.click();
+      }
+    }
+
+    // For scenario/model output, wait for the section to open before highlighting
+    if ((step.target === '#scenario-input-panel' || step.target === '#scenario-output-panel') && target) {
+      // Scroll into view
+      target.scrollIntoView({behavior: 'smooth', block: 'center'});
+      // For scenario modeling, highlight the entire details border, not just the summary, but only after open and after scroll
+      if (step.target === '#scenario-input-panel') {
+        let highlightTarget = document.getElementById('scenario-input-panel');
+        const drawAfterScroll = () => {
+          drawHighlight(highlightTarget, step, stepIdx);
+          setTimeout(() => {
+            drawPopup(target, step, stepIdx);
+          }, 60);
+        };
+        if (!highlightTarget.open) {
+          highlightTarget.open = true;
+          setTimeout(drawAfterScroll, 400); // Wait for open + scroll
+        } else {
+          setTimeout(drawAfterScroll, 350); // Wait for scroll
+        }
+        return;
+      }
+      // For scenario output panel, keep previous logic
+      setTimeout(() => {
+        drawHighlight(target, step, stepIdx);
+      }, 200);
+      setTimeout(() => {
+        drawPopup(target, step, stepIdx);
+      }, 210);
+      return;
+    }
+
+    if (!target) {
+      nextStep();
+      return;
+    }
+
+    // Default: draw highlight and popup immediately
+    drawHighlight(target, step, stepIdx);
+    drawPopup(target, step, stepIdx);
   }
 
   function drawHighlight(target, step, stepIdx) {
-    try {
-      console.log(`🎨 Drawing highlight for step ${stepIdx}`);
-      
-      // Create overlay
-      overlay = document.createElement('div');
-      overlay.style.position = 'fixed';
-      overlay.style.top = '0';
-      overlay.style.left = '0';
-      overlay.style.width = '100vw';
-      overlay.style.height = '100vh';
-      overlay.style.background = 'rgba(0,0,0,0.1)';
-      overlay.style.zIndex = '20000';
-      overlay.style.pointerEvents = 'auto';
-      document.body.appendChild(overlay);
+    // Create overlay
+    overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100vw';
+    overlay.style.height = '100vh';
+    overlay.style.background = 'rgba(0,0,0,0.1)';
+    overlay.style.zIndex = '20000';
+    overlay.style.pointerEvents = 'auto';
+    document.body.appendChild(overlay);
 
-      // Highlight target (skip for intro step)
-      let rect = {left: 0, top: 0, width: 0, height: 0};
-      let highlight = null;
-      if (!step.isIntro) {
-        rect = target.getBoundingClientRect();
-        highlight = document.createElement('div');
-        highlight.style.position = 'fixed';
-        highlight.style.left = rect.left + 'px';
-        highlight.style.top = rect.top + 'px';
-        highlight.style.width = rect.width + 'px';
-        highlight.style.height = rect.height + 'px';
-        highlight.style.border = '3px solid #FFD600';
-        highlight.style.borderRadius = '10px';
-        highlight.style.boxShadow = '0 0 0 9999px rgba(0,0,0,0.7)';
-        highlight.style.zIndex = '20001';
-        highlight.style.pointerEvents = 'none';
-        document.body.appendChild(highlight);
-        overlay.appendChild(highlight);
+    // Highlight target (skip for intro step)
+    let rect = {left: 0, top: 0, width: 0, height: 0};
+    let highlight = null;
+    if (!step.isIntro) {
+      rect = target.getBoundingClientRect();
+      highlight = document.createElement('div');
+      highlight.style.position = 'fixed';
+      highlight.style.left = rect.left + 'px';
+      highlight.style.top = rect.top + 'px';
+      highlight.style.width = rect.width + 'px';
+      highlight.style.height = rect.height + 'px';
+      highlight.style.border = '3px solid #FFD600';
+      highlight.style.borderRadius = '10px';
+      highlight.style.boxShadow = '0 0 0 9999px rgba(0,0,0,0.7)';
+      highlight.style.zIndex = '20001';
+      highlight.style.pointerEvents = 'none';
+      document.body.appendChild(highlight);
+      overlay.appendChild(highlight);
+      
+      // Add additional red circle around "Show Map" button for map step
+      if (step.target === '#map-container') {
+        const mapButton = document.getElementById('toggleMapFlowchartMap');
+        if (mapButton) {
+          const buttonRect = mapButton.getBoundingClientRect();
+          const buttonHighlight = document.createElement('div');
+          buttonHighlight.style.position = 'fixed';
+          buttonHighlight.style.left = (buttonRect.left - 10) + 'px';
+          buttonHighlight.style.top = (buttonRect.top - 10) + 'px';
+          buttonHighlight.style.width = (buttonRect.width + 20) + 'px';
+          buttonHighlight.style.height = (buttonRect.height + 20) + 'px';
+          buttonHighlight.style.border = '3px solid #e74c3c';
+          buttonHighlight.style.borderRadius = '50%';
+          buttonHighlight.style.zIndex = '20002';
+          buttonHighlight.style.pointerEvents = 'none';
+          document.body.appendChild(buttonHighlight);
+          overlay.appendChild(buttonHighlight);
+        }
       }
-    } catch (error) {
-      console.error('❌ Error in drawHighlight:', error);
     }
   }
 
   function drawPopup(target, step, stepIdx) {
-    try {
-      console.log(`💬 Drawing popup for step ${stepIdx}`);
-      
-      // Create popup
-      popup = document.createElement('div');
-      popup.style.position = 'fixed';
-      if (step.isIntro) {
-        popup.style.left = '50%';
-        popup.style.top = '20%';
-        popup.style.transform = 'translate(-50%, 0)';
-      } else if (step.target === '#decision-output-panel' || step.target === '#scenario-output-panel') {
-        // Position to the left of the panel, with a larger gap
-        const rect = target.getBoundingClientRect();
-        const popupWidth = 340;
-        const gap = 100; // Consistent gap for both panels
-        popup.style.left = (rect.left - popupWidth - gap > 20 ? rect.left - popupWidth - gap : 20) + 'px';
-        popup.style.top = rect.top + 'px';
-        popup.style.right = '';
-        popup.style.transform = '';
-      } else {
-        const rect = target.getBoundingClientRect();
-        popup.style.left = (rect.left + rect.width + 20) + 'px';
-        popup.style.top = rect.top + 'px';
-        popup.style.transform = '';
-      }
-      popup.style.background = '#fff';
-      popup.style.color = '#222';
-      popup.style.border = '2px solid #007cbf';
-      popup.style.borderRadius = '8px';
-      popup.style.boxShadow = '0 4px 24px rgba(0,0,0,0.2)';
-      popup.style.padding = '24px 32px';
-      popup.style.zIndex = '20002';
-      popup.style.maxWidth = '340px';
-      popup.style.fontSize = '16px';
-      popup.innerHTML = `<h3 style='margin-top:0;color:#007cbf;'>${step.title}</h3><p>${step.text}</p>`;
-      // Next/Close/Skip button(s)
-      if (step.isIntro) {
-        // Skip button
-        const skipBtn = document.createElement('button');
-        skipBtn.textContent = 'Skip';
-        skipBtn.style.marginTop = '18px';
-        skipBtn.style.background = '#e74c3c';
-        skipBtn.style.color = '#fff';
-        skipBtn.style.border = 'none';
-        skipBtn.style.borderRadius = '4px';
-        skipBtn.style.padding = '8px 20px';
-        skipBtn.style.fontSize = '16px';
-        skipBtn.style.cursor = 'pointer';
-        skipBtn.style.marginRight = '12px';
-        skipBtn.onclick = endWalkthrough;
-        popup.appendChild(skipBtn);
-        // Start button
-        const startBtn = document.createElement('button');
-        startBtn.textContent = 'Start Tour';
-        startBtn.style.marginTop = '18px';
-        startBtn.style.background = '#007cbf';
-        startBtn.style.color = '#fff';
-        startBtn.style.border = 'none';
-        startBtn.style.borderRadius = '4px';
-        startBtn.style.padding = '8px 20px';
-        startBtn.style.fontSize = '16px';
-        startBtn.style.cursor = 'pointer';
-        startBtn.onclick = nextStep;
-        popup.appendChild(startBtn);
-      } else {
-        const btn = document.createElement('button');
-        btn.textContent = (stepIdx === steps.length - 1) ? 'Finish' : 'Next';
-        btn.style.marginTop = '18px';
-        btn.style.background = '#007cbf';
-        btn.style.color = '#fff';
-        btn.style.border = 'none';
-        btn.style.borderRadius = '4px';
-        btn.style.padding = '8px 20px';
-        btn.style.fontSize = '16px';
-        btn.style.cursor = 'pointer';
-        btn.onclick = () => {
-          if (stepIdx === steps.length - 1) {
-            endWalkthrough();
-          } else {
-            nextStep();
-          }
-        };
-        popup.appendChild(btn);
-      }
-      document.body.appendChild(popup);
-    } catch (error) {
-      console.error('❌ Error in drawPopup:', error);
+    // Create popup
+    popup = document.createElement('div');
+    popup.style.position = 'fixed';
+    if (step.isIntro) {
+      popup.style.left = '50%';
+      popup.style.top = '20%';
+      popup.style.transform = 'translate(-50%, 0)';
+    } else if (step.target === '#decision-output-panel' || step.target === '#scenario-output-panel') {
+      // Position to the left of the panel, with a larger gap
+      const rect = target.getBoundingClientRect();
+      const popupWidth = 340;
+      const gap = 100; // Consistent gap for both panels
+      popup.style.left = (rect.left - popupWidth - gap > 20 ? rect.left - popupWidth - gap : 20) + 'px';
+      popup.style.top = rect.top + 'px';
+      popup.style.right = '';
+      popup.style.transform = '';
+    } else {
+      const rect = target.getBoundingClientRect();
+      popup.style.left = (rect.left + rect.width + 20) + 'px';
+      popup.style.top = rect.top + 'px';
+      popup.style.transform = '';
     }
+    popup.style.background = '#fff';
+    popup.style.color = '#222';
+    popup.style.border = '2px solid #007cbf';
+    popup.style.borderRadius = '8px';
+    popup.style.boxShadow = '0 4px 24px rgba(0,0,0,0.2)';
+    popup.style.padding = '24px 32px';
+    popup.style.zIndex = '20002';
+    popup.style.maxWidth = '340px';
+    popup.style.fontSize = '16px';
+    popup.innerHTML = `<h3 style='margin-top:0;color:#007cbf;'>${step.title}</h3><p>${step.text}</p>`;
+    // Next/Close/Skip button(s)
+    if (step.isIntro) {
+      // Skip button
+      const skipBtn = document.createElement('button');
+      skipBtn.textContent = 'Skip';
+      skipBtn.style.marginTop = '18px';
+      skipBtn.style.background = '#e74c3c';
+      skipBtn.style.color = '#fff';
+      skipBtn.style.border = 'none';
+      skipBtn.style.borderRadius = '4px';
+      skipBtn.style.padding = '8px 20px';
+      skipBtn.style.fontSize = '16px';
+      skipBtn.style.cursor = 'pointer';
+      skipBtn.style.marginRight = '12px';
+      skipBtn.onclick = endWalkthrough;
+      popup.appendChild(skipBtn);
+      // Start button
+      const startBtn = document.createElement('button');
+      startBtn.textContent = 'Start Tour';
+      startBtn.style.marginTop = '18px';
+      startBtn.style.background = '#007cbf';
+      startBtn.style.color = '#fff';
+      startBtn.style.border = 'none';
+      startBtn.style.borderRadius = '4px';
+      startBtn.style.padding = '8px 20px';
+      startBtn.style.fontSize = '16px';
+      startBtn.style.cursor = 'pointer';
+      startBtn.onclick = nextStep;
+      popup.appendChild(startBtn);
+    } else {
+      // Back button (except for first step)
+      if (stepIdx > 0) {
+        const backBtn = document.createElement('button');
+        backBtn.textContent = 'Back';
+        backBtn.style.marginTop = '18px';
+        backBtn.style.background = '#6c757d';
+        backBtn.style.color = '#fff';
+        backBtn.style.border = 'none';
+        backBtn.style.borderRadius = '4px';
+        backBtn.style.padding = '8px 20px';
+        backBtn.style.fontSize = '16px';
+        backBtn.style.cursor = 'pointer';
+        backBtn.style.marginRight = '12px';
+        backBtn.onclick = previousStep;
+        popup.appendChild(backBtn);
+      }
+      
+      const btn = document.createElement('button');
+      btn.textContent = (stepIdx === steps.length - 1) ? 'Finish' : 'Next';
+      btn.style.marginTop = '18px';
+      btn.style.background = '#007cbf';
+      btn.style.color = '#fff';
+      btn.style.border = 'none';
+      btn.style.borderRadius = '4px';
+      btn.style.padding = '8px 20px';
+      btn.style.fontSize = '16px';
+      btn.style.cursor = 'pointer';
+      btn.onclick = () => {
+        if (stepIdx === steps.length - 1) {
+          endWalkthrough();
+        } else {
+          nextStep();
+        }
+      };
+      popup.appendChild(btn);
+    }
+    document.body.appendChild(popup);
   }
 
   function nextStep() {
@@ -1829,14 +2090,123 @@ function startOnboardingWalkthrough() {
     }
   }
 
+  function previousStep() {
+    currentStep--;
+    if (currentStep >= 0) {
+      // Close any sections that were opened in the current step before going back
+      const currentStepTarget = steps[currentStep + 1]?.target;
+      if (currentStepTarget === '#scenario-input-panel') {
+        const scenarioPanel = document.getElementById('scenario-input-panel');
+        if (scenarioPanel && scenarioPanel.open) {
+          scenarioPanel.open = false;
+        }
+      } else if (currentStepTarget === '#decision-input-panel') {
+        const decisionPanel = document.getElementById('decision-input-panel');
+        if (decisionPanel && decisionPanel.open) {
+          decisionPanel.open = false;
+        }
+      } else if (currentStepTarget === '#decision-output-panel') {
+        const decisionOutputPanel = document.getElementById('decision-output-panel');
+        if (decisionOutputPanel && decisionOutputPanel.open) {
+          decisionOutputPanel.open = false;
+        }
+      } else if (currentStepTarget === '#scenario-output-panel') {
+        const scenarioOutputPanel = document.getElementById('scenario-output-panel');
+        if (scenarioOutputPanel && scenarioOutputPanel.open) {
+          scenarioOutputPanel.open = false;
+        }
+      } else if (currentStepTarget === '#main-flowchart-container') {
+        // Switch back to map view if we were on flowchart
+        const mapBtn = document.getElementById('toggleMapFlowchartMap');
+        if (mapBtn && !mapBtn.classList.contains('active')) {
+          mapBtn.click();
+        }
+      }
+      
+      showStep(currentStep);
+    } else {
+      endWalkthrough();
+    }
+  }
+
   function endWalkthrough() {
-    console.log('🏁 Ending walkthrough');
     if (overlay) overlay.remove();
     if (popup) popup.remove();
   }
 
-  // Add a small delay to ensure DOM is ready
-  setTimeout(() => {
-    showStep(currentStep);
-  }, 100);
+  showStep(currentStep);
+}
+
+// 1. Add a helper to inject tooltip CSS if not already present
+function injectTooltipCSS() {
+  if (document.getElementById('custom-tooltip-style')) return;
+  const style = document.createElement('style');
+  style.id = 'custom-tooltip-style';
+  style.textContent = `
+    .custom-tooltip {
+      position: fixed;
+      z-index: 9999;
+      background: #222;
+      color: #fff;
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 15px;
+      pointer-events: none;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+      white-space: nowrap;
+      opacity: 0.97;
+      transition: opacity 0.1s;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+// 2. Add a function to handle custom tooltips for dollar sign buttons
+function setupDollarSignTooltips() {
+  injectTooltipCSS();
+  // Remove any previous listeners to avoid duplicates
+  const container = document.getElementById('investmentsTableContainer');
+  if (!container) return;
+  let tooltip = null;
+
+  container.addEventListener('mouseover', function(e) {
+    const target = e.target.closest('.dollar-sign-tooltip');
+    if (target && target.dataset.tooltip) {
+      tooltip = document.createElement('div');
+      tooltip.className = 'custom-tooltip';
+      tooltip.textContent = target.dataset.tooltip;
+      document.body.appendChild(tooltip);
+      // Position tooltip near mouse
+      const move = (evt) => {
+        tooltip.style.left = (evt.clientX + 12) + 'px';
+        tooltip.style.top = (evt.clientY + 12) + 'px';
+      };
+      move(e);
+      document.addEventListener('mousemove', move);
+      target._moveHandler = move;
+    }
+  });
+  container.addEventListener('mouseout', function(e) {
+    const target = e.target.closest('.dollar-sign-tooltip');
+    if (target && tooltip) {
+      document.body.removeChild(tooltip);
+      tooltip = null;
+      if (target._moveHandler) {
+        document.removeEventListener('mousemove', target._moveHandler);
+        target._moveHandler = null;
+      }
+    }
+  });
+  // Remove tooltip on click as well
+  container.addEventListener('click', function(e) {
+    const target = e.target.closest('.dollar-sign-tooltip');
+    if (target && tooltip) {
+      document.body.removeChild(tooltip);
+      tooltip = null;
+      if (target._moveHandler) {
+        document.removeEventListener('mousemove', target._moveHandler);
+        target._moveHandler = null;
+      }
+    }
+  });
 }

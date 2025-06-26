@@ -277,6 +277,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
     canvas.height = chartData.labels.length * 14;
     const ctx = canvas.getContext('2d');
+
+    // Custom plugin for orange capacity tick marks
+    const capacityTicksPlugin = {
+      id: 'capacityTicks',
+      afterDatasetsDraw(chart, args, options) {
+        if (!chartData.capacity) return;
+        const { ctx, chartArea, scales } = chart;
+        const yScale = scales.y;
+        const xScale = scales.x;
+        ctx.save();
+        chartData.capacity.forEach((cap, i) => {
+          if (cap > 0) {
+            const y = yScale.getPixelForValue(chartData.labels[i]);
+            const x = xScale.getPixelForValue(cap);
+            ctx.beginPath();
+            ctx.strokeStyle = 'orange';
+            ctx.lineWidth = 3;
+            ctx.moveTo(x, y - 6);
+            ctx.lineTo(x, y + 6);
+            ctx.stroke();
+          }
+        });
+        ctx.restore();
+      }
+    };
+
     assignmentChartInstance = new Chart(ctx, {
       type: 'bar',
       data: chartData,
@@ -299,7 +325,8 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         },
         plugins: { legend: { position: 'bottom' } }
-      }
+      },
+      plugins: [capacityTicksPlugin]
     });
     console.log("✅ Enrollment chart rendered successfully!");
   }
