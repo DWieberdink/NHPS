@@ -4,6 +4,7 @@ console.log("🚀 Initializing Decision Logic directly in the main document");
 // Expose decision logic to the global scope
 window.decisionLogic = {
   thresholds: {
+    enrollmentThreshold: 200,
     utilization: 0.65,
     utilizationHigh: 0.95,
     enrollmentGrowth: 0,
@@ -37,6 +38,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function evaluateSchool(row, t = self.thresholds) {
+    // First check: Enrollment threshold
+    // Robust enrollment field lookup
+    const enrollmentRaw = row.Enrollment || row['Enrollment'] || row[' Enrollment'] || row['Enrollment '] || row['Enrollemnt'] || row['Enrolled'] || row['enrollment'] || row['enrollment_total'] || undefined;
+    const enrollment = parseFloat((enrollmentRaw || '').toString().replace(/,/g, '').trim());
+    if (enrollment <= t.enrollmentThreshold) {
+      return "Possibility of Closure/Merger";
+    }
+    
     const decisions = {
       F: +row.Utilization > t.utilization ? "Yes" : "No",
       G: +row.Utilization > t.utilizationHigh ? "Yes" : "No",
@@ -76,6 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderTable(data) {
+    console.log("📋 renderTable called with data length:", data.length);
     const summaryDiv = document.getElementById("summary");
     const resultsDiv = document.getElementById("results");
 
@@ -108,6 +118,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }).join("");
   
     const totalCount = Object.values(decisionCounts).reduce((sum, count) => sum + count, 0);
+    
+    console.log("📊 Decision counts:", decisionCounts);
+    console.log("📊 Total schools:", totalCount);
   
     const summaryRows = allDecisions.map(decision =>
       `<tr><td class="truncate-cell" data-tooltip="${decision}">${decision}</td><td>${decisionCounts[decision] || 0}</td></tr>`
@@ -198,18 +211,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
   self.recalculateEverything = function() {
     if (!self.schoolData || self.schoolData.length === 0) return;
+    console.log("🔑 First row keys:", Object.keys(self.schoolData[0] || {}));
     console.log("♻️ Recalculating everything with thresholds:", self.thresholds);
     
+    let closureCount = 0;
     self.schoolData.forEach(row => {
-      row.decision = evaluateSchool(row, self.thresholds);
+      // Robust enrollment field lookup
+      const enrollmentRaw = row.Enrollment || row['Enrollment'] || row[' Enrollment'] || row['Enrollment '] || row['Enrollemnt'] || row['Enrolled'] || row['enrollment'] || row['enrollment_total'] || undefined;
+      const enrollmentParsed = parseFloat((enrollmentRaw || '').toString().replace(/,/g, '').trim());
+      console.log('📝', row['Building Name'], '| Raw:', enrollmentRaw, '| Parsed:', enrollmentParsed, '| Type:', typeof enrollmentParsed);
+      const oldDecision = row.decision;
+      const enrollment = enrollmentParsed;
+      row.decision = evaluateSchool({ ...row, Enrollment: enrollmentParsed }, self.thresholds);
+      if (row.decision === "Possibility of Closure/Merger") {
+        closureCount++;
+        if (oldDecision !== row.decision) {
+          console.log("🚨 School moved to closure/merger:", row["Building Name"], "enrollment:", enrollment, "threshold:", self.thresholds.enrollmentThreshold);
+        }
+      }
+      if (oldDecision !== row.decision) {
+        console.log("🔄 School decision changed:", row["Building Name"], "enrollment:", enrollment, oldDecision, "→", row.decision);
+      }
     });
+    console.log("📊 Total schools marked for closure/merger:", closureCount);
     self.lastData = [...self.schoolData];
     renderTable(self.schoolData);
   };
   
   self.updateThresholds = function(newThresholds) {
     if (newThresholds) {
-      console.log("✅ Received new thresholds:", newThresholds);
+      console.log("✅ DecisionLogic received new thresholds:", newThresholds);
+      console.log("📊 Enrollment threshold changed from", self.thresholds.enrollmentThreshold, "to", newThresholds.enrollmentThreshold);
       Object.assign(self.thresholds, newThresholds);
       window.thresholds = self.thresholds; // For flowchart logic
       self.recalculateEverything();

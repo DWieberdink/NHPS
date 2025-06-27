@@ -31,7 +31,7 @@
       margin: 0;
       display: flex;
       height: 100vh;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif;
       overflow: hidden; /* Prevent the whole page from scrolling */
     }
 
@@ -68,11 +68,13 @@
     #sidebar h3 { margin-top: 20px; font-size: 16px; font-weight: bold; color: #333; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
     select, input[type="range"], input[type="number"] {
       width: 100%; padding: 8px; margin: 6px 0 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; box-sizing: border-box;
+      font-family: 'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif;
     }
     button {
       padding: 6px 12px; margin-top: 4px; margin-right: 6px;
       font-size: 14px; border: none; border-radius: 4px; cursor: pointer;
       background-color: #007cbf; color: white;
+      font-family: 'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif;
     }
     button:hover { background-color: #005e93; }
 
@@ -86,6 +88,7 @@
   padding: 10px;
   font-size: 13px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  font-family: 'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif;
   
   display: flex;
   flex-wrap: wrap; /* allow wrapping if space is tight */
@@ -269,6 +272,13 @@
       background: none;
     }
 
+    /* Ensure tooltip content does not overlap with close button */
+    .draggable-tooltip, .tooltip, [id$='-help-tooltip'] {
+      padding-top: 18px !important;
+      padding-right: 18px !important;
+      box-sizing: border-box;
+    }
+
     /* Flowchart Styles */
     .ellipse-node {fill: #007cbf; stroke: #ccc; stroke-width: 1.5;}
     .node rect.ellipse-node { fill: #007cbf; stroke: #ccc; stroke-width: 1.5; }
@@ -280,7 +290,7 @@
     .node.special-highlight rect {stroke: #000000; stroke-width: 3; fill: #eb77fd;}
     .link { stroke: #ccc; fill: none; stroke-width: 2px; }
     .link.active { stroke: #f0ad4e; stroke-width: 3px; marker-end: url(#arrow-active); }
-    .link-label.active-label { fill: red; font-size: 14px; font-family: Franklin Gothic Book; font-weight: bold; pointer-events: none;}
+    .link-label.active-label { fill: red; font-size: 14px; font-family: 'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif; font-weight: bold; pointer-events: none;}
 
     /* ✅ Styles for the main flowchart container to fit in the layout */
     #main-flowchart-container {
@@ -629,7 +639,7 @@
     }
 
     /* Styles from DecisionPanel.html */
-    .decision-panel-body { font-family: 'Segoe UI', sans-serif; padding: 0; margin: 0; }
+    .decision-panel-body { font-family: 'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif; padding: 0; margin: 0; }
     .decision-panel-body label { display: block; margin-top: 1rem; }
     .decision-panel-body table { border-collapse: collapse; width: 100%; }
     .decision-panel-body th, .decision-panel-body td { border: 1px solid #ccc; padding: 6px; text-align: left; }
@@ -829,7 +839,7 @@
           <span id = "decision-help-icon" class = "help-icon">
             <svg width="18" height="18" viewBox="0 0 20 20"  xmlns="http://www.w3.org/2000/svg">
               <circle cx="10" cy="10" r="10" fill="#007cbf"/>
-              <text x="10" y="15" text-anchor="middle" font-size="13" font-family="Arial" fill="white" font-weight="bold">?</text>
+              <text x="10" y="15" text-anchor="middle" font-size="13" font-family="Franklin Gothic Book, Franklin Gothic, Arial Narrow, Arial, sans-serif" fill="white" font-weight="bold">?</text>
             </svg>
           </span>
           <span id="decision-help-tooltip" class ="tooltip">
@@ -858,6 +868,9 @@
       </span>
     </summary>
     <div id="decision-sliders" style="padding-top: 1rem;">
+      <label>Enrollment Threshold: <span id="enrollmentOut">200</span>
+        <input type="range" id="enrollmentSlider" min="0" max="500" step="10" value="200">
+      </label>
       <label>Utilization Threshold: <span id="utilOut">65</span>%
         <input type="range" id="utilSlider" min="0" max="100" step="1" value="65">
       </label>
@@ -891,7 +904,7 @@
           <span id="scenario-help-icon" class= "help-icon">
             <svg width="18" height="18" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" padding= 20px>
               <circle cx="10" cy="10" r="10" fill="#007cbf"/>
-              <text x="10" y="15" text-anchor="middle" font-size="13" font-family="Arial" fill="white" font-weight="bold">?</text>
+              <text x="10" y="15" text-anchor="middle" font-size="13" font-family="Franklin Gothic Book, Franklin Gothic, Arial Narrow, Arial, sans-serif" fill="white" font-weight="bold">?</text>
             </svg>
           </span>
           <span id="scenario-help-tooltip" class = "tooltip";>
@@ -1068,7 +1081,7 @@
             <span id="flowchart-help-icon" style="display:inline-block;vertical-align:middle;cursor:pointer;">
               <svg width="18" height="18" viewBox="0 0 20 20" style="border-radius:50%;background:#007cbf;" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="10" cy="10" r="10" fill="#007cbf"/>
-                <text x="10" y="15" text-anchor="middle" font-size="13" font-family="Arial" fill="white" font-weight="bold">?</text>
+                <text x="10" y="15" text-anchor="middle" font-size="13" font-family="Franklin Gothic Book, Franklin Gothic, Arial Narrow, Arial, sans-serif" fill="white" font-weight="bold">?</text>
               </svg>
             </span>
             <span id="flowchart-help-tooltip" style="display:none;position:absolute;z-index:1000;background:#fff;color:#222;border:1px solid #007cbf;border-radius:6px;padding:10px;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-size:14px;width:300px;right:0;top:28px;font-weight:bold;">
@@ -1101,11 +1114,11 @@
         <summary class="how-to-use-summary"><strong>How to interpret the outcomes</strong></summary>
         <div style="padding: 0.5rem;">
           <h3>School & Student Decisions</h3>
-          <p>In this section you see the results of your choices. It has two key functions:
-
-            Evaluation Results: When you adjust the evaluation sliders on the left (like utilization or building condition), this section instantly updates to show recommended actions for each school—both in summary and detailed views.
-            
-            Scenario Impact Analysis: After running a simulation (like closing a school), this section displays the effects—such as where students will go, how enrollment shifts, and how travel distances change.</p>
+          <p>In this section you see the results of your choices. It has two key functions:</p>
+          <ul style="margin-top:0.5em; margin-bottom:0.5em;">
+            <li><strong>Evaluation Results:</strong> When you adjust the evaluation sliders on the left (like utilization or building condition), this section instantly updates to show recommended actions for each school—both in summary and detailed views.</li>
+            <li><strong>Scenario Impact Analysis:</strong> After running a simulation (like closing a school), this section displays the effects—such as where students will go, how enrollment shifts, and how travel distances change.</li>
+          </ul>
         </div>
       </details>
 
@@ -1122,10 +1135,10 @@
          <span id="decision-results-help-icon" class="help-icon">
            <svg width="18" height="18" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
         <circle cx="10" cy="10" r="10" fill="#007cbf"/>
-        <text x="10" y="15" text-anchor="middle" font-size="13" font-family="Arial" fill="white" font-weight="bold">?</text>
+        <text x="10" y="15" text-anchor="middle" font-size="13" font-family="Franklin Gothic Book, Franklin Gothic, Arial Narrow, Arial, sans-serif" fill="white" font-weight="bold">?</text>
            </svg>
         </span>
-       <span id="decision-results-help-tooltip" class="tooltip";>
+       <span id="decision-results-help-tooltip" class="tooltip" style="display:none;">
          <button class="close-tooltip-btn" onclick="this.parentElement.style.display='none'">&times;</button>
          This section shows the results of the school decision evaluation based on your selected criteria.
         </span>
@@ -1156,7 +1169,7 @@
                   <span id="model-output-help-icon" style="display:inline-block;vertical-align:middle;cursor:pointer;">
                     <svg width="18" height="18" viewBox="0 0 20 20" style="border-radius:50%;background:#007cbf;" xmlns="http://www.w3.org/2000/svg">
                       <circle cx="10" cy="10" r="10" fill="#007cbf"/>
-                      <text x="10" y="15" text-anchor="middle" font-size="13" font-family="Arial" fill="white" font-weight="bold">?</text>
+                      <text x="10" y="15" text-anchor="middle" font-size="13" font-family="Franklin Gothic Book, Franklin Gothic, Arial Narrow, Arial, sans-serif" fill="white" font-weight="bold">?</text>
                     </svg>
                   </span>
                   <span id="model-output-help-tooltip" style="display:none;position:absolute;z-index:1000;background:#fff;color:#222;border:1px solid #007cbf;border-radius:6px;padding:10px;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-size:14px;width:300px;right:0;top:28px;">
@@ -1377,8 +1390,84 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+  // Make all question mark tooltips draggable
+  function makeTooltipDraggable(tooltip) {
+    if (!tooltip) return;
+    tooltip.classList.add('draggable-tooltip');
+    let isMouseDown = false, offset = [0, 0];
+    tooltip.addEventListener('mousedown', function(e) {
+      isMouseDown = true;
+      offset = [
+        tooltip.offsetLeft - e.clientX,
+        tooltip.offsetTop - e.clientY
+      ];
+      tooltip.style.cursor = 'move';
+      e.preventDefault();
+    }, true);
+    document.addEventListener('mouseup', function() {
+      isMouseDown = false;
+      tooltip.style.cursor = '';
+    }, true);
+    document.addEventListener('mousemove', function(e) {
+      if (!isMouseDown) return;
+      tooltip.style.left = (e.clientX + offset[0]) + 'px';
+      tooltip.style.top = (e.clientY + offset[1]) + 'px';
+      tooltip.style.right = 'auto';
+    }, true);
+  }
+  // Find all tooltips and make them draggable
+  setTimeout(() => {
+    // By class 'tooltip'
+    document.querySelectorAll('.tooltip').forEach(makeTooltipDraggable);
+    // By style (for those not using class)
+    document.querySelectorAll('span,div').forEach(el => {
+      const style = el.getAttribute('style') || '';
+      if (style.includes('position:absolute') && style.includes('z-index:1000')) {
+        makeTooltipDraggable(el);
+      }
+    });
+  }, 500);
 });
 </script>
 
+<!-- === GLOBAL HELP TOOLTIPS (moved out of details/summary for independence) === -->
+<span id="decision-help-tooltip" class="tooltip" style="display:none;">
+  <button class="close-tooltip-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+  School Decision Evaluation: Results<br>
+  The sliders below adjust how schools are evaluated across multiple factors, which is reflected in <strong>School Decision Evaluation: Results</strong> on the right side of the screen.<br>
+  The flowchart allows you to explore the decision logic dynamically by school.<br><br>
+  <ul style="text-align:left; margin-left: 0.5em; padding-left: 1em;">
+    <li><strong>Utilization Threshold</strong><br>
+    Sets the minimum percentage of a school's capacity that should be used before it's considered underutilized.</li>
+    <li><strong>High Utilization Threshold</strong><br>
+    Defines when a school is considered highly utilized or potentially overcrowded.</li>
+    <li><strong>Enrollment Growth Threshold</strong><br>
+    Minimum expected change in student enrollment (as a percentage).</li>
+    <li><strong>Projected Utilization Threshold</strong><br>
+    Target for future utilization based on projected enrollment.</li>
+    <li><strong>Distance to Underutilized Schools</strong><br>
+    Maximum distance to look for nearby underutilized schools for reassignment.</li>
+    <li><strong>Building Threshold</strong><br>
+    Minimum required building condition score.</li>
+    <li><strong>Adequate Program Offer Minimum</strong><br>
+    Minimum number of programs (academic or extracurricular) a school should offer.</li>
+  </ul>
+</span>
+<span id="scenario-help-tooltip" class="tooltip" style="display:none;">
+  <button class="close-tooltip-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+  Use this section to test and evaluate the impact of portfolio decisions. Adjust settings and run simulations to see scenario outcomes.
+</span>
+<span id="decision-results-help-tooltip" class="tooltip" style="display:none;">
+  <button class="close-tooltip-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+  This section shows the results of the school decision evaluation based on your selected criteria.
+</span>
+<span id="model-output-help-tooltip" class="tooltip" style="display:none;">
+  <button class="close-tooltip-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+  This section displays the impact analysis of your scenario, including enrollment, utilization, and travel distance changes.
+</span>
+<span id="flowchart-help-tooltip" class="tooltip" style="display:none;">
+  <button class="close-tooltip-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+  Select a school to view its decision flowchart. The flowchart visualizes how the evaluation criteria lead to the recommended action for the selected school.
+</span>
 </body>
 </html>

@@ -5,6 +5,7 @@ let nodes = [];
 window.FlowUtils = {};
 let links = []; 
 let schoolData = [];
+let mapExportData = null;
 
 // ✅ Global initialization function for main page
 window.initializeFlowchartFromScript = function(svgElement) {
@@ -42,6 +43,7 @@ window.setupFlowchartManually = function(svgElement) {
 
 function mapSliderKeyToThresholdKey(sliderId) {
   const mapping = {
+    enrollmentSlider: "enrollmentThreshold",
     utilSlider: "utilization",
     utilHighSlider: "utilizationHigh",
     growthSlider: "enrollmentGrowth",
@@ -57,7 +59,10 @@ function mapSliderKeyToThresholdKey(sliderId) {
 function initializeFlowchartData() {
   // Data Definition for the flowchart
   nodes = [
-     // First Row
+     // Enrollment Check (NEW - First Row)
+    { id: "E", label: "Enrollment above", fx: 255, fy: -100, thresholdKey: "enrollmentSlider" },
+   
+     // First Row (moved down)
     { id: "F", label: "Utilization above", fx: 5, fy: 0, thresholdKey: "utilSlider" },
     { id: "I", label: "Past 10 year growth", fx: 255, fy: 0, thresholdKey: "growthSlider" },
     { id: "M", label: "Within mile of another underutilized school", fx: 505, fy: 0, thresholdKey: "distSlider" },
@@ -96,6 +101,8 @@ function initializeFlowchartData() {
   ];
 
   links = [
+    { source: "E", target: "F", label: "Yes" },
+    { source: "E", target: "1", label: "No" },
     { source: "F", target: "G", label: "Yes" }, 
     { source: "G", target: "K" }, 
     { source: "G", target: "U" },
@@ -184,7 +191,7 @@ function renderFlowchart() {
         .style("justify-content", "center")
         .style("height", "100%")
         .style("width", "100%")
-        .style("font", "16px franklin-gothic")
+        .style("font", "16px 'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif")
         .style("text-align", "center")
         .style("word-wrap", "break-word")
         .text(text);
@@ -209,6 +216,7 @@ function loadSchoolData() {
       
       // Set default thresholds if not already set
       window.thresholds = window.thresholds || {
+        enrollmentThreshold: 200,
         utilization: 0.65,
         utilizationHigh: 0.95,
         enrollmentGrowth: 0,
@@ -230,6 +238,8 @@ function loadSchoolData() {
 function formatSliderValue(key, value) {
   const num = parseFloat(value);
   switch (key) {
+    case "enrollmentSlider":
+      return num.toFixed(0);
     case "utilSlider":
     case "utilHighSlider":
     case "projUtilSlider":
@@ -263,7 +273,13 @@ FlowUtils.updateNodeLabels = function () {
 
 // ✅ Evaluate Path function
 function evaluatePath(row, t) {
+  // Robust enrollment field lookup
+  const enrollmentRaw = row.Enrollment || row['Enrollment'] || row[' Enrollment'] || row['Enrollment '] || row['Enrollemnt'] || row['Enrolled'] || row['enrollment'] || row['enrollment_total'] || undefined;
+  const enrollment = parseFloat((enrollmentRaw || '').toString().replace(/,/g, '').trim());
+  console.log("🔍 Evaluating path for school:", row["Building Name"], "with enrollment:", enrollment, "threshold:", t.enrollmentThreshold);
+  
   const d = {
+    E: enrollment > t.enrollmentThreshold ? "Yes" : "No",
     F: +row.Utilization > t.utilization ? "Yes" : "No",
     G: +row.Utilization > t.utilizationHigh ? "Yes" : "No",
     K: +row.ExpectedUtilization10yrs > t.projectedUtilization ? "Yes" : "No",
@@ -276,13 +292,34 @@ function evaluatePath(row, t) {
   };
   d.O = d.M;
 
+  console.log("📊 Decision values:", d);
+
   const path = [];
-  if (d.F === "No") {
-    path.push("F", "I");
-    if (d.I === "No") {
-      path.push("M");
-      if (d.M === "Yes") path.push("1");
-      else {
+  
+  // Start with enrollment check
+  if (d.E === "No") {
+    console.log("🚨 Enrollment below threshold - immediate closure/merger");
+    path.push("E", "1"); // Immediate closure/merger
+  } else {
+    console.log("✅ Enrollment above threshold - continuing with normal logic");
+    path.push("E", "F");
+    // Continue with existing logic
+    if (d.F === "No") {
+      path.push("I");
+      if (d.I === "No") {
+        path.push("M");
+        if (d.M === "Yes") path.push("1");
+        else {
+          path.push("U");
+          if (d.U === "Yes") {
+            if (d.X === "Yes") path.push("X", "2");
+            else path.push("X", "3");
+          } else {
+            if (d.W === "Yes") path.push("W", "5");
+            else path.push("W", "4");
+          }
+        }
+      } else {
         path.push("U");
         if (d.U === "Yes") {
           if (d.X === "Yes") path.push("X", "2");
@@ -292,8 +329,8 @@ function evaluatePath(row, t) {
           else path.push("W", "4");
         }
       }
-    } else {
-      path.push("U");
+    } else if (d.G === "No") {
+      path.push("G", "U");
       if (d.U === "Yes") {
         if (d.X === "Yes") path.push("X", "2");
         else path.push("X", "3");
@@ -301,30 +338,23 @@ function evaluatePath(row, t) {
         if (d.W === "Yes") path.push("W", "5");
         else path.push("W", "4");
       }
-    }
-  } else if (d.G === "No") {
-    path.push("F", "G", "U");
-    if (d.U === "Yes") {
-      if (d.X === "Yes") path.push("X", "2");
-      else path.push("X", "3");
+    } else if (d.K === "No") {
+      path.push("G", "K", "U");
+      if (d.U === "Yes") {
+        if (d.X === "Yes") path.push("X", "2");
+        else path.push("X", "3");
+      } else {
+        if (d.W === "Yes") path.push("W", "5");
+        else path.push("W", "4");
+      }
     } else {
-      if (d.W === "Yes") path.push("W", "5");
-      else path.push("W", "4");
+      path.push("G", "K", "O");
+      if (d.O === "Yes") path.push("20");
+      else path.push("Z", d.Z === "Yes" ? "21" : "20");
     }
-  } else if (d.K === "No") {
-    path.push("F", "G", "K", "U");
-    if (d.U === "Yes") {
-      if (d.X === "Yes") path.push("X", "2");
-      else path.push("X", "3");
-    } else {
-      if (d.W === "Yes") path.push("W", "5");
-      else path.push("W", "4");
-    }
-  } else {
-    path.push("F", "G", "K", "O");
-    if (d.O === "Yes") path.push("20");
-    else path.push("Z", d.Z === "Yes" ? "21" : "20");
   }
+  
+  console.log("🛤️ Final path:", path);
   return { path, decisions: d };
 }
 
@@ -348,7 +378,7 @@ function highlightFlow(path, decisions) {
     .classed("highlight", true);
 
   d3.selectAll(".node")
-    .filter(d => ["1", "2", "3", "4", "5", "20", "21"].includes(d.id) && path.includes(d.id))
+    .filter(d => ["E", "1", "2", "3", "4", "5", "20", "21"].includes(d.id) && path.includes(d.id))
     .classed("special-highlight", true);
 
   // Highlight the links
@@ -385,10 +415,15 @@ function highlightFlow(path, decisions) {
 }
 
 function updateFlowForSchool(name, thresholds) {
+  console.log("🎯 updateFlowForSchool called with:", name, "thresholds:", thresholds);
   const row = schoolData.find(r => r["Building Name"] === name);
   if (row) {
+    console.log("✅ Found school data for:", name);
     const { path, decisions} = evaluatePath(row, thresholds);
+    console.log("🎨 Highlighting flow with path:", path);
     highlightFlow(path, decisions);
+  } else {
+    console.warn("⚠️ School not found:", name);
   }
 }
 
@@ -448,3 +483,90 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 });
+
+// Add this utility to get school type
+function getSchoolType(row, schoolName) {
+  // Try to get from Map_Export.csv first
+  if (mapExportData) {
+    const mapRow = mapExportData.find(r => (r["Building Name"] || "").trim() === schoolName.trim());
+    if (mapRow && mapRow["School Level"]) return mapRow["School Level"];
+  }
+  // Fallback to Decision Data
+  const type = (row["School Type"] || "").toLowerCase();
+  if (type.includes("high")) return "High School";
+  if (type.includes("middle")) return "Middle School";
+  if (type.includes("elementary") || type.includes("k-8")) return "Elementary School";
+  return row["School Type"] || "Unknown";
+}
+
+// Add this utility to get enrollment from Map_Export.csv
+function loadMapExportData(callback) {
+  if (mapExportData) { callback && callback(); return; }
+  Papa.parse("Map_Export.csv", {
+    download: true,
+    header: true,
+    skipEmptyLines: true,
+    complete: function(res) {
+      mapExportData = res.data;
+      if (callback) callback();
+    },
+    error: function(err) {
+      console.error("❌ Failed to load Map_Export.csv:", err);
+      if (callback) callback();
+    }
+  });
+}
+
+function getEnrollmentFromMapExport(schoolName) {
+  if (!mapExportData) return null;
+  const row = mapExportData.find(r => (r["Building Name"] || "").trim() === schoolName.trim());
+  return row ? row["Enrollment"] : null;
+}
+
+// Update updateFlowchartSchoolInfo to use Map_Export.csv for enrollment
+function updateFlowchartSchoolInfo(name) {
+  const infoDivId = "flowchart-school-info";
+  let infoDiv = document.getElementById(infoDivId);
+  if (!infoDiv) {
+    // Insert the info div just below the .flowchart-header
+    const header = document.querySelector("#main-flowchart-container .flowchart-header");
+    if (header) {
+      infoDiv = document.createElement("div");
+      infoDiv.id = infoDivId;
+      infoDiv.style.margin = "8px 0 16px 0";
+      infoDiv.style.fontSize = "16px";
+      infoDiv.style.fontWeight = "bold";
+      infoDiv.style.color = "#333";
+      header.insertAdjacentElement("afterend", infoDiv);
+    }
+  }
+  if (!infoDiv) return;
+  const row = schoolData.find(r => r["Building Name"] === name);
+  if (!row) {
+    infoDiv.innerHTML = "";
+    return;
+  }
+  // Get enrollment from Map_Export.csv if available
+  let enroll = getEnrollmentFromMapExport(name);
+  if (!enroll) enroll = row["Enrollment"] || "N/A";
+  const util = row["Utilization"] ? (parseFloat(row["Utilization"]) * 100).toFixed(1) + "%" : "N/A";
+  const type = getSchoolType(row, name);
+  infoDiv.innerHTML = `<div style='font-size:20px;font-weight:bold;margin-bottom:4px;text-decoration:underline;font-family:\"Franklin Gothic Book\", \"Franklin Gothic\", \"Arial Narrow\", Arial, sans-serif;'>${name}</div><span style='font-family:\"Franklin Gothic Book\", \"Franklin Gothic\", \"Arial Narrow\", Arial, sans-serif;'>Current Utilization: <strong>${util}</strong> &nbsp; | &nbsp; Current Enrollment: <strong>${enroll}</strong> &nbsp; | &nbsp; School Type: <strong>${type}</strong></span>`;
+}
+
+// Patch the dropdown event to update info, loading Map_Export.csv if needed
+const mainFlowchartSelect = document.getElementById('mainFlowchartSchoolSelect');
+if (mainFlowchartSelect) {
+  mainFlowchartSelect.addEventListener('change', function() {
+    loadMapExportData(() => updateFlowchartSchoolInfo(this.value));
+  });
+}
+// Also update info when flow is updated programmatically
+window.updateFlowForSchool = function(name, thresholds) {
+  loadMapExportData(() => updateFlowchartSchoolInfo(name));
+  const row = schoolData.find(r => r["Building Name"] === name);
+  if (row) {
+    const { path, decisions} = evaluatePath(row, thresholds);
+    highlightFlow(path, decisions);
+  }
+};

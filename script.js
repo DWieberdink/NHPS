@@ -168,9 +168,9 @@ document.addEventListener('DOMContentLoaded', function() {
               
               // Rebuild the table with new multiplier
               let tableHTML = `<table class=\"data-table\"><thead><tr><th>School Name</th><th>Square Footage</th><th>Cost <div style=\"display:flex; gap:5px; margin-top:5px; justify-content:center;\">
-                <span class=\"dollar-sign-tooltip\" style=\"cursor:pointer; padding:2px 4px; border-radius:3px; background:${costMultiplier === 300 ? '#007cbf' : '#e0e0e0'}; color:${costMultiplier === 300 ? 'white' : 'black'};\" onclick=\"updateCostMultiplier(300)\" data-tooltip=\"Low renovation\">$</span>
-                <span class=\"dollar-sign-tooltip\" style=\"cursor:pointer; padding:2px 4px; border-radius:3px; background:${costMultiplier === 600 ? '#007cbf' : '#e0e0e0'}; color:${costMultiplier === 600 ? 'white' : 'black'};\" onclick=\"updateCostMultiplier(600)\" data-tooltip=\"Medium renovation\">$$</span>
-                <span class=\"dollar-sign-tooltip\" style=\"cursor:pointer; padding:2px 4px; border-radius:3px; background:${costMultiplier === 1200 ? '#007cbf' : '#e0e0e0'}; color:${costMultiplier === 1200 ? 'white' : 'black'};\" onclick=\"updateCostMultiplier(1200)\" data-tooltip=\"High renovation\">$$$</span>
+                <span class=\"dollar-sign-tooltip\" style=\"cursor:pointer; padding:2px 4px; border-radius:3px; background:${costMultiplier === 300 ? '#007cbf' : '#e0e0e0'}; color:${costMultiplier === 300 ? 'white' : 'black'};\" onclick=\"updateCostMultiplier(300)\" data-tooltip=\"Low level renovation\">$</span>
+                <span class=\"dollar-sign-tooltip\" style=\"cursor:pointer; padding:2px 4px; border-radius:3px; background:${costMultiplier === 600 ? '#007cbf' : '#e0e0e0'}; color:${costMultiplier === 600 ? 'white' : 'black'};\" onclick=\"updateCostMultiplier(600)\" data-tooltip=\"Medium level renovation\">$$</span>
+                <span class=\"dollar-sign-tooltip\" style=\"cursor:pointer; padding:2px 4px; border-radius:3px; background:${costMultiplier === 1200 ? '#007cbf' : '#e0e0e0'}; color:${costMultiplier === 1200 ? 'white' : 'black'};\" onclick=\"updateCostMultiplier(1200)\" data-tooltip=\"High level renovation\">$$$</span>
               </div></th></tr></thead><tbody>`;
               
               // Add total row at the top
@@ -1741,14 +1741,18 @@ function addPercentageListeners(visibleFeatures) {
 // ✅ New script to connect sidebar sliders to the DecisionLogic iframe - REPLACED
 document.addEventListener("DOMContentLoaded", function() {
     const sliderIds = [
-      "utilSlider", "utilHighSlider", "growthSlider", 
+      "enrollmentSlider", "utilSlider", "utilHighSlider", "growthSlider", 
       "projUtilSlider", "distSlider", "buildSlider", "progSlider"
     ];
 
     const sliders = sliderIds.map(id => document.getElementById(id));
+    
+    console.log("🔍 Found sliders:", sliderIds.map((id, i) => ({ id, found: !!sliders[i] })));
 
     function sendSliderData() {
+      console.log("📊 sendSliderData called");
       const thresholds = {
+        enrollmentThreshold: parseInt(document.getElementById("enrollmentSlider").value, 10),
         utilization: parseFloat(document.getElementById("utilSlider").value)/100,
         utilizationHigh: parseFloat(document.getElementById("utilHighSlider").value)/100,
         enrollmentGrowth: parseFloat(document.getElementById("growthSlider").value)/100,
@@ -1757,6 +1761,8 @@ document.addEventListener("DOMContentLoaded", function() {
         buildingThreshold: parseFloat(document.getElementById("buildSlider").value),
         adequateProgramsMin: parseInt(document.getElementById("progSlider").value, 10),
       };
+      
+      console.log("📊 New thresholds:", thresholds);
       
       // Store thresholds globally for flowchart access
       window.thresholds = thresholds;
@@ -1785,24 +1791,39 @@ document.addEventListener("DOMContentLoaded", function() {
 
       // ✅ Update flowchart node labels with new threshold values
       if (typeof window.FlowUtils !== 'undefined' && typeof window.FlowUtils.updateNodeLabels === 'function') {
+        console.log("🔄 Updating flowchart node labels with new thresholds");
         window.FlowUtils.updateNodeLabels();
+      } else {
+        console.warn("⚠️ FlowUtils.updateNodeLabels not available");
       }
       
       // ✅ Update flowchart path for currently selected school
       const flowchartSelect = document.getElementById('mainFlowchartSchoolSelect');
+      console.log("🔍 Flowchart select element:", flowchartSelect);
+      console.log("🔍 updateFlowForSchool function available:", typeof window.updateFlowForSchool === 'function');
       if (flowchartSelect && flowchartSelect.value && typeof window.updateFlowForSchool === 'function') {
+        console.log("🔄 Updating flowchart path for school:", flowchartSelect.value);
         window.updateFlowForSchool(flowchartSelect.value, thresholds);
+      } else {
+        console.log("🔍 Flowchart select or updateFlowForSchool not available");
+        console.log("  - flowchartSelect exists:", !!flowchartSelect);
+        console.log("  - flowchartSelect has value:", flowchartSelect ? !!flowchartSelect.value : "N/A");
+        console.log("  - updateFlowForSchool function:", typeof window.updateFlowForSchool);
       }
     }
 
     sliders.forEach(slider => {
       if (slider) {
+        console.log("✅ Adding event listener to slider:", slider.id);
         // Use 'input' for real-time updates
         slider.addEventListener("input", () => {
+          console.log("🎛️ Slider changed:", slider.id, "value:", slider.value);
           const outSpan = document.getElementById(slider.id.replace("Slider", "Out"));
           if (outSpan) outSpan.textContent = slider.value;
           sendSliderData(); // Call the main update function
         });
+      } else {
+        console.warn("⚠️ Slider not found:", sliderIds[sliders.indexOf(slider)]);
       }
     });
 
@@ -1813,6 +1834,8 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 // --- ONBOARDING WALKTHROUGH LOGIC ---
+let isSettingUpPath = false; // Flag to track if we're setting up a specific path
+
 function startOnboardingWalkthrough() {
   const steps = [
     {
@@ -1855,6 +1878,12 @@ function startOnboardingWalkthrough() {
       target: '#scenario-output-panel',
       title: 'Model Output: Impact Analysis',
       text: 'After running a scenario or simulation, this section displays the impact analysis, including changes in enrollment, utilization, and travel distances for students. Use this to understand the effects of your decisions on the school system.'
+    },
+    {
+      target: 'body',
+      title: 'Choose Your Path',
+      text: 'Now that you\'ve seen the main features, choose how you\'d like to start using the tool.',
+      isChoice: true
     }
   ];
 
@@ -1868,6 +1897,13 @@ function startOnboardingWalkthrough() {
     if (popup) popup.remove();
 
     const step = steps[stepIdx];
+    
+    // Handle choice screen
+    if (step.isChoice) {
+      showChoiceScreen();
+      return;
+    }
+    
     let target = document.querySelector(step.target);
     // Open dropdown <details> if the step is for a details section
     const detailsIds = ['#decision-input-panel', '#scenario-input-panel', '#decision-output-panel', '#scenario-output-panel'];
@@ -1905,14 +1941,23 @@ function startOnboardingWalkthrough() {
         }
         return;
       }
-      // For scenario output panel, keep previous logic
-      setTimeout(() => {
-        drawHighlight(target, step, stepIdx);
-      }, 200);
-      setTimeout(() => {
-        drawPopup(target, step, stepIdx);
-      }, 210);
-      return;
+      // For scenario output panel, highlight after open and scroll
+      if (step.target === '#scenario-output-panel') {
+        let highlightTarget = document.getElementById('scenario-output-panel');
+        const drawAfterScroll = () => {
+          drawHighlight(highlightTarget, step, stepIdx);
+          setTimeout(() => {
+            drawPopup(target, step, stepIdx);
+          }, 60);
+        };
+        if (!highlightTarget.open) {
+          highlightTarget.open = true;
+          setTimeout(drawAfterScroll, 400); // Wait for open + scroll
+        } else {
+          setTimeout(drawAfterScroll, 350); // Wait for scroll
+        }
+        return;
+      }
     }
 
     if (!target) {
@@ -1923,6 +1968,401 @@ function startOnboardingWalkthrough() {
     // Default: draw highlight and popup immediately
     drawHighlight(target, step, stepIdx);
     drawPopup(target, step, stepIdx);
+  }
+
+  function showChoiceScreen() {
+    // Create overlay
+    overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100vw';
+    overlay.style.height = '100vh';
+    overlay.style.background = 'rgba(0,0,0,0.8)';
+    overlay.style.zIndex = '20000';
+    overlay.style.display = 'flex';
+    overlay.style.justifyContent = 'center';
+    overlay.style.alignItems = 'center';
+    document.body.appendChild(overlay);
+
+    // Create choice container
+    const choiceContainer = document.createElement('div');
+    choiceContainer.style.background = '#fff';
+    choiceContainer.style.borderRadius = '12px';
+    choiceContainer.style.padding = '40px';
+    choiceContainer.style.maxWidth = '900px';
+    choiceContainer.style.width = '90%';
+    choiceContainer.style.textAlign = 'center';
+    choiceContainer.style.boxShadow = '0 8px 32px rgba(0,0,0,0.3)';
+    choiceContainer.style.fontFamily = "'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif";
+
+    // Title
+    const title = document.createElement('h2');
+    title.textContent = 'Choose Your Path';
+    title.style.color = '#007cbf';
+    title.style.marginBottom = '30px';
+    title.style.fontSize = '28px';
+    title.style.fontWeight = 'bold';
+    choiceContainer.appendChild(title);
+
+    // Subtitle
+    const subtitle = document.createElement('p');
+    subtitle.textContent = 'Now that you\'ve seen the main features, choose how you\'d like to start using the tool.';
+    subtitle.style.color = '#666';
+    subtitle.style.marginBottom = '40px';
+    subtitle.style.fontSize = '18px';
+    choiceContainer.appendChild(subtitle);
+
+    // Buttons container
+    const buttonsContainer = document.createElement('div');
+    buttonsContainer.style.display = 'flex';
+    buttonsContainer.style.gap = '20px';
+    buttonsContainer.style.justifyContent = 'center';
+    buttonsContainer.style.flexWrap = 'nowrap';
+    buttonsContainer.style.alignItems = 'stretch';
+
+    // Button 1: School Decision Evaluation
+    const btn1 = createChoiceButton(
+      '🏫',
+      'Start the School Decision Evaluation',
+      'Begin by evaluating schools using the decision criteria sliders',
+      '#007cbf',
+      () => setupSchoolDecisionEvaluation()
+    );
+
+    // Button 2: Scenario Modeling
+    const btn2 = createChoiceButton(
+      '📊',
+      'Go Directly into Scenario Modeling',
+      'Jump straight into testing different portfolio decisions',
+      '#27ae60',
+      () => setupScenarioModeling()
+    );
+
+    // Button 3: Choose Own Path
+    const btn3 = createChoiceButton(
+      '🗺️',
+      'Choose My Own Path',
+      'Start with a clean slate and explore at your own pace',
+      '#9b59b6',
+      () => setupOwnPath()
+    );
+
+    buttonsContainer.appendChild(btn1);
+    buttonsContainer.appendChild(btn2);
+    buttonsContainer.appendChild(btn3);
+    choiceContainer.appendChild(buttonsContainer);
+
+    overlay.appendChild(choiceContainer);
+  }
+
+  function createChoiceButton(icon, title, description, color, onClick) {
+    const button = document.createElement('div');
+    button.style.flex = '1';
+    button.style.minWidth = '200px';
+    button.style.maxWidth = '250px';
+    button.style.height = '280px'; // Fixed height for all buttons
+    button.style.padding = '30px 15px';
+    button.style.border = `3px solid ${color}`;
+    button.style.borderRadius = '12px';
+    button.style.cursor = 'pointer';
+    button.style.transition = 'all 0.3s ease';
+    button.style.background = '#fff';
+    button.style.display = 'flex';
+    button.style.flexDirection = 'column';
+    button.style.alignItems = 'center';
+    button.style.justifyContent = 'center'; // Center content vertically
+    button.style.gap = '15px';
+    button.style.boxSizing = 'border-box'; // Include padding in height calculation
+
+    // Hover effect
+    button.addEventListener('mouseenter', () => {
+      button.style.transform = 'translateY(-5px)';
+      button.style.boxShadow = `0 8px 25px rgba(0,0,0,0.2)`;
+      button.style.background = color;
+      button.style.color = '#fff';
+    });
+
+    button.addEventListener('mouseleave', () => {
+      button.style.transform = 'translateY(0)';
+      button.style.boxShadow = 'none';
+      button.style.background = '#fff';
+      button.style.color = '#333';
+    });
+
+    // Icon
+    const iconEl = document.createElement('div');
+    iconEl.textContent = icon;
+    iconEl.style.fontSize = '48px';
+    iconEl.style.marginBottom = '10px';
+    button.appendChild(iconEl);
+
+    // Title
+    const titleEl = document.createElement('h3');
+    titleEl.textContent = title;
+    titleEl.style.margin = '0';
+    titleEl.style.fontSize = '18px';
+    titleEl.style.fontWeight = 'bold';
+    titleEl.style.color = 'inherit';
+    button.appendChild(titleEl);
+
+    // Description
+    const descEl = document.createElement('p');
+    descEl.textContent = description;
+    descEl.style.margin = '0';
+    descEl.style.fontSize = '14px';
+    descEl.style.lineHeight = '1.4';
+    descEl.style.color = 'inherit';
+    descEl.style.opacity = '0.8';
+    button.appendChild(descEl);
+
+    // Click handler
+    button.addEventListener('click', () => {
+      console.log("🔘 Choice button clicked:", title);
+      // Add a small delay to ensure DOM is ready
+      setTimeout(() => {
+        onClick();
+        // Delay endWalkthrough to allow panels to open
+        setTimeout(() => {
+          endWalkthrough();
+        }, 500);
+      }, 100);
+    });
+
+    return button;
+  }
+
+  function setupSchoolDecisionEvaluation() {
+    console.log("🏫 Setting up School Decision Evaluation path...");
+    isSettingUpPath = true; // Set flag to prevent panel closing
+    
+    // Ensure sidebar is visible
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) {
+      console.log("📋 Sidebar found, ensuring visibility");
+      sidebar.style.display = 'flex';
+    } else {
+      console.error("❌ Could not find sidebar");
+    }
+    
+    // Ensure right sidebar (map-sidebar) is visible and properly configured
+    const mapSidebar = document.getElementById('map-sidebar');
+    if (mapSidebar) {
+      console.log("📋 Map sidebar found, ensuring visibility");
+      mapSidebar.style.display = 'flex';
+      mapSidebar.classList.remove('hidden', 'wide');
+      mapSidebar.classList.add('normal');
+    } else {
+      console.error("❌ Could not find map-sidebar");
+    }
+    
+    // Close all panels first
+    const allPanels = [
+      document.getElementById('decision-input-panel'),
+      document.getElementById('scenario-input-panel'),
+      document.getElementById('decision-output-panel'),
+      document.getElementById('scenario-output-panel')
+    ];
+    
+    console.log("🔍 Found panels:", allPanels.map(p => p ? p.id : 'null'));
+    
+    allPanels.forEach(panel => { 
+      if (panel && panel.open) {
+        console.log("🔒 Closing panel:", panel.id);
+        panel.open = false; 
+      }
+    });
+
+    // Wait a bit before opening panels to ensure everything is settled
+    setTimeout(() => {
+      // Open required panels
+      const decisionInputPanel = document.getElementById('decision-input-panel');
+      const decisionOutputPanel = document.getElementById('decision-output-panel');
+      
+      if (decisionInputPanel) {
+        console.log("🔓 Opening decision input panel");
+        decisionInputPanel.open = true;
+        // Force a reflow to ensure the panel opens
+        decisionInputPanel.offsetHeight;
+        
+        // Check if it actually opened
+        setTimeout(() => {
+          console.log("🔍 Decision input panel open state:", decisionInputPanel.open);
+          if (!decisionInputPanel.open) {
+            console.log("🔄 Retrying to open decision input panel");
+            decisionInputPanel.open = true;
+            decisionInputPanel.offsetHeight;
+          }
+        }, 100);
+      } else {
+        console.error("❌ Could not find decision-input-panel");
+      }
+      
+      if (decisionOutputPanel) {
+        console.log("🔓 Opening decision output panel");
+        decisionOutputPanel.open = true;
+        // Force a reflow to ensure the panel opens
+        decisionOutputPanel.offsetHeight;
+        
+        // Check if it actually opened
+        setTimeout(() => {
+          console.log("🔍 Decision output panel open state:", decisionOutputPanel.open);
+          if (!decisionOutputPanel.open) {
+            console.log("🔄 Retrying to open decision output panel");
+            decisionOutputPanel.open = true;
+            decisionOutputPanel.offsetHeight;
+          }
+        }, 100);
+      } else {
+        console.error("❌ Could not find decision-output-panel");
+      }
+    }, 200);
+
+    // Switch to flowchart view (and keep it there)
+    const flowchartBtn = document.getElementById('toggleMapFlowchartFlowchart');
+    if (flowchartBtn && !flowchartBtn.classList.contains('active')) {
+      console.log("📊 Switching to flowchart view");
+      flowchartBtn.click();
+    } else {
+      console.log("📊 Flowchart view already active or button not found");
+    }
+    
+    console.log("✅ School Decision Evaluation setup complete");
+  }
+
+  function setupScenarioModeling() {
+    console.log("📊 Setting up Scenario Modeling path...");
+    isSettingUpPath = true; // Set flag to prevent panel closing
+    
+    // Ensure sidebar is visible
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) {
+      console.log("📋 Sidebar found, ensuring visibility");
+      sidebar.style.display = 'flex';
+    } else {
+      console.error("❌ Could not find sidebar");
+    }
+    
+    // Ensure right sidebar (map-sidebar) is visible and properly configured
+    const mapSidebar = document.getElementById('map-sidebar');
+    if (mapSidebar) {
+      console.log("📋 Map sidebar found, ensuring visibility");
+      mapSidebar.style.display = 'flex';
+      mapSidebar.classList.remove('hidden', 'wide');
+      mapSidebar.classList.add('normal');
+    } else {
+      console.error("❌ Could not find map-sidebar");
+    }
+    
+    // Close all panels first
+    const allPanels = [
+      document.getElementById('decision-input-panel'),
+      document.getElementById('scenario-input-panel'),
+      document.getElementById('decision-output-panel'),
+      document.getElementById('scenario-output-panel')
+    ];
+    
+    console.log("🔍 Found panels:", allPanels.map(p => p ? p.id : 'null'));
+    
+    allPanels.forEach(panel => { 
+      if (panel && panel.open) {
+        console.log("🔒 Closing panel:", panel.id);
+        panel.open = false; 
+      }
+    });
+
+    // Wait a bit before opening panels to ensure everything is settled
+    setTimeout(() => {
+      // Open required panels
+      const scenarioInputPanel = document.getElementById('scenario-input-panel');
+      const scenarioOutputPanel = document.getElementById('scenario-output-panel');
+      
+      if (scenarioInputPanel) {
+        console.log("🔓 Opening scenario input panel");
+        scenarioInputPanel.open = true;
+        // Force a reflow to ensure the panel opens
+        scenarioInputPanel.offsetHeight;
+        
+        // Check if it actually opened
+        setTimeout(() => {
+          console.log("🔍 Scenario input panel open state:", scenarioInputPanel.open);
+          console.log("🔍 Scenario input panel display:", window.getComputedStyle(scenarioInputPanel).display);
+          console.log("🔍 Scenario input panel visibility:", window.getComputedStyle(scenarioInputPanel).visibility);
+          
+          // If it's still not open, try again
+          if (!scenarioInputPanel.open) {
+            console.log("🔄 Retrying to open scenario input panel");
+            scenarioInputPanel.open = true;
+            scenarioInputPanel.offsetHeight;
+          }
+        }, 100);
+      } else {
+        console.error("❌ Could not find scenario-input-panel");
+      }
+      
+      if (scenarioOutputPanel) {
+        console.log("🔓 Opening scenario output panel");
+        scenarioOutputPanel.open = true;
+        // Force a reflow to ensure the panel opens
+        scenarioOutputPanel.offsetHeight;
+        
+        // Check if it actually opened
+        setTimeout(() => {
+          console.log("🔍 Scenario output panel open state:", scenarioOutputPanel.open);
+          console.log("🔍 Scenario output panel display:", window.getComputedStyle(scenarioOutputPanel).display);
+          console.log("🔍 Scenario output panel visibility:", window.getComputedStyle(scenarioOutputPanel).visibility);
+          
+          // If it's still not open, try again
+          if (!scenarioOutputPanel.open) {
+            console.log("🔄 Retrying to open scenario output panel");
+            scenarioOutputPanel.open = true;
+            scenarioOutputPanel.offsetHeight;
+          }
+        }, 100);
+      } else {
+        console.error("❌ Could not find scenario-output-panel");
+      }
+    }, 200);
+
+    // Switch to map view
+    const mapBtn = document.getElementById('toggleMapFlowchartMap');
+    if (mapBtn && !mapBtn.classList.contains('active')) {
+      console.log("🗺️ Switching to map view");
+      mapBtn.click();
+    } else {
+      console.log("🗺️ Map view already active or button not found");
+    }
+    
+    console.log("✅ Scenario Modeling setup complete");
+  }
+
+  function setupOwnPath() {
+    console.log("🗺️ Setting up Own Path...");
+    
+    // Close all panels
+    const allPanels = [
+      document.getElementById('decision-input-panel'),
+      document.getElementById('scenario-input-panel'),
+      document.getElementById('decision-output-panel'),
+      document.getElementById('scenario-output-panel')
+    ];
+    allPanels.forEach(panel => { 
+      if (panel && panel.open) {
+        console.log("🔒 Closing panel:", panel.id);
+        panel.open = false; 
+      }
+    });
+
+    // Switch to map view
+    const mapBtn = document.getElementById('toggleMapFlowchartMap');
+    if (mapBtn && !mapBtn.classList.contains('active')) {
+      console.log("🗺️ Switching to map view");
+      mapBtn.click();
+    } else {
+      console.log("🗺️ Map view already active or button not found");
+    }
+    
+    console.log("✅ Own Path setup complete");
   }
 
   function drawHighlight(target, step, stepIdx) {
@@ -2011,6 +2451,7 @@ function startOnboardingWalkthrough() {
     popup.style.zIndex = '20002';
     popup.style.maxWidth = '340px';
     popup.style.fontSize = '16px';
+    popup.style.fontFamily = "'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif";
     popup.innerHTML = `<h3 style='margin-top:0;color:#007cbf;'>${step.title}</h3><p>${step.text}</p>`;
     // Next/Close/Skip button(s)
     if (step.isIntro) {
@@ -2024,6 +2465,7 @@ function startOnboardingWalkthrough() {
       skipBtn.style.borderRadius = '4px';
       skipBtn.style.padding = '8px 20px';
       skipBtn.style.fontSize = '16px';
+      skipBtn.style.fontFamily = "'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif";
       skipBtn.style.cursor = 'pointer';
       skipBtn.style.marginRight = '12px';
       skipBtn.onclick = endWalkthrough;
@@ -2038,6 +2480,7 @@ function startOnboardingWalkthrough() {
       startBtn.style.borderRadius = '4px';
       startBtn.style.padding = '8px 20px';
       startBtn.style.fontSize = '16px';
+      startBtn.style.fontFamily = "'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif";
       startBtn.style.cursor = 'pointer';
       startBtn.onclick = nextStep;
       popup.appendChild(startBtn);
@@ -2053,6 +2496,7 @@ function startOnboardingWalkthrough() {
         backBtn.style.borderRadius = '4px';
         backBtn.style.padding = '8px 20px';
         backBtn.style.fontSize = '16px';
+        backBtn.style.fontFamily = "'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif";
         backBtn.style.cursor = 'pointer';
         backBtn.style.marginRight = '12px';
         backBtn.onclick = previousStep;
@@ -2068,6 +2512,7 @@ function startOnboardingWalkthrough() {
       btn.style.borderRadius = '4px';
       btn.style.padding = '8px 20px';
       btn.style.fontSize = '16px';
+      btn.style.fontFamily = "'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif";
       btn.style.cursor = 'pointer';
       btn.onclick = () => {
         if (stepIdx === steps.length - 1) {
@@ -2132,6 +2577,29 @@ function startOnboardingWalkthrough() {
   function endWalkthrough() {
     if (overlay) overlay.remove();
     if (popup) popup.remove();
+    
+    // Only close panels if we're not setting up a specific path
+    if (!isSettingUpPath) {
+      // Close all dropdown sections
+      const panels = [
+        document.getElementById('decision-input-panel'),
+        document.getElementById('scenario-input-panel'),
+        document.getElementById('decision-output-panel'),
+        document.getElementById('scenario-output-panel')
+      ];
+      panels.forEach(panel => { if (panel && panel.open) panel.open = false; });
+      
+      // Switch to map view if currently on flowchart (only when not setting up a path)
+      const mapBtn = document.getElementById('toggleMapFlowchartMap');
+      if (mapBtn && !mapBtn.classList.contains('active')) {
+        mapBtn.click();
+      }
+    } else {
+      // Reset the flag after a delay
+      setTimeout(() => {
+        isSettingUpPath = false;
+      }, 1000);
+    }
   }
 
   showStep(currentStep);
@@ -2151,6 +2619,7 @@ function injectTooltipCSS() {
       padding: 7px 14px;
       border-radius: 6px;
       font-size: 15px;
+      font-family: 'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif;
       pointer-events: none;
       box-shadow: 0 1px 4px rgba(0,0,0,0.15);
       white-space: nowrap;
@@ -2210,3 +2679,98 @@ function setupDollarSignTooltips() {
     }
   });
 }
+
+// ✅ Global close for all help tooltips (question mark textboxes)
+document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('close-tooltip-btn')) {
+      // Find the parent tooltip/span and hide it
+      const tooltip = e.target.parentElement;
+      if (tooltip && (tooltip.classList.contains('tooltip') || tooltip.classList.contains('draggable-tooltip') || tooltip.id.endsWith('-help-tooltip'))) {
+        tooltip.style.display = 'none';
+      }
+    }
+  });
+});
+
+// ✅ Prevent <details> toggle when clicking help icon or tooltip in summary
+// This ensures only clicks on the summary text toggle the section
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Prevent toggle when clicking help icon
+  document.querySelectorAll('.help-icon').forEach(function(icon) {
+    icon.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+  });
+  // Prevent toggle when clicking inside any help tooltip
+  document.querySelectorAll('.tooltip').forEach(function(tooltip) {
+    tooltip.addEventListener('click', function(e) {
+      e.stopPropagation();
+    });
+  });
+});
+
+// === HELP TOOLTIP LOGIC: Move tooltips to body and position absolutely ===
+document.addEventListener('DOMContentLoaded', function() {
+  const helpTooltips = [
+    { icon: 'decision-help-icon', tooltip: 'decision-help-tooltip' },
+    { icon: 'scenario-help-icon', tooltip: 'scenario-help-tooltip' },
+    { icon: 'decision-results-help-icon', tooltip: 'decision-results-help-tooltip' },
+    { icon: 'model-output-help-icon', tooltip: 'model-output-help-tooltip' },
+    { icon: 'flowchart-help-icon', tooltip: 'flowchart-help-tooltip' },
+  ];
+  helpTooltips.forEach(({icon, tooltip}) => {
+    const iconEl = document.getElementById(icon);
+    const tooltipEl = document.getElementById(tooltip);
+    if (!iconEl || !tooltipEl) return;
+    // Always hide initially
+    tooltipEl.style.display = 'none';
+    // On click, move to body, position, and show
+    iconEl.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      // Move tooltip to body if not already
+      if (tooltipEl.parentElement !== document.body) {
+        document.body.appendChild(tooltipEl);
+      }
+      
+      // Position near the icon with smart positioning
+      const rect = iconEl.getBoundingClientRect();
+      const tooltipWidth = 300; // Approximate tooltip width
+      const margin = 10;
+      
+      tooltipEl.style.position = 'fixed';
+      tooltipEl.style.zIndex = 10000;
+      tooltipEl.style.display = 'block';
+      
+      // Check if positioning to the right would go off-screen
+      const rightPosition = rect.right + margin;
+      const leftPosition = rect.left - tooltipWidth - margin;
+      
+      if (rightPosition + tooltipWidth > window.innerWidth) {
+        // Position to the left if right would go off-screen
+        tooltipEl.style.left = Math.max(margin, leftPosition) + 'px';
+        tooltipEl.style.right = 'auto';
+      } else {
+        // Position to the right (default behavior)
+        tooltipEl.style.left = rightPosition + 'px';
+        tooltipEl.style.right = 'auto';
+      }
+      
+      // Vertical positioning
+      tooltipEl.style.top = (rect.top - 10) + 'px';
+    });
+    // Hide on click outside
+    document.addEventListener('mousedown', function(e) {
+      if (tooltipEl.style.display === 'block' && !tooltipEl.contains(e.target) && e.target !== iconEl) {
+        tooltipEl.style.display = 'none';
+      }
+    });
+    // Hide on close button (handled by markup)
+    // Prevent <details> toggle when clicking help icon or tooltip
+    iconEl.addEventListener('click', function(e) { e.preventDefault(); e.stopPropagation(); });
+    tooltipEl.addEventListener('click', function(e) { e.stopPropagation(); });
+  });
+});

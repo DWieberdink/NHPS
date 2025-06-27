@@ -1,3 +1,5 @@
+console.log("🔑 First row keys:", Object.keys(self.schoolData[0] || {}));
+
 Building Name,School Level,Latitude,Longitude,Capacity,Enrollment,Available Seats,BuildingScore
 Augusta Lewis Troup School,Elementary and K-8 Schools,41.313256,-72.9422382,552,300,252,1.75297619
 Barack H. Obama Magnet University School,Elementary and K-8 Schools,41.32899609,-72.95416394,476,343,133,0.089285714
