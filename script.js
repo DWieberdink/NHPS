@@ -363,7 +363,7 @@ function updateLegend() {
     "Building & Programmatic Investments": '#1abc9c',
     "Candidate for Building Addition": '#9b59b6',
     "School-specific evaluation of alternative options": '#f1c40f',
-    "Possibility of Closure/Merger": '#e74c3c',
+    "Candidate for Closure/Merger": '#e74c3c',
     "Other / Unknown": '#7f8c8d'
   };
 
@@ -513,7 +513,7 @@ map.on('load', () => {
             "Building & Programmatic Investments", '#1abc9c',
             "Candidate for Building Addition", '#9b59b6',
             "School-specific evaluation of alternative options", '#f1c40f',
-            "Possibility of Closure/Merger", '#e74c3c',
+            "Candidate for Closure/Merger", '#e74c3c',
             '#7f8c8d'
           ]
         }
@@ -730,7 +730,7 @@ map.on('load', () => {
           "Building & Programmatic Investments", '#1abc9c',
           "Candidate for Building Addition", '#9b59b6',
           "School-specific evaluation of alternative options", '#f1c40f',
-          "Possibility of Closure/Merger", '#e74c3c',
+          "Candidate for Closure/Merger", '#e74c3c',
           '#7f8c8d']
       );
     }
@@ -1648,10 +1648,10 @@ function filterSchoolsInIsochrone(polygon) {
   if (!isoTableBody) return;
 
   let visibleFeatures = geojsonData.features.filter(f => turf.booleanPointInPolygon(f.geometry, polygon));
-  // Exclude the selected school if decision type is 'Possibility of Closure/Merger'
+  // Exclude the selected school if decision type is 'Candidate for Closure/Merger'
   const decisionFilter = document.getElementById('decisionFilter');
   const schoolSelect = document.getElementById('schoolSelect');
-  if (decisionFilter && schoolSelect && decisionFilter.value === 'Possibility of Closure/Merger') {
+  if (decisionFilter && schoolSelect && decisionFilter.value === 'Candidate for Closure/Merger') {
     const selectedSchool = schoolSelect.value;
     visibleFeatures = visibleFeatures.filter(f => f.properties['Building Name'] !== selectedSchool);
     // --- Add info above the table ---
@@ -1716,7 +1716,7 @@ function addPercentageListeners(visibleFeatures) {
       // --- Update number of students to be assigned in closure/merger info ---
       const decisionFilter = document.getElementById('decisionFilter');
       const infoDiv = document.getElementById('closureMergerInfo');
-      if (infoDiv && decisionFilter && decisionFilter.value === 'Possibility of Closure/Merger') {
+      if (infoDiv && decisionFilter && decisionFilter.value === 'Candidate for Closure/Merger') {
         // Sum all assigned students
         let totalAssigned = 0;
         document.querySelectorAll('.assign-percent').forEach(input2 => {

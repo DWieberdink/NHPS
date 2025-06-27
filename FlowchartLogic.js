@@ -20,7 +20,7 @@ window.initializeFlowchartFromScript = function(svgElement) {
   g.append("g").attr("class", "link-labels");
 
   svg.call(d3.zoom().scaleExtent([0.5, 2]).on("zoom", e => g.attr("transform", e.transform)))
-     .call(d3.zoom().transform, d3.zoomIdentity.translate(100, 250).scale(0.65)); // ✅ Pushed down vertically
+     .call(d3.zoom().transform, d3.zoomIdentity.translate(100, 250).scale(0.65)); // ✅ Original zoom level
 
   svg.append("defs").append("marker")
     .attr("id", "arrow-active").attr("viewBox", "0 -5 10 10").attr("refX", 10)
@@ -59,45 +59,45 @@ function mapSliderKeyToThresholdKey(sliderId) {
 function initializeFlowchartData() {
   // Data Definition for the flowchart
   nodes = [
-     // Enrollment Check (NEW - First Row)
-    { id: "E", label: "Enrollment above", fx: 255, fy: -100, thresholdKey: "enrollmentSlider" },
+     // Enrollment Check (NEW - First Row) - moved up to fy: -30
+    { id: "E", label: "Enrollment above", fx: 255, fy: -30, thresholdKey: "enrollmentSlider" },
    
-     // First Row (moved down)
-    { id: "F", label: "Utilization above", fx: 5, fy: 0, thresholdKey: "utilSlider" },
-    { id: "I", label: "Past 10 year growth", fx: 255, fy: 0, thresholdKey: "growthSlider" },
-    { id: "M", label: "Within mile of another underutilized school", fx: 505, fy: 0, thresholdKey: "distSlider" },
+     // First Row (remains at fy: 60)
+    { id: "F", label: "Utilization above", fx: 5, fy: 60, thresholdKey: "utilSlider" },
+    { id: "I", label: "Past 10 year growth", fx: 255, fy: 60, thresholdKey: "growthSlider" },
+    { id: "M", label: "Within mile of another underutilized school", fx: 505, fy: 60, thresholdKey: "distSlider" },
    
    
      // Second Row
-    { id: "G", label: "Utilization above", fx: 5, fy: 105, thresholdKey: "utilHighSlider" },
+    { id: "G", label: "Utilization above", fx: 5, fy: 155, thresholdKey: "utilHighSlider" },
 
     // Third Row
-    { id: "K", label: "5-yr projection above", fx: 5, fy: 205, thresholdKey: "projUtilSlider" },
-    { id: "U", label: "Building Score ≤", fx: 255, fy: 205, thresholdKey: "buildSlider" },
-    { id: "1", label: "Closure/Merger", fx: 505, fy: 155 },
+    { id: "K", label: "5-yr projection above", fx: 5, fy: 255, thresholdKey: "projUtilSlider" },
+    { id: "U", label: "Building Score ≤", fx: 255, fy: 255, thresholdKey: "buildSlider" },
+    { id: "1", label: "Candidate to\nClosure/Merger", fx: 505, fy: 205 },
     
    
     // Fourth Row
-    { id: "O", label: "Within mile of another underutilized school", fx: 5, fy: 305, thresholdKey: "distSlider" },
-    { id: "X", label: "More programs than", fx: 255, fy: 305, thresholdKey: "progSlider" },
-    { id: "W", label: "More programs than", fx: 505, fy: 305, thresholdKey: "progSlider" },
+    { id: "O", label: "Within mile of another underutilized school", fx: 5, fy: 355, thresholdKey: "distSlider" },
+    { id: "X", label: "More programs than", fx: 255, fy: 355, thresholdKey: "progSlider" },
+    { id: "W", label: "More programs than", fx: 505, fy: 355, thresholdKey: "progSlider" },
     
 
     // Fifth Row
-    { id: "Z", label: "Can School expand on site?", fx: 105, fy: 405, thresholdKey: null },
+    { id: "Z", label: "Can School expand on site?", fx: 105, fy: 455, thresholdKey: null },
 
     // Outcomes (shifted to the right a bit)
     //Sixth Row
-    { id: "5", label: "Building Investment", fx: 600, fy: 500 }, 
-    { id: "20", label: "School-Specific Evaluation", fx: -50, fy: 500},
+    { id: "5", label: "Building Investment", fx: 600, fy: 550 }, 
+    { id: "20", label: "School-Specific Evaluation", fx: -50, fy: 550},
 
     // Seventh Row 
-    { id: "4", label: "Bldg + Program Investment", fx: 475, fy: 580 },
-    { id: "21", label: "Building Addition", fx: 25, fy: 580 },
+    { id: "4", label: "Bldg + Program Investment", fx: 475, fy: 630 },
+    { id: "21", label: "Building Addition", fx: 25, fy: 630 },
 
     // Eighth Row
-    { id: "2", label: "Monitoring", fx: 150, fy: 650 },
-    { id: "3", label: "Program Investment", fx: 350, fy: 650 },
+    { id: "2", label: "Monitoring", fx: 150, fy: 700 },
+    { id: "3", label: "Program Investment", fx: 350, fy: 700 },
   ];
 
   links = [
@@ -122,6 +122,8 @@ function initializeFlowchartData() {
 
 // ✅ Render flowchart
 function renderFlowchart() {
+  console.log("🎯 Rendering flowchart with nodes:", nodes);
+  
   // Clear all existing highlights
   svg.selectAll(".node")
     .classed("highlight", false)
@@ -465,7 +467,7 @@ document.addEventListener("DOMContentLoaded", () => {
     g.append("g").attr("class", "link-labels");
 
     svg.call(d3.zoom().scaleExtent([0.5, 2]).on("zoom", e => g.attr("transform", e.transform)))
-       .call(d3.zoom().transform, d3.zoomIdentity.translate(100, 250).scale(0.65)); // ✅ Pushed down vertically
+       .call(d3.zoom().transform, d3.zoomIdentity.translate(100, 250).scale(0.65)); // ✅ Original zoom level
 
     svg.append("defs").append("marker")
       .attr("id", "arrow-active").attr("viewBox", "0 -5 10 10").attr("refX", 10)

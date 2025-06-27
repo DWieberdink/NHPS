@@ -43,7 +43,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const enrollmentRaw = row.Enrollment || row['Enrollment'] || row[' Enrollment'] || row['Enrollment '] || row['Enrollemnt'] || row['Enrolled'] || row['enrollment'] || row['enrollment_total'] || undefined;
     const enrollment = parseFloat((enrollmentRaw || '').toString().replace(/,/g, '').trim());
     if (enrollment <= t.enrollmentThreshold) {
-      return "Possibility of Closure/Merger";
+      console.log("🚨 Enrollment below threshold - immediate closure/merger");
+      return "Candidate for Closure/Merger";
     }
     
     const decisions = {
@@ -61,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (decisions.F === "No") {
       if (decisions.I === "No") {
-        if (decisions.M === "Yes") return "Possibility of Closure/Merger";
+        if (decisions.M === "Yes") return "Candidate for Closure/Merger";
         if (decisions.U === "Yes") return decisions.X === "Yes" ? "Ongoing Monitoring & Evaluation" : "Programmatic Investment";
         return decisions.W === "Yes" ? "Building Investment" : "Building & Programmatic Investments";
       }
@@ -101,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "Building & Programmatic Investments",
       "Candidate for Building Addition",
       "School-specific evaluation of alternative options",
-      "Possibility of Closure/Merger"
+      "Candidate for Closure/Merger"
     ];
   
     const decisionCounts = {};
@@ -223,7 +224,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const oldDecision = row.decision;
       const enrollment = enrollmentParsed;
       row.decision = evaluateSchool({ ...row, Enrollment: enrollmentParsed }, self.thresholds);
-      if (row.decision === "Possibility of Closure/Merger") {
+      if (row.decision === "Candidate for Closure/Merger") {
         closureCount++;
         if (oldDecision !== row.decision) {
           console.log("🚨 School moved to closure/merger:", row["Building Name"], "enrollment:", enrollment, "threshold:", self.thresholds.enrollmentThreshold);

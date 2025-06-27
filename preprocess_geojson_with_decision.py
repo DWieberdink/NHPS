@@ -34,7 +34,7 @@ def evaluate_school(row, t=default_thresholds):
     if not decisions['F']:
         if not decisions['I']:
             if decisions['M']:
-                return 'Possibility of Closure/Merger'
+                return 'Candidate for Closure/Merger'
             if decisions['U']:
                 return 'Ongoing Monitoring & Evaluation' if decisions['X'] else 'Programmatic Investment'
             return 'Building Investment' if decisions['W'] else 'Building & Programmatic Investments'
