@@ -124,15 +124,15 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("📊 Total schools:", totalCount);
   
     const summaryRows = allDecisions.map(decision =>
-      `<tr><td class="truncate-cell" data-tooltip="${decision}">${decision}</td><td>${decisionCounts[decision] || 0}</td></tr>`
+      `<tr><td class="truncate-cell" data-tooltip="${decision}" style="width: 80%;">${decision}</td><td class="text-center" style="width: 20%; min-width: 60px; max-width: 75px;">${decisionCounts[decision] || 0}</td></tr>`
     ).join("");
   
     summaryDiv.innerHTML = `
       <table class="data-table">
         <thead>
           <tr>
-            <th class="sortable-header" data-column="0" data-type="string">Decision</th>
-            <th class="sortable-header text-center" data-column="1" data-type="number"># Schools</th>
+            <th class="sortable-header" data-column="0" data-type="string" style="width: 80%;">Decision</th>
+            <th class="sortable-header text-center" data-column="1" data-type="number" style="width: 20%; min-width: 60px; max-width: 75px;"># Schools</th>
           </tr>
         </thead>
         <tbody>${summaryRows}</tbody>
@@ -296,7 +296,33 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Helper to inject .custom-tooltip CSS if not present
+  function injectTooltipCSS() {
+    if (document.getElementById('custom-tooltip-style')) return;
+    const style = document.createElement('style');
+    style.id = 'custom-tooltip-style';
+    style.textContent = `
+      .custom-tooltip {
+        position: fixed;
+        z-index: 9999;
+        background: #222;
+        color: #fff;
+        padding: 7px 14px;
+        border-radius: 6px;
+        font-size: 15px;
+        font-family: 'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif;
+        pointer-events: none;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+        white-space: nowrap;
+        opacity: 0.97;
+        transition: opacity 0.1s;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
   function renderEnrollmentChart(chartData) {
+    injectTooltipCSS();
     console.log("📊 renderEnrollmentChart called with:", chartData);
     if (assignmentChartInstance) {
       assignmentChartInstance.destroy();
@@ -307,6 +333,11 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("❌ assignmentChart canvas not found!");
       return;
     }
+
+    // Store original labels for tooltip use
+    const originalLabels = chartData.labels.slice();
+    // Truncate labels for display (single line)
+    chartData.labels = chartData.labels.map(l => (typeof l === 'string' && l.length > 18) ? l.slice(0, 16) + '…' : l);
 
     canvas.height = chartData.labels.length * 14;
     const ctx = canvas.getContext('2d');
@@ -336,30 +367,101 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     };
 
+    // Plugin to show tooltip with full school name on y-axis label hover, following the mouse
+    const yAxisLabelTooltipPlugin = {
+      id: 'yAxisLabelTooltip',
+      afterEvent(chart, args) {
+        const event = args.event;
+        const yScale = chart.scales.y;
+        if (!yScale) return;
+        const mouseY = event.y;
+        const mouseX = event.x;
+        // Only show tooltip if mouse is within the y-axis label area
+        const labelAreaLeft = yScale.left;
+        const labelAreaRight = yScale.left + yScale.width;
+        if (mouseX < labelAreaLeft || mouseX > labelAreaRight) {
+          const tooltip = document.getElementById('yAxisLabelTooltip');
+          if (tooltip) {
+            document.body.removeChild(tooltip);
+            if (tooltip._moveHandler) {
+              document.removeEventListener('mousemove', tooltip._moveHandler);
+            }
+          }
+          return;
+        }
+        let hoveredIndex = null;
+        yScale.ticks.forEach((tick, i) => {
+          const tickY = yScale.getPixelForValue(tick.value);
+          if (mouseY > tickY - 7 && mouseY < tickY + 7) {
+            hoveredIndex = i;
+          }
+        });
+        let tooltip = document.getElementById('yAxisLabelTooltip');
+        if (tooltip) {
+          document.body.removeChild(tooltip);
+          if (tooltip._moveHandler) {
+            document.removeEventListener('mousemove', tooltip._moveHandler);
+          }
+        }
+        if (hoveredIndex !== null && originalLabels[hoveredIndex]) {
+          tooltip = document.createElement('div');
+          tooltip.id = 'yAxisLabelTooltip';
+          tooltip.className = 'custom-tooltip';
+          tooltip.textContent = originalLabels[hoveredIndex];
+          const clientX = event.native ? event.native.clientX : event.x;
+          const clientY = event.native ? event.native.clientY : event.y;
+          tooltip.style.left = (clientX + 12) + 'px';
+          tooltip.style.top = (clientY + 12) + 'px';
+          document.body.appendChild(tooltip);
+          // Follow the mouse while hovering
+          const moveHandler = (evt) => {
+            const moveX = evt.clientX !== undefined ? evt.clientX : (evt.native ? evt.native.clientX : evt.x);
+            const moveY = evt.clientY !== undefined ? evt.clientY : (evt.native ? evt.native.clientY : evt.y);
+            tooltip.style.left = (moveX + 12) + 'px';
+            tooltip.style.top = (moveY + 12) + 'px';
+          };
+          document.addEventListener('mousemove', moveHandler);
+          tooltip._moveHandler = moveHandler;
+        }
+      },
+      afterDraw(chart) {
+        const tooltip = document.getElementById('yAxisLabelTooltip');
+        if (tooltip) {
+          document.body.removeChild(tooltip);
+          if (tooltip._moveHandler) {
+            document.removeEventListener('mousemove', tooltip._moveHandler);
+          }
+        }
+      }
+    };
+
     assignmentChartInstance = new Chart(ctx, {
       type: 'bar',
       data: chartData,
       options: {
         responsive: true,
         indexAxis: 'y',
-        layout: { padding: { top: 0, bottom: 0, left: 20 } },
+        layout: { padding: { top: 0, bottom: 0, left: 5 } },
         scales: {
           x: { stacked: true, title: { display: true, text: 'Students' } },
           y: {
             stacked: true,
             position: 'left',
             ticks: {
-              align: 'end',
-              padding: 10,
+              align: 'start',
+              padding: 2,
               maxWidth: 120,
               overflow: 'truncate',
-              clip: false
+              clip: false,
+              font: {
+                size: 12
+              }
             }
           }
         },
         plugins: { legend: { position: 'bottom' } }
       },
-      plugins: [capacityTicksPlugin]
+      plugins: [capacityTicksPlugin, yAxisLabelTooltipPlugin]
     });
     console.log("✅ Enrollment chart rendered successfully!");
   }

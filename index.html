@@ -27,11 +27,14 @@
   <style>
     /* General Layout */
    
+    body, html, input, select, button, textarea, table, th, td, h1, h2, h3, h4, h5, h6, p, span, div, label, summary, details, ul, ol, li {
+      font-family: 'Franklin Gothic Book', 'Franklin Gothic' !important;
+    }
+
     body {
       margin: 0;
       display: flex;
       height: 100vh;
-      font-family: 'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif;
       overflow: hidden; /* Prevent the whole page from scrolling */
     }
 
@@ -68,13 +71,11 @@
     #sidebar h3 { margin-top: 20px; font-size: 16px; font-weight: bold; color: #333; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
     select, input[type="range"], input[type="number"] {
       width: 100%; padding: 8px; margin: 6px 0 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; box-sizing: border-box;
-      font-family: 'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif;
     }
     button {
       padding: 6px 12px; margin-top: 4px; margin-right: 6px;
       font-size: 14px; border: none; border-radius: 4px; cursor: pointer;
       background-color: #007cbf; color: white;
-      font-family: 'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif;
     }
     button:hover { background-color: #005e93; }
 
@@ -88,7 +89,6 @@
   padding: 10px;
   font-size: 13px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.3);
-  font-family: 'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif;
   
   display: flex;
   flex-wrap: wrap; /* allow wrapping if space is tight */
@@ -290,7 +290,7 @@
     .node.special-highlight rect {stroke: #000000; stroke-width: 3; fill: #eb77fd;}
     .link { stroke: #ccc; fill: none; stroke-width: 2px; }
     .link.active { stroke: #f0ad4e; stroke-width: 3px; marker-end: url(#arrow-active); }
-    .link-label.active-label { fill: red; font-size: 14px; font-family: 'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif; font-weight: bold; pointer-events: none;}
+    .link-label.active-label { fill: red; font-size: 14px; font-weight: bold; pointer-events: none;}
 
     /* ✅ Styles for the main flowchart container to fit in the layout */
     #main-flowchart-container {
@@ -801,6 +801,19 @@
     .tooltip .close-tooltip-btn:hover {
       color: #e74c3c;
     }
+
+    /* Highlight Choices.js group headers */
+    .choices__list--dropdown .choices__group {
+      background: #e0e0e0 !important;
+      border-radius: 3px;
+      margin: 0;
+      padding: 6px 12px;
+    }
+    .choices__list--dropdown .choices__heading {
+      color: #000 !important;
+      font-size: .9em !important;
+      font-weight: bold;
+    }
   </style>
 </head>
 
@@ -844,21 +857,22 @@
           </span>
           <span id="decision-help-tooltip" class ="tooltip">
             <button class="close-tooltip-btn" onclick="this.parentElement.style.display='none'">&times;</button>
-            School Decision Evaluation: Results<br>
-            The sliders below adjust how schools are evaluated across multiple factors, which is reflected in <strong>School Decision Evaluation: Results</strong> on the right side of the screen.<br>
-            The flowchart allows you to explore the decision logic dynamically by school.<br><br>
+            Use the sliders to adjust how schools are evaluated across multiple factors, which is reflected in <strong>School Decision Evaluation: Results</strong> on the right sidebar.<br>
+            The flowchart allows you to visualize the decision logic dynamically by school.<br><br>
             <ul style="text-align:left; margin-left: 0.5em; padding-left: 1em;">
-              <li><strong>Utilization Threshold</strong><br>
+              <li><strong>Enrollment</strong><br>
+                Minimum number of enrolled students</li>
+              <li><strong>Utilization</strong><br>
               Sets the minimum percentage of a school's capacity that should be used before it's considered underutilized.</li>
-              <li><strong>High Utilization Threshold</strong><br>
+              <li><strong>High Utilization</strong><br>
               Defines when a school is considered highly utilized or potentially overcrowded.</li>
-              <li><strong>Enrollment Growth Threshold</strong><br>
+              <li><strong>Enrollment Growth</strong><br>
               Minimum expected change in student enrollment (as a percentage).</li>
-              <li><strong>Projected Utilization Threshold</strong><br>
+              <li><strong>Projected Utilization</strong><br>
               Target for future utilization based on projected enrollment.</li>
               <li><strong>Distance to Underutilized Schools</strong><br>
               Maximum distance to look for nearby underutilized schools for reassignment.</li>
-              <li><strong>Building Threshold</strong><br>
+              <li><strong>Building Quality</strong><br>
               Minimum required building condition score.</li>
               <li><strong>Adequate Program Offer Minimum</strong><br>
               Minimum number of programs (academic or extracurricular) a school should offer.</li>
@@ -868,25 +882,25 @@
       </span>
     </summary>
     <div id="decision-sliders" style="padding-top: 1rem;">
-      <label>Enrollment Threshold: <span id="enrollmentOut">200</span>
+      <label>Enrollment: <span id="enrollmentOut">200</span>
         <input type="range" id="enrollmentSlider" min="0" max="500" step="10" value="200">
       </label>
-      <label>Utilization Threshold: <span id="utilOut">65</span>%
+      <label>Utilization: <span id="utilOut">65</span>%
         <input type="range" id="utilSlider" min="0" max="100" step="1" value="65">
       </label>
-      <label>High Utilization Threshold: <span id="utilHighOut">95</span>%
+      <label>High Utilization: <span id="utilHighOut">95</span>%
         <input type="range" id="utilHighSlider" min="0" max="120" step="1" value="95">
       </label>
-      <label>Enrollment Growth Threshold: <span id="growthOut">0</span>%
+      <label>Enrollment Growth: <span id="growthOut">0</span>%
         <input type="range" id="growthSlider" min="-300" max="300" step="1" value="0">
       </label>
-      <label>Projected Utilization Threshold: <span id="projUtilOut">95</span>%
+      <label>Projected Utilization: <span id="projUtilOut">95</span>%
         <input type="range" id="projUtilSlider" min="0" max="150" step="1" value="95">
       </label>
       <label>Distance to Underutilized Schools: <span id="distOut">1.0</span>
         <input type="range" id="distSlider" min="0" max="5" step="0.1" value="1.0">
       </label>
-      <label>Building Threshold: <span id="buildOut">1.5</span>
+      <label>Building Quality (Lower is better): <span id="buildOut">1.5</span>
         <input type="range" id="buildSlider" min="0" max="3" step="0.1" value="1.5">
       </label>
       <label>Adequate Program Offer Minimum: <span id="progOut">2</span>
@@ -909,7 +923,7 @@
           </span>
           <span id="scenario-help-tooltip" class = "tooltip";>
             <button class="close-tooltip-btn" onclick="this.parentElement.style.display='none'">&times;</button>
-            Use this section to test and evaluate the impact of portfolio decisions. Adjust settings and run simulations to see scenario outcomes.
+            Use this section to test and evaluate the impact of different decision types. Adjust settings and run simulations to see scenario outcomes.
           </span>
         </span>
       </summary>
@@ -942,14 +956,14 @@
 
       <!-- Manual Entry View -->
       <div id="manualView">
-        <h3>Select Distance Threshold for Analysis</h3>
+        <h3>Select Distance for Analysis</h3>
         <select id="isoDistance">
           <option value="2413">1.5 miles</option>
           <option value="1609">1 mile</option>
           <option value="804">0.5 mile</option>
         </select>
 
-        <h3>Schools within Distance Threshold</h3>
+        <h3>Schools within Selected Distance</h3>
         <table id="isoTable" class="data-table">
           <thead>
             <tr>
@@ -968,22 +982,22 @@
         <h4>Rate the importance of each factor (0 = not important, 10 = very important)</h4>
         
         <div class="slider-container">
-          <label for="distanceWeightSlider">Distance Weighting (0 = not important, 10 = very important) <span id="distanceWeightLabel">5</span></label>
+          <label for="distanceWeightSlider">Distance Weighting <span id="distanceWeightLabel">5</span></label>
           <input type="range" id="distanceWeightSlider" min="0" max="10" value="5" />
         </div>
 
         <div class="slider-container">
-          <label for="enrollmentWeightSlider">Enrollment Demand (0 = not important, 10 = very important) <span id="enrollmentWeightLabel">5</span></label>
+          <label for="enrollmentWeightSlider">Enrollment Demand<span id="enrollmentWeightLabel">5</span></label>
           <input type="range" id="enrollmentWeightSlider" min="0" max="10" value="5" />
         </div>
 
         <div class="slider-container">
-          <label for="buildingWeightSlider">Building Quality (0 = not important, 10 = very important) <span id="buildingWeightLabel">5</span></label>
+          <label for="buildingWeightSlider">Building Quality<span id="buildingWeightLabel">5</span></label>
           <input type="range" id="buildingWeightSlider" min="0" max="10" value="5" />
         </div>
         
         <div class="slider-container">
-          <label for="scorecardWeightSlider">Scorecard Weighting (0 = not important, 10 = very important) <span id="scorecardWeightLabel">5</span></label>
+          <label for="scorecardWeightSlider">Scorecard Weighting<span id="scorecardWeightLabel">5</span></label>
           <input type="range" id="scorecardWeightSlider" min="0" max="10" value="5" />
         </div>
 
@@ -1014,16 +1028,32 @@
   <div id="map-container">
     <div id="map"></div>
 
+    <!-- Start Tour Button -->
+    <button id="startTourBtn" class="tour-btn" style="position: absolute; top: 50px; right: 16px; z-index: 1200; background: #FFD600; color: #222; font-weight: bold; border: none; border-radius: 6px; padding: 8px 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); cursor: pointer;">Start Tour</button>
+
      <div id="map-legend" class="legend">
       <h4>Legend</h4>
       <div id="legend-content"></div>
     </div>
     
     <!-- Decisions/Assignments Toggle positioned below legend -->
-    <div class="toggle-buttons" style="position: absolute; bottom: 20px; left: 20px; z-index: 999;">
+    <div class="toggle-buttons" style="position: absolute; bottom: 20px; left: 20px; z-index: 999; align-items: center; gap: 8px;">
       <button id="toggleViewDecisions" class="active">Show Decisions</button>
       <button id="toggleViewAssignments">Show Assignments</button>
     </div>
+    <span style="position: absolute; bottom: 25px; left: 290px; z-index: 1000; display: flex; align-items: center;">
+      <span id="map-toggle-help-icon" class="help-icon" style="cursor:pointer;display:inline-block;vertical-align:middle;">
+        <svg width="18" height="18" viewBox="0 0 20 20" style="border-radius:50%;background:#007cbf;" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="10" cy="10" r="10" fill="#007cbf"/>
+          <text x="10" y="15" text-anchor="middle" font-size="13" font-family="Franklin Gothic Book, Franklin Gothic, Arial Narrow, Arial, sans-serif" fill="white" font-weight="bold">?</text>
+        </svg>
+      </span>
+      <span id="map-toggle-help-tooltip" style="display:none;position:absolute;z-index:1000;background:#fff;color:#222;border:1px solid #007cbf;border-radius:6px;padding:10px;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-size:14px;width:300px;left:37px;bottom:10px;">
+        <button class="close-tooltip-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+        Show Decisions / Show Assignments:<br>
+        Toggle between viewing the current decision type for each school (color-coded) and the results of student assignment simulations. "Show Decisions" displays the recommended action for each school, while "Show Assignments" highlights schools that receive new students in your scenario.
+      </span>
+    </span>
    
     <details id="filter-panel">
         <summary><strong>Map Filters</strong></summary>
@@ -1084,7 +1114,7 @@
                 <text x="10" y="15" text-anchor="middle" font-size="13" font-family="Franklin Gothic Book, Franklin Gothic, Arial Narrow, Arial, sans-serif" fill="white" font-weight="bold">?</text>
               </svg>
             </span>
-            <span id="flowchart-help-tooltip" style="display:none;position:absolute;z-index:1000;background:#fff;color:#222;border:1px solid #007cbf;border-radius:6px;padding:10px;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-size:14px;width:300px;right:0;top:28px;font-weight:bold;">
+            <span id="flowchart-help-tooltip" style="display:none;position:absolute;z-index:1000;background:#fff;color:#222;border:1px solid #007cbf;border-radius:6px;padding:10px;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-size:14px;width:300px;right:0;top:28px;">
               <button class="close-tooltip-btn" onclick="this.parentElement.style.display='none'">&times;</button>
               Select a school to view its decision flowchart. The flowchart visualizes how the evaluation criteria lead to the recommended action for the selected school.
             </span>
@@ -1146,18 +1176,42 @@
         </summary>
 
             <div class="details-content-wrapper" style="padding: 0.5rem;">
-              <details open>
-                <summary><strong>Summary Table</strong></summary>
-                <div class="details-content-wrapper" style="padding: 0.5rem;">
-                  <div id="summary" style="padding: 0;"></div>
-                </div>
-              </details>
-              <details>
-                <summary><strong>Decision by School</strong></summary>
-                <div class="details-content-wrapper" style="padding: 0.5rem;">
-                  <div id="results" style="padding: 0;"></div>
-                </div>
-              </details>
+              <div style="position: relative; min-height: 40px;">
+                <details id="summary-table-details">
+                  <summary class="custom-summary" style="display: flex; align-items: center;"><strong>Summary Table</strong></summary>
+                  <div class="details-content-wrapper" style="padding: 0.5rem;">
+                    <div id="summary" style="padding: 0;"></div>
+                  </div>
+                </details>
+                <span id="summary-table-help-icon" class="help-icon" style="position: absolute; top: 10px; right: 10px; cursor:pointer; display:inline-block; vertical-align:middle; z-index: 1001;">
+                  <svg width="16" height="16" viewBox="0 0 20 20" style="border-radius:50%;background:#007cbf;" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="10" cy="10" r="10" fill="#007cbf"/>
+                    <text x="10" y="15" text-anchor="middle" font-size="11" font-family="Franklin Gothic Book, Franklin Gothic, Arial Narrow, Arial, sans-serif" fill="white" font-weight="bold">?</text>
+                  </svg>
+                </span>
+                <span id="summary-table-help-tooltip" style="display:none;position:absolute;z-index:1000;background:#fff;color:#222;border:1px solid #007cbf;border-radius:6px;padding:10px;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-size:13px;width:240px;right:10px;top:30px;" onclick="event.stopPropagation();">
+                  <button class="close-tooltip-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+                  This table provides a summary of recommended actions for all schools based on your selected evaluation criteria.
+                </span>
+              </div>
+              <div style="position: relative; min-height: 40px;">
+                <details id="decision-by-school-details">
+                  <summary class="custom-summary" style="display: flex; align-items: center;"><strong>Decision by School</strong></summary>
+                  <div class="details-content-wrapper" style="padding: 0.5rem;">
+                    <div id="results" style="padding: 0;"></div>
+                  </div>
+                </details>
+                <span id="decision-by-school-help-icon" class="help-icon" style="position: absolute; top: 10px; right: 10px; cursor:pointer; display:inline-block; vertical-align:middle; z-index: 1001;">
+                  <svg width="16" height="16" viewBox="0 0 20 20" style="border-radius:50%;background:#007cbf;" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="10" cy="10" r="10" fill="#007cbf"/>
+                    <text x="10" y="15" text-anchor="middle" font-size="11" font-family="Franklin Gothic Book, Franklin Gothic, Arial Narrow, Arial, sans-serif" fill="white" font-weight="bold">?</text>
+                  </svg>
+                </span>
+                <span id="decision-by-school-help-tooltip" style="display:none;position:absolute;z-index:1000;background:#fff;color:#222;border:1px solid #007cbf;border-radius:6px;padding:10px;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-size:13px;width:240px;right:10px;top:30px;" onclick="event.stopPropagation();">
+                  <button class="close-tooltip-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+                  This table lists the recommended action for each individual school, allowing you to review and compare decisions at the school level.
+                </span>
+              </div>
             </div>
           </details>
           <details id="scenario-output-panel">
@@ -1437,17 +1491,17 @@ document.addEventListener('DOMContentLoaded', function() {
   The sliders below adjust how schools are evaluated across multiple factors, which is reflected in <strong>School Decision Evaluation: Results</strong> on the right side of the screen.<br>
   The flowchart allows you to explore the decision logic dynamically by school.<br><br>
   <ul style="text-align:left; margin-left: 0.5em; padding-left: 1em;">
-    <li><strong>Utilization Threshold</strong><br>
+    <li><strong>Utilization</strong><br>
     Sets the minimum percentage of a school's capacity that should be used before it's considered underutilized.</li>
-    <li><strong>High Utilization Threshold</strong><br>
+    <li><strong>High Utilization</strong><br>
     Defines when a school is considered highly utilized or potentially overcrowded.</li>
-    <li><strong>Enrollment Growth Threshold</strong><br>
+    <li><strong>Enrollment Growth</strong><br>
     Minimum expected change in student enrollment (as a percentage).</li>
-    <li><strong>Projected Utilization Threshold</strong><br>
+    <li><strong>Projected Utilization</strong><br>
     Target for future utilization based on projected enrollment.</li>
     <li><strong>Distance to Underutilized Schools</strong><br>
     Maximum distance to look for nearby underutilized schools for reassignment.</li>
-    <li><strong>Building Threshold</strong><br>
+    <li><strong>Building Quality Score</strong><br>
     Minimum required building condition score.</li>
     <li><strong>Adequate Program Offer Minimum</strong><br>
     Minimum number of programs (academic or extracurricular) a school should offer.</li>

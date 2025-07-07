@@ -22,10 +22,7 @@ window.initializeFlowchartFromScript = function(svgElement) {
   svg.call(d3.zoom().scaleExtent([0.5, 2]).on("zoom", e => g.attr("transform", e.transform)))
      .call(d3.zoom().transform, d3.zoomIdentity.translate(100, 250).scale(0.65)); // ✅ Original zoom level
 
-  svg.append("defs").append("marker")
-    .attr("id", "arrow-active").attr("viewBox", "0 -5 10 10").attr("refX", 10)
-    .attr("markerWidth", 6).attr("markerHeight", 6).attr("orient", "auto")
-    .append("path").attr("d", "M0,-5L10,0L0,5").attr("fill", "#f0ad4e");
+ 
 
   // Initialize the flowchart
   initializeFlowchartData();
@@ -74,7 +71,7 @@ function initializeFlowchartData() {
     // Third Row
     { id: "K", label: "5-yr projection above", fx: 5, fy: 255, thresholdKey: "projUtilSlider" },
     { id: "U", label: "Building Score ≤", fx: 255, fy: 255, thresholdKey: "buildSlider" },
-    { id: "1", label: "Candidate to\nClosure/Merger", fx: 505, fy: 205 },
+    { id: "1", label: "Candidate for\nClosure/Merger", fx: 505, fy: 205 },
     
    
     // Fourth Row
@@ -92,8 +89,8 @@ function initializeFlowchartData() {
     { id: "20", label: "School-Specific Evaluation", fx: -50, fy: 550},
 
     // Seventh Row 
-    { id: "4", label: "Bldg + Program Investment", fx: 475, fy: 630 },
-    { id: "21", label: "Building Addition", fx: 25, fy: 630 },
+    { id: "4", label: "Building + Program Investment", fx: 475, fy: 630 },
+    { id: "21", label: "Candidate for\nBuilding Addition", fx: 25, fy: 630 },
 
     // Eighth Row
     { id: "2", label: "Monitoring", fx: 150, fy: 700 },
@@ -132,16 +129,120 @@ function renderFlowchart() {
   svg.selectAll(".link")
     .classed("active", false);
 
-  //Draw Lines (Links)
+  // Draw Lines (Links) - use <path> for all, with custom curve for E→1
   g.select(".links")
-    .selectAll("line")
+    .selectAll("path")
     .data(links)
-    .join("line")
+    .join("path")
     .attr("class", "link")
-    .attr("x1", d => nodes.find(n => n.id === d.source).fx)
-    .attr("y1", d => nodes.find(n => n.id === d.source).fy)
-    .attr("x2", d => nodes.find(n => n.id === d.target).fx)
-    .attr("y2", d => nodes.find(n => n.id === d.target).fy);
+    .attr("d", d => {
+      const source = nodes.find(n => n.id === d.source);
+      const target = nodes.find(n => n.id === d.target);
+      if (d.source === "E" && d.target === "1") {
+        // Right-angle path: right from E, then down, then left to 1, all to the right of M
+        const nodeWidth = 150;
+        const nodeHeight = 65;
+        const horizontalGap = 120; // distance to the right of M
+        const startX = source.fx + nodeWidth / 2;
+        const startY = source.fy;
+        const m = nodes.find(n => n.id === "M");
+        const rightOfM_X = m.fx + nodeWidth / 2 + horizontalGap;
+        const endX = target.fx + nodeWidth / 2;
+        const endY = target.fy;
+        // Path: right from E, down to 1's y, left to 1
+        return [
+          `M${startX},${startY}`,
+          `L${rightOfM_X},${startY}`,
+          `L${rightOfM_X},${endY}`,
+          `L${endX},${endY}`
+        ].join(' ');
+      } else if (d.source === "E" && d.target === "F") {
+        // Custom right-angle path: left from E, left to center of F, then down into center of F
+        const nodeWidthE = 180; // E is a rectangle node
+        const nodeHeightE = 80;
+        const nodeWidthF = 180;
+        const nodeHeightF = 80;
+        const startX = source.fx - nodeWidthE / 2; // left edge of E
+        const startY = source.fy;
+        const centerFX = target.fx; // center x of F
+        const centerFY = target.fy; // center y of F
+        return [
+          `M${startX},${startY}`,
+          `L${centerFX},${startY}`,
+          `L${centerFX},${centerFY}`
+        ].join(' ');
+      } else if (d.source === "O" && d.target === "20") {
+        // Custom path: left from O, down to center left of 20, then right into center left of 20
+        const nodeWidthO = 180;
+        const nodeHeightO = 80;
+        const nodeWidth20 = 150;
+        const nodeHeight20 = 65;
+        const leftGap = 60; // how far left to go before turning down
+        const startX = source.fx - nodeWidthO / 2; // left edge of O
+        const startY = source.fy;
+        const leftX = startX - leftGap;
+        const endX = target.fx - nodeWidth20 / 2; // center left of 20
+        const endY = target.fy; // vertical center of 20
+        return [
+          `M${startX},${startY}`,
+          `L${leftX},${startY}`,
+          `L${leftX},${endY}`,
+          `L${endX},${endY}`
+        ].join(' ');
+      } else if (d.source === "Z" && d.target === "20") {
+        // Custom path: right from Z, right to center of 20, then down into top of 20
+        const nodeWidthZ = 180;
+        const nodeHeightZ = 80;
+        const nodeWidth20 = 150;
+        const nodeHeight20 = 65;
+        const startX = source.fx + nodeWidthZ / 2; // right edge of Z
+        const startY = source.fy;
+        const center20X = target.fx; // center x of 20
+        const top20Y = target.fy - nodeHeight20 / 2; // top of 20
+        return [
+          `M${startX},${startY}`,
+          `L${center20X},${startY}`,
+          `L${center20X},${top20Y}`
+        ].join(' ');
+      } else if (d.source === "W" && d.target === "5") {
+        // Custom path: right from W, further right, then down, entering slightly right of center of 5
+        const nodeWidthW = 150;
+        const nodeHeightW = 65;
+        const nodeWidth5 = 150;
+        const nodeHeight5 = 65;
+        const offset = 40; // how far to go right before going down
+        const startX = source.fx + nodeWidthW / 2; // right edge of W
+        const startY = source.fy;
+        const rightX = startX + offset;
+        const entryX = target.fx + offset; // enter slightly right of center
+        const top5Y = target.fy - nodeHeight5 / 2; // top of 5
+        return [
+          `M${startX},${startY}`,
+          `L${rightX},${startY}`,
+          `L${rightX},${top5Y}`,
+          `L${entryX},${top5Y}`,
+          `L${entryX},${target.fy}`
+        ].join(' ');
+      } else if (d.source === "G" && d.target === "U") {
+        // Custom path: start at center right of G, go to center of U
+        const nodeWidthG = 180;
+        const startX = source.fx + nodeWidthG / 2; // right edge of G
+        const startY = source.fy;
+        const endX = target.fx;
+        const endY = target.fy;
+        return `M${startX},${startY} L${endX},${endY}`;
+      } else if (d.source === "U" && d.target === "W"){
+        const nodeWidthU = 180;
+        const startX = source.fx + nodeWidthU / 2; // right edge of U
+        const startY = source.fy;
+        const endX = target.fx;
+        const endY = target.fy;
+        return `M${startX},${startY} L${endX},${endY}`;
+      }
+       else {
+        return `M${source.fx},${source.fy} L${target.fx},${target.fy}`;
+      }
+    });
 
   g.select(".nodes")
     .selectAll("g")
@@ -194,9 +295,12 @@ function renderFlowchart() {
         .style("height", "100%")
         .style("width", "100%")
         .style("font", "16px 'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif")
+        .style("font-family", "'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif")
         .style("text-align", "center")
         .style("word-wrap", "break-word")
+        .style("white-space", "pre-line")
         .text(text);
+        
     });
 
   FlowUtils.updateNodeLabels();
@@ -247,7 +351,7 @@ function formatSliderValue(key, value) {
     case "projUtilSlider":
       return `${Math.round(num * 100)}%`;
     case "growthSlider":
-      return `${Math.round(num)}%`;
+      return `${Math.round(num * 100)}%`;
     case "distSlider":
     case "buildSlider":
       return num.toFixed(1);
@@ -380,7 +484,7 @@ function highlightFlow(path, decisions) {
     .classed("highlight", true);
 
   d3.selectAll(".node")
-    .filter(d => ["E", "1", "2", "3", "4", "5", "20", "21"].includes(d.id) && path.includes(d.id))
+    .filter(d => [ "1", "2", "3", "4", "5", "20", "21"].includes(d.id) && path.includes(d.id))
     .classed("special-highlight", true);
 
   // Highlight the links
@@ -390,7 +494,6 @@ function highlightFlow(path, decisions) {
       return i >= 0 && path[i + 1] === d.target;
     })
     .classed("active", true)
-    .attr("marker-end", "url(#arrow-active)");
 
   // Highlight labels for active links
   const labelGroup = d3.select(".link-labels");
@@ -404,12 +507,75 @@ function highlightFlow(path, decisions) {
       console.warn(`⚠️ Could not find node for: ${path[i]} ➝ ${path[i + 1]}`);
       continue; // Skip this label
     }
-    const midX = (source.fx + target.fx) / 2;
-    const midY = (source.fy + target.fy) / 2;
+    let midX, midY;
+    // Custom label placement for E→F and E→1
+    if (source.id === "E" && target.id === "F") {
+      // Place label above the horizontal segment between left of E and center of F
+      const nodeWidthE = 180;
+      const startX = source.fx - nodeWidthE / 2;
+      const endX = target.fx;
+      midX = (startX + endX) / 2;
+      midY = source.fy - 10; // slightly above the line
+    } else if (source.id === "E" && target.id === "1") {
+      // Place label above the first horizontal segment (right from E)
+      const nodeWidthE = 150;
+      const startX = source.fx + nodeWidthE / 2;
+      const m = nodes.find(n => n.id === "M");
+      const horizontalGap = 120;
+      const rightOfM_X = m.fx + nodeWidthE / 2 + horizontalGap;
+      midX = (startX + rightOfM_X) / 2;
+      midY = source.fy - 10;
+    } else if (source.id === "O" && target.id === "20") {
+      // Place label above the first horizontal segment (left from O)
+      const nodeWidthO = 180;
+      const startX = source.fx - nodeWidthO / 2;
+      const leftGap = 60;
+      const leftX = startX - leftGap;
+      midX = ((startX + leftX) / 2)-50;
+      midY = source.fy +70;
+    } else if (source.id === "Z" && target.id === "20") {
+      // Place label above the first horizontal segment (right from Z)
+      const nodeWidthZ = 180;
+      const startX = source.fx + nodeWidthZ / 2;
+      const center20X = target.fx;
+      midX = (startX + center20X) / 2;
+      midY = source.fy - 10;
+    } else if (source.id === "W" && target.id === "5") {
+      // Place label to the right and slightly down from the first horizontal segment (right from W)
+      const nodeWidthW = 150;
+      const offset = 40;
+      const startX = source.fx + nodeWidthW / 2;
+      const rightX = startX + offset;
+      midX = (startX + rightX) / 2 + 35; // move right
+      midY = source.fy + 70; // move down
+    } else if (source.id === "G" && target.id === "U") {
+      // Place label at midpoint between right edge of G and center of U
+      const nodeWidthG = 180;
+      const startX = source.fx + nodeWidthG / 2;
+      const startY = source.fy;
+      const endX = target.fx;
+      const endY = target.fy;
+      midX = (startX + endX) / 2-20;
+      midY = (startY + endY) / 2 - 20; // slightly above the line
+    } else if (source.id === "U" && target.id === "W"){
+      // Place label at midpoint between right edge of U and center of W
+      const nodeWidthU = 180;
+      const startX = source.fx + nodeWidthU / 2;
+      const startY = source.fy;
+      const endX = target.fx;
+      const endY = target.fy;
+      midX = (startX + endX) / 2-20;
+      midY = (startY + endY) / 2 - 20; // slightly above the line
+    }
+    else {
+      // Default: midpoint of straight line
+      midX = (source.fx + target.fx) / 2;
+      midY = ((source.fy + target.fy) / 2)+5;
+    }
     const label = decisions[source.id] || "";
     labelGroup.append("text")
       .attr("x", midX)
-      .attr("y", midY +5)
+      .attr("y", midY)
       .attr("text-anchor", "middle")
       .attr("class", "link-label")
       .text(label);
@@ -469,10 +635,6 @@ document.addEventListener("DOMContentLoaded", () => {
     svg.call(d3.zoom().scaleExtent([0.5, 2]).on("zoom", e => g.attr("transform", e.transform)))
        .call(d3.zoom().transform, d3.zoomIdentity.translate(100, 250).scale(0.65)); // ✅ Original zoom level
 
-    svg.append("defs").append("marker")
-      .attr("id", "arrow-active").attr("viewBox", "0 -5 10 10").attr("refX", 10)
-      .attr("markerWidth", 6).attr("markerHeight", 6).attr("orient", "auto")
-      .append("path").attr("d", "M0,-5L10,0L0,5").attr("fill", "#f0ad4e");
 
     initializeFlowchartData();
     renderFlowchart();
@@ -486,25 +648,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// Add this utility to get school type
-function getSchoolType(row, schoolName) {
-  // Try to get from Map_Export.csv first
-  if (mapExportData) {
-    const mapRow = mapExportData.find(r => (r["Building Name"] || "").trim() === schoolName.trim());
-    if (mapRow && mapRow["School Level"]) return mapRow["School Level"];
-  }
-  // Fallback to Decision Data
-  const type = (row["School Type"] || "").toLowerCase();
-  if (type.includes("high")) return "High School";
-  if (type.includes("middle")) return "Middle School";
-  if (type.includes("elementary") || type.includes("k-8")) return "Elementary School";
-  return row["School Type"] || "Unknown";
-}
 
 // Add this utility to get enrollment from Map_Export.csv
 function loadMapExportData(callback) {
   if (mapExportData) { callback && callback(); return; }
-  Papa.parse("Map_Export.csv", {
+  Papa.parse("https://raw.githubusercontent.com/DWieberdink/NHPS/main/Map_Export.csv", {
     download: true,
     header: true,
     skipEmptyLines: true,
@@ -517,6 +665,20 @@ function loadMapExportData(callback) {
       if (callback) callback();
     }
   });
+}
+
+function getSchoolType(row, schoolName) {
+  // Try to get from Map_Export.csv first
+  if (mapExportData) {
+    const mapRow = mapExportData.find(r => (r["Building Name"] || "").trim() === schoolName.trim());
+    if (mapRow && mapRow["School Level"]) return mapRow["School Level"];
+  }
+  // Fallback to Decision Data
+  const type = (row["School Type"] || "").toLowerCase();
+  if (type.includes("high")) return "High School";
+  if (type.includes("middle")) return "Middle School";
+  if (type.includes("elementary") || type.includes("k-8")) return "Elementary School";
+  return row["School Type"] || "Unknown";
 }
 
 function getEnrollmentFromMapExport(schoolName) {
@@ -539,10 +701,13 @@ function updateFlowchartSchoolInfo(name) {
       infoDiv.style.fontSize = "16px";
       infoDiv.style.fontWeight = "bold";
       infoDiv.style.color = "#333";
+      infoDiv.style.fontFamily = "'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif";
       header.insertAdjacentElement("afterend", infoDiv);
     }
   }
   if (!infoDiv) return;
+  // Always set font family in case infoDiv already exists
+  infoDiv.style.fontFamily = "'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif";
   const row = schoolData.find(r => r["Building Name"] === name);
   if (!row) {
     infoDiv.innerHTML = "";
@@ -553,7 +718,35 @@ function updateFlowchartSchoolInfo(name) {
   if (!enroll) enroll = row["Enrollment"] || "N/A";
   const util = row["Utilization"] ? (parseFloat(row["Utilization"]) * 100).toFixed(1) + "%" : "N/A";
   const type = getSchoolType(row, name);
-  infoDiv.innerHTML = `<div style='font-size:20px;font-weight:bold;margin-bottom:4px;text-decoration:underline;font-family:\"Franklin Gothic Book\", \"Franklin Gothic\", \"Arial Narrow\", Arial, sans-serif;'>${name}</div><span style='font-family:\"Franklin Gothic Book\", \"Franklin Gothic\", \"Arial Narrow\", Arial, sans-serif;'>Current Utilization: <strong>${util}</strong> &nbsp; | &nbsp; Current Enrollment: <strong>${enroll}</strong> &nbsp; | &nbsp; School Type: <strong>${type}</strong></span>`;
+  // Get enrollment growth from Decision Data Export.csv
+  let growth = row["2014-2024_EnrollmentGrowth"];
+  if (growth !== undefined && growth !== null && growth !== "") {
+    growth = (parseFloat(growth) * 100).toFixed(1) + "%";
+  } else {
+    growth = "N/A";
+  }
+  // Get number of programs from Decision Data Export.csv
+  let numPrograms = row["AdequateProgramOffer"];
+  if (numPrograms === undefined || numPrograms === null || numPrograms === "") {
+    numPrograms = "N/A";
+  }
+  // Get building quality score from Map_Export.csv
+  let buildingScore = null;
+  if (mapExportData) {
+    const mapRow = mapExportData.find(r => (r["Building Name"] || "").trim() === name.trim());
+    if (mapRow && mapRow["BuildingScore"] !== undefined && mapRow["BuildingScore"] !== null && mapRow["BuildingScore"] !== "") {
+      buildingScore = parseFloat(mapRow["BuildingScore"]).toFixed(2);
+    }
+  }
+  if (!buildingScore) buildingScore = "N/A";
+  infoDiv.innerHTML = `<div style='font-size:20px;font-weight:bold;margin-bottom:4px;text-decoration:none;font-family:"Franklin Gothic Book", "Franklin Gothic", "Arial Narrow", Arial, sans-serif;'>
+  ${name}</div>
+  <span style='font-family:"Franklin Gothic Book", "Franklin Gothic", "Arial Narrow", Arial, sans-serif;'>
+    School Type: <strong>${type} </strong> &nbsp; | &nbsp; Current Utilization: <strong>${util}</strong> &nbsp; | &nbsp; Current Enrollment: <strong>${enroll}</strong> &nbsp; | &nbsp; Enrollment Growth (2014-2024): <strong>${growth}</strong>
+  </span>
+  <div style='font-family:"Franklin Gothic Book", "Franklin Gothic", "Arial Narrow", Arial, sans-serif; margin-top:4px;'>
+    Number of Programs: <strong>${numPrograms}</strong> &nbsp; | &nbsp; Building Quality Score: <strong>${buildingScore}</strong>
+  </div>`;
 }
 
 // Patch the dropdown event to update info, loading Map_Export.csv if needed
@@ -571,4 +764,53 @@ window.updateFlowForSchool = function(name, thresholds) {
     const { path, decisions} = evaluatePath(row, thresholds);
     highlightFlow(path, decisions);
   }
+};
+
+// --- Zoom to fit function ---
+window.zoomFlowchartToFit = function() {
+  console.log('[zoomFlowchartToFit] Called');
+  if (!svg || !g) {
+    console.log('[zoomFlowchartToFit] svg or g not initialized', {svg, g});
+    return;
+  }
+  // Ensure SVG is 100% width/height
+  const svgNode = svg.node();
+  if (svgNode) {
+    svgNode.style.width = '100%';
+    svgNode.style.height = '100%';
+    svgNode.setAttribute('width', '100%');
+    svgNode.setAttribute('height', '100%');
+  }
+  // Force reflow
+  if (svgNode) void svgNode.offsetWidth;
+  // Get bounding box of all content in the <g>
+  const gNode = g.node();
+  if (!gNode) {
+    console.log('[zoomFlowchartToFit] g.node() not found');
+    return;
+  }
+  const bbox = gNode.getBBox();
+  // Get the SVG container size
+  let width = 0, height = 0;
+  if (svgNode) {
+    width = svgNode.clientWidth || svgNode.parentNode.clientWidth;
+    height = svgNode.clientHeight || svgNode.parentNode.clientHeight;
+  }
+  console.log('[zoomFlowchartToFit] bbox:', bbox, 'svg size:', width, height);
+  if (!width || !height) return;
+  // Add some padding
+  const pad = 30;
+  const boxWidth = bbox.width + pad * 2;
+  const boxHeight = bbox.height + pad * 2;
+  // Calculate scale to fit
+  const scale = Math.min(width / boxWidth, height / boxHeight);
+  // Center the content
+  const tx = (width - bbox.width * scale) / 2 - bbox.x * scale + pad * scale;
+  const ty = (height - bbox.height * scale) / 2 - bbox.y * scale + pad * scale;
+  // Use d3.zoom to set transform after a longer delay
+  setTimeout(() => {
+    console.log('[zoomFlowchartToFit] Applying transform', {tx, ty, scale});
+    svg.transition().duration(400)
+      .call(d3.zoom().transform, d3.zoomIdentity.translate(tx, ty).scale(scale));
+  }, 250);
 };

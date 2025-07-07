@@ -573,14 +573,52 @@ map.on('load', () => {
       const excludedSchoolsSelect = document.getElementById('excludedSchools');
       if (excludedSchoolsSelect) {
         excludedSchoolsSelect.innerHTML = '';
+        // Group schools by type
+        const groups = {
+          'Elementary and K-8 Schools': [],
+          'High Schools': [],
+          'Other Schools': []
+        };
         geojsonData.features.forEach(f => {
           const name = f.properties['Building Name'];
-          const option = document.createElement('option');
-          option.value = name;
-          option.textContent = name;
-          excludedSchoolsSelect.appendChild(option);
+          const type = f.properties['School Level'];
+          if (type === 'High School') {
+            groups['High Schools'].push(name);
+          } else if (groups[type]) {
+            groups[type].push(name);
+          } else {
+            groups['Other Schools'].push(name);
+          }
         });
-        // Initialize Choices.js for a better multi-select dropdown
+        // Helper to create optgroup with select-all
+        function addGroup(label, schools) {
+          if (!schools.length) return;
+          const group = document.createElement('optgroup');
+          group.label = label;
+          // Add select-all option
+          const selectAllOption = document.createElement('option');
+          selectAllOption.value = '__select_all_' + label.replace(/\s/g, '_');
+          selectAllOption.textContent = 'Select All ' + label;
+          group.appendChild(selectAllOption);
+          schools.forEach(name => {
+            const option = document.createElement('option');
+            option.value = name;
+            if (label === 'Other Schools') {
+              // Find the type for this school
+              const feature = geojsonData.features.find(f => f.properties['Building Name'] === name);
+              const type = feature && feature.properties['School Level'] ? feature.properties['School Level'] : 'Unknown';
+              option.textContent = `${name} (${type})`;
+            } else {
+              option.textContent = name;
+            }
+            group.appendChild(option);
+          });
+          excludedSchoolsSelect.appendChild(group);
+        }
+        addGroup('Elementary and K-8 Schools', groups['Elementary and K-8 Schools']);
+        addGroup('High Schools', groups['High Schools']);
+        addGroup('Other Schools', groups['Other Schools']);
+        // Choices.js setup
         if (window.Choices) {
           if (excludedSchoolsSelect.choicesInstance) {
             excludedSchoolsSelect.choicesInstance.destroy();
@@ -591,6 +629,24 @@ map.on('load', () => {
             placeholder: true,
             placeholderValue: 'Select schools to exclude',
             shouldSort: false
+          });
+          // Add event listener for select-all
+          excludedSchoolsSelect.addEventListener('change', function(e) {
+            const selected = Array.from(excludedSchoolsSelect.selectedOptions).map(opt => opt.value);
+            // Handle select-all for each group
+            ['Elementary and K-8 Schools', 'High Schools', 'Other Schools'].forEach(label => {
+              const selectAllValue = '__select_all_' + label.replace(/\s/g, '_');
+              if (selected.includes(selectAllValue)) {
+                // Select all schools in this group
+                const group = Array.from(excludedSchoolsSelect.querySelectorAll('optgroup[label="' + label + '"] option'))
+                  .filter(opt => !opt.value.startsWith('__select_all_'));
+                group.forEach(opt => opt.selected = true);
+                // Deselect the select-all option
+                excludedSchoolsSelect.querySelector('option[value="' + selectAllValue + '"]').selected = false;
+                // Update Choices.js UI
+                excludedSchoolsSelect.choicesInstance.setChoiceByValue(group.map(opt => opt.value));
+              }
+            });
           });
         }
       }
@@ -816,6 +872,13 @@ map.on('load', () => {
         map.setCenter(center);
       }, 350);
     }
+    // Zoom flowchart to fit if in wide view and flowchart is visible
+    if (newState === 'wide' && flowchartContainer && flowchartContainer.style.display !== 'none' && typeof window.zoomFlowchartToFit === 'function') {
+      console.log('[updateSidebarState] Triggering zoomFlowchartToFit. flowchartContainer display:', flowchartContainer.style.display);
+      setTimeout(() => {
+        window.zoomFlowchartToFit();
+      }, 400);
+    }
   }
 
   // Add event listeners to all buttons
@@ -946,7 +1009,7 @@ map.on('load', () => {
           datasets: [
             { label: 'Current Enrollment', data: [], backgroundColor: '#0033A0', barThickness: 12 },
             { label: 'New Assignments', data: [], backgroundColor: '#FFC72C', barThickness: 12 },
-            { label: 'Capacity', data: [], type: 'line', borderColor: '#FF530D', borderWidth: 3, pointStyle: 'line', pointRadius: 7, rotation: 90, fill: false, showLine: false, yAxisID: 'y' }
+            { label: 'Capacity', data: [], type: 'line', borderColor: '#FF530D', borderWidth: 3, pointStyle: 'line', pointRadius: 7, pointHoverRadius: 7, rotation: 90, fill: false, showLine: false, yAxisID: 'y' }
           ]
         },
         distanceChartData: {
@@ -1493,15 +1556,11 @@ document.addEventListener('DOMContentLoaded', function() {
         updateLegend();
         
         const sortedSummary = Object.entries(summaryCounts).sort((a, b) => b[1] - a[1]);
-        let output = `<strong>Student Assignments</strong><br/>`;
-        output += `<table style="width:100%;margin-top:8px;border-collapse:collapse;">`;
-        output += `<thead><tr style="background-color:#f2f2f2;">
-                    <th style="border:1px solid #ccc;padding:6px;text-align:left;">School Name</th>
-                    <th style="border:1px solid #ccc;padding:6px;text-align:left;"># Students</th></tr>
-                    </thead><tbody>`;
+        let output = `<strong style='font-size:18px;'>Student Assignments</strong><br/>`;
+        output += `<table style=\"width:100%;margin-top:8px;border-collapse:collapse;font-family:'Franklin Gothic Book','Franklin Gothic','Arial Narrow',Arial,sans-serif;\">`;
+        output += `<thead><tr style=\"background-color:#f2f2f2;\">\n                    <th style=\"border:1px solid #ccc;padding:6px;text-align:left;width:70%;min-width:220px;font-family:'Franklin Gothic Book','Franklin Gothic','Arial Narrow',Arial,sans-serif;\">School Name</th>\n                    <th style=\"border:1px solid #ccc;padding:6px;text-align:center;width:30%;min-width:50px;font-family:'Franklin Gothic Book','Franklin Gothic','Arial Narrow',Arial,sans-serif;\"># Students</th></tr>\n                    </thead><tbody>`;
         for (const [school, count] of sortedSummary) {
-            output += `<tr><td class="truncate-cell" data-tooltip="${school}">${school}</td>
-                    <td style="border:1px solid #ccc;padding:6px;text-align:center;">${count}</td></tr>`;
+            output += `<tr><td class=\"truncate-cell\" data-tooltip=\"${school}\" style=\"width:70%;min-width:220px;font-family:'Franklin Gothic Book','Franklin Gothic','Arial Narrow',Arial,sans-serif;\">${school}</td>\n                    <td style=\"border:1px solid #ccc;padding:6px;text-align:center;width:30%;min-width:50px;font-family:'Franklin Gothic Book','Franklin Gothic','Arial Narrow',Arial,sans-serif;\">${count}</td></tr>`;
         }
         output += `</tbody></table>`;
         
@@ -1548,7 +1607,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 datasets: [
                     { label: 'Current Enrollment', data: baseEnrollment, backgroundColor: '#0033A0', barThickness: 12 },
                     { label: 'New Assignments', data: simulatedAdds, backgroundColor: '#FFC72C', barThickness: 12 },
-                    { label: 'Capacity', data: capacity, type: 'line', borderColor: '#FF530D', borderWidth: 3, pointStyle: 'line', pointRadius: 7, rotation: 90, fill: false, showLine: false, yAxisID: 'y' }
+                    { label: 'Capacity', data: capacity, type: 'line', borderColor: '#FF530D', borderWidth: 3, pointStyle: 'line', pointRadius: 7, pointHoverRadius: 7, rotation: 90, fill: false, showLine: false, yAxisID: 'y' }
                 ]
             },
             distanceChartData: {
@@ -1590,12 +1649,29 @@ document.addEventListener('DOMContentLoaded', function() {
           window.distanceChartInstance.update();
           // Hide the placeholder text
           const placeholder = document.getElementById('distanceChartPlaceholder');
-          if (placeholder) placeholder.style.display = 'none';
+          if (placeholder && placeholder.parentNode) {
+            console.log('Removing distanceChartPlaceholder from DOM');
+            placeholder.parentNode.removeChild(placeholder);
+          }
         }
 
         // Hide the enrollment chart placeholder as well
         const enrollPlaceholder = document.getElementById('enrollmentChartPlaceholder');
         if (enrollPlaceholder) enrollPlaceholder.style.display = 'none';
+
+        // When updating the model output section, ensure the font is set for the entire container
+        // Find the model output container and set its font family
+        const modelOutputContainer = document.getElementById('scenario-output-panel');
+        if (modelOutputContainer) {
+          modelOutputContainer.style.fontFamily = "'Franklin Gothic Book','Franklin Gothic','Arial Narrow',Arial,sans-serif";
+        }
+
+        console.log('Simulation completed, checking for and removing distanceChartPlaceholder if present');
+        const placeholder = document.getElementById('distanceChartPlaceholder');
+        if (placeholder && placeholder.parentNode) {
+          console.log('Removing distanceChartPlaceholder from DOM');
+          placeholder.parentNode.removeChild(placeholder);
+        }
 
     } catch (error) {
         console.error('❌ Error in assignment process:', error);
@@ -1846,8 +1922,14 @@ function startOnboardingWalkthrough() {
     },
     {
       target: '#sidebar',
-      title: 'Sidebar',
-      text: 'This is the main sidebar. It contains navigation and controls for the planning tool.'
+      title: 'Input Sidebar',
+      text: 'This sidebar contains the input controls for the planning tool, including criteria for school decision evaluations and scenario modeling.'
+    },
+    // New step for right sidebar
+    {
+      target: '#map-sidebar',
+      title: 'Results Sidebar',
+      text: 'This sidebar displays the results of your evaluations and scenario modeling, including recommended actions and impact analysis.'
     },
     {
       target: '#decision-input-panel',
@@ -1855,29 +1937,29 @@ function startOnboardingWalkthrough() {
       text: 'Adjust how schools are evaluated using these sliders. This affects the results and recommendations.'
     },
     {
-      target: '#scenario-input-panel',
-      title: 'Scenario Modeling',
-      text: 'Test and evaluate the impact of different portfolio decisions here.'
+      target: '#decision-output-panel',
+      title: 'School Decision Evaluation: Results',
+      text: 'This section summarizes recommended actions for each school based on the criteria you set on the left. You can view both a summary and detailed results for each school.'
     },
     {
       target: '#map-container',
-      title: 'Map',
-      text: 'The map shows all schools and their current status. You can interact with the map to explore data.'
+      title: 'Output Visualizations: Map',
+      text: 'The map shows all schools and their current decision status. You can interact with the map to explore decision and student assignment data.'
     },
     {
       target: '#main-flowchart-container',
-      title: 'Flowchart',
-      text: 'The flowchart visualizes the decision logic for a selected school.'
+      title: 'Output Visualizations: Flowchart',
+      text: 'The flowchart visualizes the decision logic for a selected school chosen from the dropdown menu.'
     },
     {
-      target: '#decision-output-panel',
-      title: 'School Decision Evaluation: Results',
-      text: 'This section shows the results of your evaluation. It summarizes recommended actions for each school based on the criteria you set on the left. You can view both a summary and detailed results for each school.'
+      target: '#scenario-input-panel',
+      title: 'Scenario Modeling',
+      text: 'Test and evaluate the impact of different decision types here.'
     },
     {
       target: '#scenario-output-panel',
       title: 'Model Output: Impact Analysis',
-      text: 'After running a scenario or simulation, this section displays the impact analysis, including changes in enrollment, utilization, and travel distances for students. Use this to understand the effects of your decisions on the school system.'
+      text: 'After running a scenario or simulation, this section shows changes in enrollment, utilization, and travel distances for students. Use this to understand the effects of your decisions on the school system.'
     },
     {
       target: 'body',
@@ -2125,8 +2207,8 @@ function startOnboardingWalkthrough() {
         // Delay endWalkthrough to allow panels to open
         setTimeout(() => {
           endWalkthrough();
-        }, 500);
-      }, 100);
+        }, 200);
+      }, 50);
     });
 
     return button;
@@ -2383,12 +2465,16 @@ function startOnboardingWalkthrough() {
     let highlight = null;
     if (!step.isIntro) {
       rect = target.getBoundingClientRect();
+      let pad = 0;
+      if (step.target === '#scenario-input-panel') {
+        pad = 8; // Add 8px padding for scenario modeling highlight
+      }
       highlight = document.createElement('div');
       highlight.style.position = 'fixed';
-      highlight.style.left = rect.left + 'px';
-      highlight.style.top = rect.top + 'px';
-      highlight.style.width = rect.width + 'px';
-      highlight.style.height = rect.height + 'px';
+      highlight.style.left = (rect.left - pad) + 'px';
+      highlight.style.top = (rect.top - pad) + 'px';
+      highlight.style.width = (rect.width + pad * 2) + 'px';
+      highlight.style.height = (rect.height + pad * 2) + 'px';
       highlight.style.border = '3px solid #FFD600';
       highlight.style.borderRadius = '10px';
       highlight.style.boxShadow = '0 0 0 9999px rgba(0,0,0,0.7)';
@@ -2402,6 +2488,25 @@ function startOnboardingWalkthrough() {
         const mapButton = document.getElementById('toggleMapFlowchartMap');
         if (mapButton) {
           const buttonRect = mapButton.getBoundingClientRect();
+          const buttonHighlight = document.createElement('div');
+          buttonHighlight.style.position = 'fixed';
+          buttonHighlight.style.left = (buttonRect.left - 10) + 'px';
+          buttonHighlight.style.top = (buttonRect.top - 10) + 'px';
+          buttonHighlight.style.width = (buttonRect.width + 20) + 'px';
+          buttonHighlight.style.height = (buttonRect.height + 20) + 'px';
+          buttonHighlight.style.border = '3px solid #e74c3c';
+          buttonHighlight.style.borderRadius = '50%';
+          buttonHighlight.style.zIndex = '20002';
+          buttonHighlight.style.pointerEvents = 'none';
+          document.body.appendChild(buttonHighlight);
+          overlay.appendChild(buttonHighlight);
+        }
+      }
+
+      if (step.target === '#main-flowchart-container') {
+        const flowchartButton = document.getElementById('toggleMapFlowchartFlowchart2');
+        if (flowchartButton) {
+          const buttonRect = flowchartButton.getBoundingClientRect();
           const buttonHighlight = document.createElement('div');
           buttonHighlight.style.position = 'fixed';
           buttonHighlight.style.left = (buttonRect.left - 10) + 'px';
@@ -2432,6 +2537,15 @@ function startOnboardingWalkthrough() {
       const rect = target.getBoundingClientRect();
       const popupWidth = 340;
       const gap = 100; // Consistent gap for both panels
+      popup.style.left = (rect.left - popupWidth - gap > 20 ? rect.left - popupWidth - gap : 20) + 'px';
+      popup.style.top = rect.top + 'px';
+      popup.style.right = '';
+      popup.style.transform = '';
+    } else if (step.target === '#map-sidebar') {
+      // Always position to the left of the sidebar for the Results Sidebar step
+      const rect = target.getBoundingClientRect();
+      const popupWidth = 340;
+      const gap = 100;
       popup.style.left = (rect.left - popupWidth - gap > 20 ? rect.left - popupWidth - gap : 20) + 'px';
       popup.style.top = rect.top + 'px';
       popup.style.right = '';
@@ -2773,4 +2887,147 @@ document.addEventListener('DOMContentLoaded', function() {
     iconEl.addEventListener('click', function(e) { e.preventDefault(); e.stopPropagation(); });
     tooltipEl.addEventListener('click', function(e) { e.stopPropagation(); });
   });
+});
+
+// === START TOUR BUTTON LOGIC ===
+document.addEventListener('DOMContentLoaded', function() {
+  const startTourBtn = document.getElementById('startTourBtn');
+  if (startTourBtn) {
+    startTourBtn.addEventListener('click', function() {
+      startOnboardingWalkthrough();
+    });
+  }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  // ... existing help icon logic ...
+
+  // Map toggle help icon logic
+  var mapToggleHelpIcon = document.getElementById('map-toggle-help-icon');
+  var mapToggleHelpTooltip = document.getElementById('map-toggle-help-tooltip');
+  if (mapToggleHelpIcon && mapToggleHelpTooltip) {
+    mapToggleHelpIcon.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (mapToggleHelpTooltip.style.display === 'none' || mapToggleHelpTooltip.style.display === '') {
+        mapToggleHelpTooltip.style.display = 'block';
+      } else {
+        mapToggleHelpTooltip.style.display = 'none';
+      }
+    });
+    document.addEventListener('click', function(e) {
+      if (mapToggleHelpTooltip.style.display === 'block' && !mapToggleHelpTooltip.contains(e.target) && e.target !== mapToggleHelpIcon) {
+        mapToggleHelpTooltip.style.display = 'none';
+      }
+    });
+    // Make the tooltip draggable
+    mapToggleHelpTooltip.classList.add('draggable-tooltip');
+    let isMouseDown = false, offset = [0, 0];
+    mapToggleHelpTooltip.addEventListener('mousedown', function(e) {
+      isMouseDown = true;
+      offset = [
+        mapToggleHelpTooltip.offsetLeft - e.clientX,
+        mapToggleHelpTooltip.offsetTop - e.clientY
+      ];
+      mapToggleHelpTooltip.style.cursor = 'move';
+      e.preventDefault();
+    }, true);
+    document.addEventListener('mouseup', function() {
+      isMouseDown = false;
+      mapToggleHelpTooltip.style.cursor = '';
+    }, true);
+    document.addEventListener('mousemove', function(e) {
+      if (!isMouseDown) return;
+      mapToggleHelpTooltip.style.left = (e.clientX + offset[0]) + 'px';
+      mapToggleHelpTooltip.style.top = (e.clientY + offset[1]) + 'px';
+      mapToggleHelpTooltip.style.right = 'auto';
+      mapToggleHelpTooltip.style.bottom = 'auto';
+    }, true);
+  }
+
+  // Summary Table help icon logic
+  var summaryTableHelpIcon = document.getElementById('summary-table-help-icon');
+  var summaryTableHelpTooltip = document.getElementById('summary-table-help-tooltip');
+  if (summaryTableHelpIcon && summaryTableHelpTooltip) {
+    summaryTableHelpTooltip.classList.add('draggable-tooltip');
+    summaryTableHelpIcon.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (summaryTableHelpTooltip.style.display === 'none' || summaryTableHelpTooltip.style.display === '') {
+        summaryTableHelpTooltip.style.display = 'block';
+      } else {
+        summaryTableHelpTooltip.style.display = 'none';
+      }
+    });
+    document.addEventListener('click', function(e) {
+      if (summaryTableHelpTooltip.style.display === 'block' && !summaryTableHelpTooltip.contains(e.target) && e.target !== summaryTableHelpIcon) {
+        summaryTableHelpTooltip.style.display = 'none';
+      }
+    });
+    // Draggable logic
+    let isMouseDown = false, offset = [0, 0];
+    summaryTableHelpTooltip.addEventListener('mousedown', function(e) {
+      isMouseDown = true;
+      offset = [
+        summaryTableHelpTooltip.offsetLeft - e.clientX,
+        summaryTableHelpTooltip.offsetTop - e.clientY
+      ];
+      summaryTableHelpTooltip.style.cursor = 'move';
+      e.preventDefault();
+    }, true);
+    document.addEventListener('mouseup', function() {
+      isMouseDown = false;
+      summaryTableHelpTooltip.style.cursor = '';
+    }, true);
+    document.addEventListener('mousemove', function(e) {
+      if (!isMouseDown) return;
+      summaryTableHelpTooltip.style.left = (e.clientX + offset[0]) + 'px';
+      summaryTableHelpTooltip.style.top = (e.clientY + offset[1]) + 'px';
+      summaryTableHelpTooltip.style.right = 'auto';
+    }, true);
+  }
+
+  // Decision by School help icon logic (now outside details)
+  var decisionBySchoolHelpIcon = document.getElementById('decision-by-school-help-icon');
+  var decisionBySchoolHelpTooltip = document.getElementById('decision-by-school-help-tooltip');
+  if (decisionBySchoolHelpIcon && decisionBySchoolHelpTooltip) {
+    decisionBySchoolHelpIcon.style.cursor = 'pointer';
+    decisionBySchoolHelpTooltip.classList.add('draggable-tooltip');
+    decisionBySchoolHelpIcon.addEventListener('click', function(e) {
+      console.log('Decision by School help icon clicked');
+      e.preventDefault();
+      e.stopPropagation();
+      if (decisionBySchoolHelpTooltip.style.display === 'none' || decisionBySchoolHelpTooltip.style.display === '') {
+        decisionBySchoolHelpTooltip.style.display = 'block';
+      } else {
+        decisionBySchoolHelpTooltip.style.display = 'none';
+      }
+    });
+    document.addEventListener('click', function(e) {
+      if (decisionBySchoolHelpTooltip.style.display === 'block' && !decisionBySchoolHelpTooltip.contains(e.target) && e.target !== decisionBySchoolHelpIcon) {
+        decisionBySchoolHelpTooltip.style.display = 'none';
+      }
+    });
+    // Draggable logic
+    let isMouseDown2 = false, offset2 = [0, 0];
+    decisionBySchoolHelpTooltip.addEventListener('mousedown', function(e) {
+      isMouseDown2 = true;
+      offset2 = [
+        decisionBySchoolHelpTooltip.offsetLeft - e.clientX,
+        decisionBySchoolHelpTooltip.offsetTop - e.clientY
+      ];
+      decisionBySchoolHelpTooltip.style.cursor = 'move';
+      e.preventDefault();
+    }, true);
+    document.addEventListener('mouseup', function() {
+      isMouseDown2 = false;
+      decisionBySchoolHelpTooltip.style.cursor = '';
+    }, true);
+    document.addEventListener('mousemove', function(e) {
+      if (!isMouseDown2) return;
+      decisionBySchoolHelpTooltip.style.left = (e.clientX + offset2[0]) + 'px';
+      decisionBySchoolHelpTooltip.style.top = (e.clientY + offset2[1]) + 'px';
+      decisionBySchoolHelpTooltip.style.right = 'auto';
+    }, true);
+  }
 });
