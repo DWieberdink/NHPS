@@ -667,19 +667,14 @@ function loadMapExportData(callback) {
   });
 }
 
-function getSchoolType(row, schoolName) {
-  // Try to get from Map_Export.csv first
-  if (mapExportData) {
-    const mapRow = mapExportData.find(r => (r["Building Name"] || "").trim() === schoolName.trim());
-    if (mapRow && mapRow["School Level"]) return mapRow["School Level"];
-  }
-  // Fallback to Decision Data
-  const type = (row["School Type"] || "").toLowerCase();
-  if (type.includes("high")) return "High School";
-  if (type.includes("middle")) return "Middle School";
-  if (type.includes("elementary") || type.includes("k-8")) return "Elementary School";
-  return row["School Type"] || "Unknown";
-}
+// function getSchoolType(row, schoolName) {
+//   // Use the School Level from Decision Data Export.csv
+//   const level = (row["School Level"] || "").toLowerCase();
+//   if (level.includes("high")) return "High School";
+//   if (level.includes("middle")) return "Middle School";
+//   if (level.includes("elementary") || level.includes("k-8")) return "Elementary School";
+//   return row["School Level"] || "Unknown";
+// }
 
 function getEnrollmentFromMapExport(schoolName) {
   if (!mapExportData) return null;
@@ -717,32 +712,31 @@ function updateFlowchartSchoolInfo(name) {
   let enroll = getEnrollmentFromMapExport(name);
   if (!enroll) enroll = row["Enrollment"] || "N/A";
   const util = row["Utilization"] ? (parseFloat(row["Utilization"]) * 100).toFixed(1) + "%" : "N/A";
-  const type = getSchoolType(row, name);
-  // Get enrollment growth from Decision Data Export.csv
+  // Find the actual key for School Level (case-insensitive, trimmed)
+  let schoolLevelKey = Object.keys(row).find(k => k.trim().toLowerCase() === "school level");
+  let schoolType = (schoolLevelKey && row[schoolLevelKey] && row[schoolLevelKey].trim() !== "") ? row[schoolLevelKey] : "N/A";
+
   let growth = row["2014-2024_EnrollmentGrowth"];
   if (growth !== undefined && growth !== null && growth !== "") {
     growth = (parseFloat(growth) * 100).toFixed(1) + "%";
   } else {
     growth = "N/A";
   }
-  // Get number of programs from Decision Data Export.csv
   let numPrograms = row["AdequateProgramOffer"];
   if (numPrograms === undefined || numPrograms === null || numPrograms === "") {
     numPrograms = "N/A";
   }
-  // Get building quality score from Map_Export.csv
-  let buildingScore = null;
-  if (mapExportData) {
-    const mapRow = mapExportData.find(r => (r["Building Name"] || "").trim() === name.trim());
-    if (mapRow && mapRow["BuildingScore"] !== undefined && mapRow["BuildingScore"] !== null && mapRow["BuildingScore"] !== "") {
-      buildingScore = parseFloat(mapRow["BuildingScore"]).toFixed(2);
-    }
+  // Get building quality score from Decision Data Export.csv
+  let buildingScore = row["BuildingTreshhold"];
+  if (buildingScore !== undefined && buildingScore !== null && buildingScore !== "") {
+    buildingScore = parseFloat(buildingScore).toFixed(2);
+  } else {
+    buildingScore = "N/A";
   }
-  if (!buildingScore) buildingScore = "N/A";
   infoDiv.innerHTML = `<div style='font-size:20px;font-weight:bold;margin-bottom:4px;text-decoration:none;font-family:"Franklin Gothic Book", "Franklin Gothic", "Arial Narrow", Arial, sans-serif;'>
   ${name}</div>
   <span style='font-family:"Franklin Gothic Book", "Franklin Gothic", "Arial Narrow", Arial, sans-serif;'>
-    School Type: <strong>${type} </strong> &nbsp; | &nbsp; Current Utilization: <strong>${util}</strong> &nbsp; | &nbsp; Current Enrollment: <strong>${enroll}</strong> &nbsp; | &nbsp; Enrollment Growth (2014-2024): <strong>${growth}</strong>
+    <span>School Type: <strong>${schoolType}</strong></span> &nbsp; | &nbsp; Current Utilization: <strong>${util}</strong> &nbsp; | &nbsp; Current Enrollment: <strong>${enroll}</strong> &nbsp; | &nbsp; Enrollment Growth (2014-2024): <strong>${growth}</strong>
   </span>
   <div style='font-family:"Franklin Gothic Book", "Franklin Gothic", "Arial Narrow", Arial, sans-serif; margin-top:4px;'>
     Number of Programs: <strong>${numPrograms}</strong> &nbsp; | &nbsp; Building Quality Score: <strong>${buildingScore}</strong>

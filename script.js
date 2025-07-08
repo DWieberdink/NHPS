@@ -1724,12 +1724,16 @@ function filterSchoolsInIsochrone(polygon) {
   if (!isoTableBody) return;
 
   let visibleFeatures = geojsonData.features.filter(f => turf.booleanPointInPolygon(f.geometry, polygon));
+  // Always exclude the selected school from manual assignment options
+  const schoolSelect = document.getElementById('schoolSelect');
+  if (schoolSelect && schoolSelect.value) {
+    visibleFeatures = visibleFeatures.filter(f => f.properties['Building Name'] !== schoolSelect.value);
+  }
   // Exclude the selected school if decision type is 'Candidate for Closure/Merger'
   const decisionFilter = document.getElementById('decisionFilter');
-  const schoolSelect = document.getElementById('schoolSelect');
   if (decisionFilter && schoolSelect && decisionFilter.value === 'Candidate for Closure/Merger') {
     const selectedSchool = schoolSelect.value;
-    visibleFeatures = visibleFeatures.filter(f => f.properties['Building Name'] !== selectedSchool);
+    // (Already excluded above)
     // --- Add info above the table ---
     const manualView = document.getElementById('manualView');
     const isoTable = document.getElementById('isoTable');
@@ -1775,19 +1779,94 @@ function filterSchoolsInIsochrone(polygon) {
 
 function addPercentageListeners(visibleFeatures) {
   const inputs = document.querySelectorAll('.assign-percent');
+  // Add or get warning message element above the table
+  let warningDiv = document.getElementById('manualAssignWarning');
+  const isoTable = document.getElementById('isoTable');
+  if (!warningDiv && isoTable) {
+    warningDiv = document.createElement('div');
+    warningDiv.id = 'manualAssignWarning';
+    warningDiv.style.color = '#e74c3c';
+    warningDiv.style.fontWeight = 'bold';
+    warningDiv.style.marginBottom = '8px';
+    warningDiv.style.display = 'none';
+    isoTable.parentNode.insertBefore(warningDiv, isoTable);
+  }
+
+  function showWarning(msg) {
+    if (warningDiv) {
+      warningDiv.textContent = msg;
+      warningDiv.style.display = 'block';
+    }
+  }
+  function hideWarning() {
+    if (warningDiv) {
+      warningDiv.style.display = 'none';
+      warningDiv.textContent = '';
+    }
+  }
+
   inputs.forEach((input, i) => {
+    function switchToAssignmentsView() {
+      const assignmentsBtn = document.getElementById('toggleViewAssignments');
+      if (assignmentsBtn && !assignmentsBtn.classList.contains('active')) {
+        assignmentsBtn.click();
+      }
+    }
+    input.addEventListener('focus', switchToAssignmentsView);
+    input.addEventListener('input', switchToAssignmentsView);
     input.addEventListener('input', () => {
       if(i >= visibleFeatures.length) return;
-      const percent = parseFloat(input.value) || 0;
-      const assignedCell = input.closest('tr').querySelector('.assigned-count');
-      const updatedCell = input.closest('tr').querySelector('.updated-seats');
-
-      const assignedStudents = Math.round((percent / 100) * selectedEnrollment);
-      const originalSeats = parseInt(visibleFeatures[i].properties['Available Seats']) || 0;
-      const remainingSeats = originalSeats - assignedStudents;
-
-      assignedCell.textContent = assignedStudents;
-      updatedCell.textContent = remainingSeats;
+      // Calculate total assigned if this input is changed
+      let totalAssigned = 0;
+      const assignedCounts = [];
+      inputs.forEach((inp, idx) => {
+        let percent = parseFloat(inp.value) || 0;
+        let assigned = Math.round((percent / 100) * selectedEnrollment);
+        assignedCounts[idx] = assigned;
+        totalAssigned += assigned;
+      });
+      // If over limit, adjust this input
+      if (totalAssigned > selectedEnrollment) {
+        // Calculate how many students are already assigned (excluding this input)
+        let assignedOther = 0;
+        inputs.forEach((inp, idx) => {
+          if (idx !== i) {
+            let percent = parseFloat(inp.value) || 0;
+            assignedOther += Math.round((percent / 100) * selectedEnrollment);
+          }
+        });
+        // Set this input so total = selectedEnrollment
+        let maxForThis = Math.max(0, selectedEnrollment - assignedOther);
+        let maxPercent = selectedEnrollment > 0 ? Math.floor((maxForThis / selectedEnrollment) * 100) : 0;
+        input.value = maxPercent;
+        // Update assigned cell and updated seats
+        const assignedCell = input.closest('tr').querySelector('.assigned-count');
+        const updatedCell = input.closest('tr').querySelector('.updated-seats');
+        assignedCell.textContent = maxForThis;
+        const originalSeats = parseInt(visibleFeatures[i].properties['Available Seats']) || 0;
+        updatedCell.textContent = originalSeats - maxForThis;
+        showWarning('Cannot assign more students than available to be assigned.');
+      } else {
+        // Normal update
+        const percent = parseFloat(input.value) || 0;
+        const assignedCell = input.closest('tr').querySelector('.assigned-count');
+        const updatedCell = input.closest('tr').querySelector('.updated-seats');
+        const assignedStudents = Math.round((percent / 100) * selectedEnrollment);
+        const originalSeats = parseInt(visibleFeatures[i].properties['Available Seats']) || 0;
+        const remainingSeats = originalSeats - assignedStudents;
+        assignedCell.textContent = assignedStudents;
+        updatedCell.textContent = remainingSeats;
+        // Check if total assigned is now valid, hide warning if so
+        // (recalculate totalAssigned in case it changed)
+        let validTotal = 0;
+        inputs.forEach((inp) => {
+          let percent = parseFloat(inp.value) || 0;
+          validTotal += Math.round((percent / 100) * selectedEnrollment);
+        });
+        if (validTotal <= selectedEnrollment) {
+          hideWarning();
+        }
+      }
 
       // --- Update number of students to be assigned in closure/merger info ---
       const decisionFilter = document.getElementById('decisionFilter');
@@ -1809,6 +1888,46 @@ function addPercentageListeners(visibleFeatures) {
         const remaining = Math.max(0, originalEnrollment - totalAssigned);
         // Update only the number in the infoDiv
         infoDiv.innerHTML = infoDiv.innerHTML.replace(/(Number of students to be assigned:<\/strong> )\d+/, `$1${remaining}`);
+      }
+
+      // --- Update map assignments in real time for manual entry ---
+      // Only if 'Show Assignments' is active
+      const assignmentsBtn = document.getElementById('toggleViewAssignments');
+      const showingAssignmentsNow = assignmentsBtn && assignmentsBtn.classList.contains('active');
+      // Build summaryCounts from current table
+      let summaryCounts = {};
+      document.querySelectorAll('#isoTable tbody tr').forEach((row, idx) => {
+        const nameCell = row.querySelector('td');
+        const assignedCell = row.querySelector('.assigned-count');
+        if (nameCell && assignedCell) {
+          const schoolName = nameCell.textContent.trim();
+          const assigned = parseInt(assignedCell.textContent) || 0;
+          if (assigned > 0) summaryCounts[schoolName] = assigned;
+        }
+      });
+      // Build assignedFeatures for the map
+      const assignedFeatures = geojsonData.features
+        .filter(f => summaryCounts[f.properties['Building Name']])
+        .map(f => {
+          const assignedCount = summaryCounts[f.properties['Building Name']];
+          return {
+            type: 'Feature',
+            geometry: f.geometry,
+            properties: {
+              name: f.properties['Building Name'],
+              assigned: assignedCount
+            }
+          };
+        });
+      const assignedGeoJSON = {
+        type: 'FeatureCollection',
+        features: assignedFeatures
+      };
+      if (map.getSource('assigned-schools')) {
+        map.getSource('assigned-schools').setData(assignedGeoJSON);
+        if (map.getLayer('assigned-schools-layer')) {
+          map.setLayoutProperty('assigned-schools-layer', 'visibility', assignedFeatures.length > 0 ? 'visible' : 'none');
+        }
       }
     });
   });
