@@ -1767,7 +1767,14 @@ function filterSchoolsInIsochrone(polygon) {
 
     row.innerHTML = `
       <td class="truncate-cell" data-tooltip="${name}">${name}</td>
-      <td class="percent-cell"><input type="number" class="assign-percent" min="0" max="100" value="0" /> <span>%</span></td>
+      <td class="percent-cell">
+        <span class="assign-percent-btns" style="display:inline-flex; flex-direction:column; align-items:center; margin-right:2px;">
+          <button type="button" class="assign-percent-up" tabindex="-1">&#x25B2;</button>
+          <button type="button" class="assign-percent-down" tabindex="-1">&#x25BC;</button>
+        </span>
+        <input type="text" class="assign-percent" maxlength="3" pattern="[0-9]*" inputmode="numeric" value="0" style="width:50px; text-align:center; margin:0;" />
+        <span>%</span>
+      </td>
       <td class="assigned-count text-center">0</td>
       <td class="updated-seats text-center">${originalSeats}</td>
     `;
@@ -1775,6 +1782,27 @@ function filterSchoolsInIsochrone(polygon) {
   });
 
   addPercentageListeners(visibleFeatures);
+  // Add up/down button listeners for % Assigned
+  document.querySelectorAll('.assign-percent-up').forEach((btn, idx) => {
+    btn.addEventListener('click', function() {
+      const input = btn.closest('td').querySelector('.assign-percent');
+      let val = parseInt(input.value) || 0;
+      if (val < 100) {
+        input.value = val + 1;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    });
+  });
+  document.querySelectorAll('.assign-percent-down').forEach((btn, idx) => {
+    btn.addEventListener('click', function() {
+      const input = btn.closest('td').querySelector('.assign-percent');
+      let val = parseInt(input.value) || 0;
+      if (val > 0) {
+        input.value = val - 1;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    });
+  });
 }
 
 function addPercentageListeners(visibleFeatures) {
@@ -1812,7 +1840,11 @@ function addPercentageListeners(visibleFeatures) {
         assignmentsBtn.click();
       }
     }
-    input.addEventListener('focus', switchToAssignmentsView);
+    input.addEventListener('focus', function() {
+      if (input.value === "0") {
+        input.value = "";
+      }
+    });
     input.addEventListener('input', switchToAssignmentsView);
     input.addEventListener('input', () => {
       if(i >= visibleFeatures.length) return;
@@ -1845,7 +1877,7 @@ function addPercentageListeners(visibleFeatures) {
         assignedCell.textContent = maxForThis;
         const originalSeats = parseInt(visibleFeatures[i].properties['Available Seats']) || 0;
         updatedCell.textContent = originalSeats - maxForThis;
-        showWarning('Cannot assign more students than available to be assigned.');
+        showWarning('Cannot assign more than 100% of students.');
       } else {
         // Normal update
         const percent = parseFloat(input.value) || 0;
@@ -2032,6 +2064,20 @@ document.addEventListener("DOMContentLoaded", function() {
 let isSettingUpPath = false; // Flag to track if we're setting up a specific path
 
 function startOnboardingWalkthrough() {
+  // Close all major details sections before starting the tour
+  const detailsIds = [
+    'decision-input-panel',
+    'scenario-input-panel',
+    'decision-output-panel',
+    'scenario-output-panel',
+    'summary-table-details',
+    'decision-by-school-details'
+  ];
+  detailsIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.open = false;
+  });
+
   const steps = [
     {
       target: 'body',
@@ -2124,7 +2170,7 @@ function startOnboardingWalkthrough() {
     // For scenario/model output, wait for the section to open before highlighting
     if ((step.target === '#scenario-input-panel' || step.target === '#scenario-output-panel') && target) {
       // Scroll into view
-      target.scrollIntoView({behavior: 'smooth', block: 'center'});
+      target.scrollIntoView({behavior: 'smooth', block: 'nearest'});
       // For scenario modeling, highlight the entire details border, not just the summary, but only after open and after scroll
       if (step.target === '#scenario-input-panel') {
         let highlightTarget = document.getElementById('scenario-input-panel');
@@ -2136,7 +2182,8 @@ function startOnboardingWalkthrough() {
         };
         if (!highlightTarget.open) {
           highlightTarget.open = true;
-          setTimeout(drawAfterScroll, 400); // Wait for open + scroll
+          void highlightTarget.offsetWidth; // Force reflow
+          setTimeout(drawAfterScroll, 600); // Wait for open + scroll
         } else {
           setTimeout(drawAfterScroll, 350); // Wait for scroll
         }
@@ -2153,7 +2200,8 @@ function startOnboardingWalkthrough() {
         };
         if (!highlightTarget.open) {
           highlightTarget.open = true;
-          setTimeout(drawAfterScroll, 400); // Wait for open + scroll
+          void highlightTarget.offsetWidth; // Force reflow
+          setTimeout(drawAfterScroll, 600); // Wait for open + scroll
         } else {
           setTimeout(drawAfterScroll, 350); // Wait for scroll
         }
@@ -2585,9 +2633,7 @@ function startOnboardingWalkthrough() {
     if (!step.isIntro) {
       rect = target.getBoundingClientRect();
       let pad = 0;
-      if (step.target === '#scenario-input-panel') {
-        pad = 8; // Add 8px padding for scenario modeling highlight
-      }
+     
       highlight = document.createElement('div');
       highlight.style.position = 'fixed';
       highlight.style.left = (rect.left - pad) + 'px';

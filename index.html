@@ -177,6 +177,23 @@
       margin: 0;
     }
 
+    /* Add after existing button styles or near the table styles */
+.assign-percent-up, .assign-percent-down {
+  font-size: 12px !important;
+  color: #888 !important;
+  background: none !important;
+  border: none !important;
+  padding: 0 3px !important;
+  box-shadow: none !important;
+  line-height: 1;
+  vertical-align: middle;
+  cursor: pointer;
+}
+.assign-percent-up:hover, .assign-percent-down:hover {
+  color: #333 !important;
+  background: none !important;
+}
+
     /* ✅ Styling for details/summary to create hierarchy */
     details {
       margin-top: 1rem;
@@ -328,7 +345,10 @@
     }
 
     #mainFlowchartSchoolSelect {
-      min-width: 250px;
+      margin-top: 6px !important;
+      margin-left: 0 !important;
+      width: auto !important;
+      min-width: 0 !important;
     }
 
     .sidebar-toggle-btn {
@@ -553,6 +573,7 @@
       font-size: 16px;
       margin-bottom: 15px;
       text-align: center;
+      margin-left: -10px;
     }
 
     .password-input:focus {
@@ -813,6 +834,17 @@
       color: #000 !important;
       font-size: .9em !important;
       font-weight: bold;
+    }
+    #flowchart-toggle-group .sidebar-toggle-btn {
+      font-size: 11px !important;
+      padding: 3px 8px !important;
+      min-width: 40px !important;
+      height: 22px !important;
+    }
+    #excludedSchools {
+      max-width: 220px;
+      width: 100%;
+      min-width: 120px;
     }
   </style>
 </head>
@@ -1103,7 +1135,7 @@
   <div id="main-flowchart-container">
       <div class="flowchart-header">
         <div class="school-select-container" style="display: flex; align-items: center; gap: 8px;">
-          <label for="mainFlowchartSchoolSelect">Select School:</label>
+          <label for="mainFlowchartSchoolSelect" style="display:block;">Select<br>School:</label>
           <select id="mainFlowchartSchoolSelect">
             <option value="">-- Select School --</option>
           </select>
@@ -1120,7 +1152,7 @@
             </span>
           </span>
         </div>
-        <div class="sidebar-toggle-group" id="flowchart-toggle-group" style="margin-left: 16px;">
+        <div class="sidebar-toggle-group" id="flowchart-toggle-group" style="margin-top: 15px;">
           <button id="flowchart-sidebar-wide-btn" class="sidebar-toggle-btn">Wide</button>
           <button id="flowchart-sidebar-normal-btn" class="sidebar-toggle-btn active">Normal</button>
           <button id="flowchart-sidebar-hidden-btn" class="sidebar-toggle-btn">Hidden</button>

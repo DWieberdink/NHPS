@@ -733,13 +733,13 @@ function updateFlowchartSchoolInfo(name) {
   } else {
     buildingScore = "N/A";
   }
-  infoDiv.innerHTML = `<div style='font-size:20px;font-weight:bold;margin-bottom:4px;text-decoration:none;font-family:"Franklin Gothic Book", "Franklin Gothic", "Arial Narrow", Arial, sans-serif;'>
+  infoDiv.innerHTML = `<div style='font-size:18px;font-weight:bold;margin-bottom:4px;text-decoration:none;font-family:"Franklin Gothic Book", "Franklin Gothic", "Arial Narrow", Arial, sans-serif;'>
   ${name}</div>
-  <span style='font-family:"Franklin Gothic Book", "Franklin Gothic", "Arial Narrow", Arial, sans-serif;'>
-    <span>School Type: <strong>${schoolType}</strong></span> &nbsp; | &nbsp; Current Utilization: <strong>${util}</strong> &nbsp; | &nbsp; Current Enrollment: <strong>${enroll}</strong> &nbsp; | &nbsp; Enrollment Growth (2014-2024): <strong>${growth}</strong>
+  <span style='font-family:"Franklin Gothic Book", "Franklin Gothic", "Arial Narrow", Arial, sans-serif; font-size:14px;'>
+    <span>School Type: <strong>${schoolType}</strong></span> &nbsp; | &nbsp; Current Utilization: <strong>${util}</strong> &nbsp; | &nbsp; Current Enrollment: <strong>${enroll}</strong>
   </span>
-  <div style='font-family:"Franklin Gothic Book", "Franklin Gothic", "Arial Narrow", Arial, sans-serif; margin-top:4px;'>
-    Number of Programs: <strong>${numPrograms}</strong> &nbsp; | &nbsp; Building Quality Score: <strong>${buildingScore}</strong>
+  <div style='font-family:"Franklin Gothic Book", "Franklin Gothic", "Arial Narrow", Arial, sans-serif; margin-top:4px; font-size:14px;'>
+    Enrollment Growth (2014-2024): <strong>${growth}</strong> &nbsp; | &nbsp; Number of Programs: <strong>${numPrograms}</strong> &nbsp; | &nbsp; Building Quality Score: <strong>${buildingScore}</strong>
   </div>`;
 }
 
