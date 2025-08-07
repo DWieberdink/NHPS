@@ -3196,3 +3196,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }, true);
   }
 });
+
+// Add event listener for the data viewer button
+document.addEventListener('DOMContentLoaded', function() {
+  const dataViewerBtn = document.getElementById('dataViewerBtn');
+  if (dataViewerBtn) {
+    dataViewerBtn.addEventListener('click', function() {
+      window.open('data-viewer.html', '_blank');
+    });
+  }
+});

@@ -1,0 +1,26 @@
+{
+  "timestamp": "2025-08-07T17:16:53.109Z",
+  "summary": {
+    "totalSchools": 40,
+    "matchingSchools": 40,
+    "missingSchools": 0,
+    "dataMismatches": 2
+  },
+  "issues": [
+    {
+      "type": "BUILDING_SCORE_MISMATCH",
+      "school": "riverside academy",
+      "message": "Building score mismatch: Decision Data (1.678571429) vs Map Data (1.523809524)",
+      "decisionValue": 1.678571429,
+      "mapValue": 1.523809524
+    },
+    {
+      "type": "SCHOOL_LEVEL_MISMATCH",
+      "school": "riverside academy",
+      "message": "School level mismatch: Decision Data (\"Elementary and K-8 Schools\") vs Map Data (\"High School\")",
+      "decisionValue": "Elementary and K-8 Schools",
+      "mapValue": "High School"
+    }
+  ],
+  "warnings": []
+}

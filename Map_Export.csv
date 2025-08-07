@@ -1,41 +1,41 @@
-Building Name,School Level,Latitude,Longitude,Capacity,Enrollment,Available Seats,BuildingScore
-Augusta Lewis Troup School,Elementary and K-8 Schools,41.313256,-72.9422382,552,300,252,1.75297619
-Barack H. Obama Magnet University School,Elementary and K-8 Schools,41.32899609,-72.95416394,476,343,133,0.089285714
-Barnard Environment Studies Interdistrict Magnet School,Elementary and K-8 Schools,41.3096543,-72.9524168,673,496,177,1.541666667
-Benjamin Jepson Magnet,Elementary and K-8 Schools,41.2992489,-72.8867215,540,483,57,1.782738095
-Betsy Ross Arts and Design Academy,Middle School,41.2891784,-72.9342738,711.45,348,363.45,2.044642857
-Bishop Woods Architecture & Design Magnet,Elementary and K-8 Schools,41.3262779,-72.8668955,490,408,82,1.556547619
-Brennan Rogers School of Communication and Media,Elementary and K-8 Schools,41.344398,-72.9588302,273,203,70,1.87202381
-Celentano Biotech Health & Medical Magnet,Elementary and K-8 Schools,41.3245332,-72.921934,540,328,212,1.75
-Clemente Leadership Academy,Elementary and K-8 Schools,41.2967749,-72.936413,650,434,216,1.94047619
-Clinton Avenue School,Elementary and K-8 Schools,41.3187495,-72.8919138,676,446,230,1.964285714
-Cooperative Arts & Humanities High School,High School,41.3054759,-72.9295272,940.95,560,380.95,1.392857143
-Davis Academy for Arts & Design Innovation,Elementary and K-8 Schools,41.3285687,-72.9733702,540,489,51,1.580357143
-Dr. Reginald Mayo Early Learning Center,Early Childhood Program,41.3170963,-72.9359109,620,358,262,1.226190476
-East Rock Community & Cultural Studies Magnet School,Elementary and K-8 Schools,41.3193103,-72.9072577,629,442,187,1.5625
-Edgewood Creative Thinking Through STEAM Magnet School,Elementary and K-8 Schools,41.3182296,-72.9608451,480,397,83,2.270833333
-Engineering & Science University Magnet School,High School,41.31041064,-72.92425364,616,608,8,0.916666667
-Fair Haven School,Elementary and K-8 Schools,41.308695,-72.8933884,1013,734,279,1.758928571
-Family Academy of Multilingual Exploration,Elementary and K-8 Schools,41.3096236,-72.8988665,572,441,131,1.803571429
-Harry A. Conte West Hills Magnet School,Elementary and K-8 Schools,41.30373939,-72.91526289,840,496,344,2.306547619
-High School In The Community,High School,41.3014699,-72.9226538,504.9,251,253.9,1.791666667
-Hill Central Music Academy,Elementary and K-8 Schools,41.2952895,-72.9360657,573,430,143,1.55952381
-Hill Regional Career Magnet,High School,41.3055779,-72.9400892,1308.15,625,683.15,1.895833333
-James Hillhouse High School,High School,41.3214517,-72.9404057,1615,1124,491,2.074404762
-John C. Daniels School of International Communication,Elementary and K-8 Schools,41.3006112,-72.9384062,560,522,38,1.758928571
-John S. Martinez Sea & Sky STEM Magnet School,Elementary and K-8 Schools,41.3052219,-72.9033854,540,486,54,1.87202381
-King Robinson Interdistrict Magnet School,Elementary and K-8 Schools,41.32927494,-72.94198552,520,412,108,1.916666667
-Lincoln Bassett Community School,Elementary and K-8 Schools,41.3303694,-72.9313439,521,236,285,2.43452381
-LW Beecher Museum School of Arts & Sciences Interdistrict Magnet,Elementary and K-8 Schools,41.325913,-72.9534499,560,462,98,1.776785714
-"Mauro Sheridan Science, Technology & Communications School",Elementary and K-8 Schools,41.3275807,-72.9658555,673,482,191,1.744047619
-Metropolitan Business Academy,High School,41.30109589,-72.91953259,619.65,380,239.65,1.25
-Nathan Hale School,Elementary and K-8 Schools,41.2697141,-72.8975076,604,506,98,1.892857143
-New Haven Academy Magnet,High School,41.31313672,-72.91885315,481.95,321,160.95,1.089285714
-Riverside Academy,High School,41.28556749,-72.9292969,229.5,78,151.5,1.523809524
-Ross Woodward Classical Studies Magnet School,Elementary and K-8 Schools,41.3236629,-72.8780599,859,562,297,1.678571429
-Sound School,Sounds School,41.28195234,-72.92864495,619.65,322,297.65,2.066666667
-Truman School,Elementary and K-8 Schools,41.2928811,-72.9410789,655,460,195,1.800595238
-Wexler Grant School,Elementary and K-8 Schools,41.3193433,-72.9308938,490,194,296,2.157738095
-Wilbur Cross High School,High School,41.324718,-72.9079853,1784.15,1742,42.15,1.866071429
-Worthington Hooker School (3-8),Elementary and K-8 Schools,41.3289084,-72.9134838,324,278,46,1.654761905
-Worthington Hooker School (K-2),Elementary and K-8 Schools,41.3237592,-72.9141789,156,142,14,1.5
+Facility_Number,Building Name,School Level,Latitude,Longitude,Capacity,Enrollment,Available Seats,BuildingScore
+931511,Augusta Lewis Troup School,Elementary and K-8 Schools,41.313256,-72.9422382,552,308,244,1.75297619
+932811,Barack H. Obama Magnet University School,Elementary and K-8 Schools,41.32899609,-72.95416394,476,356,120,0.089285714
+930211,Barnard Environment Studies Interdistrict Magnet School,Elementary and K-8 Schools,41.3096543,-72.9524168,673,485,188,1.541666667
+931811,Benjamin Jepson Magnet,Elementary and K-8 Schools,41.2992489,-72.8867215,540,478,62,1.782738095
+935511,Betsy Ross Arts and Design Academy,Middle School,41.2891784,-72.9342738,711.45,319,392.45,2.044642857
+934311,Bishop Woods Architecture & Design Magnet,Elementary and K-8 Schools,41.3262779,-72.8668955,490,401,89,1.556547619
+932111,Brennan Rogers School of Communication and Media,Elementary and K-8 Schools,41.344398,-72.9588302,273,,273,1.87202381
+934811,Celentano Biotech Health & Medical Magnet,Elementary and K-8 Schools,41.3245332,-72.921934,540,367,173,1.75
+934211,Clemente Leadership Academy,Elementary and K-8 Schools,41.2967749,-72.936413,650,427,223,1.94047619
+930611,Clinton Avenue School,Elementary and K-8 Schools,41.3187495,-72.8919138,676,423,253,1.964285714
+936411,Cooperative Arts & Humanities High School,High School,41.3054759,-72.9295272,940.95,568,372.95,1.392857143
+930911,Davis Academy for Arts & Design Innovation,Elementary and K-8 Schools,41.3285687,-72.9733702,540,506,34,1.580357143
+932711,Dr. Reginald Mayo Early Learning Center,Early Childhood Program,41.3170963,-72.9359109,620,228,392,1.226190476
+934611,East Rock Community & Cultural Studies Magnet School,Elementary and K-8 Schools,41.3193103,-72.9072577,629,442,187,1.5625
+931211,Edgewood Creative Thinking Through STEAM Magnet School,Elementary and K-8 Schools,41.3182296,-72.9608451,480,409,71,2.270833333
+931711,Engineering & Science University Magnet School,High School,41.31041064,-72.92425364,616,580,36,0.916666667
+931611,Fair Haven School,Elementary and K-8 Schools,41.308695,-72.8933884,1013,680,333,1.758928571
+934111,Family Academy of Multilingual Exploration,Elementary and K-8 Schools,41.3096236,-72.8988665,572,422,150,1.803571429
+933111,Harry A. Conte West Hills Magnet School,Elementary and K-8 Schools,41.30373939,-72.91526289,840,484,356,2.306547619
+936611,High School In The Community,High School,41.3014699,-72.9226538,504.9,256,248.9,1.791666667
+930711,Hill Central Music Academy,Elementary and K-8 Schools,41.2952895,-72.9360657,573,391,182,1.55952381
+936311,Hill Regional Career Magnet,High School,41.3055779,-72.9400892,1308.15,621,687.15,1.895833333
+936211,James Hillhouse High School,High School,41.3214517,-72.9404057,1615,1062,553,2.074404762
+931311,John C. Daniels School of International Communication,Elementary and K-8 Schools,41.3006112,-72.9384062,560,524,36,1.758928571
+930811,John S. Martinez Sea & Sky STEM Magnet School,Elementary and K-8 Schools,41.3052219,-72.9033854,540,445,95,1.87202381
+933011,King Robinson Interdistrict Magnet School,Elementary and K-8 Schools,41.32927494,-72.94198552,520,407,113,1.916666667
+932011,Lincoln Bassett Community School,Elementary and K-8 Schools,41.3303694,-72.9313439,521,,521,2.43452381
+930311,LW Beecher Museum School of Arts & Sciences Interdistrict Magnet,Elementary and K-8 Schools,41.325913,-72.9534499,560,475,85,1.776785714
+931911,"Mauro Sheridan Science, Technology & Communications School",Elementary and K-8 Schools,41.3275807,-72.9658555,673,475,198,1.744047619
+936011,Metropolitan Business Academy,High School,41.30109589,-72.91953259,619.65,383,236.65,1.25
+931411,Nathan Hale School,Elementary and K-8 Schools,41.2697141,-72.8975076,604,475,129,1.892857143
+937011,New Haven Academy Magnet,High School,41.31313672,-72.91885315,481.95,317,164.95,1.089285714
+939111,Riverside Academy,High School,41.28556749,-72.9292969,229.5,51,178.5,1.523809524
+931011,Ross Woodward Classical Studies Magnet School,Elementary and K-8 Schools,41.3236629,-72.8780599,859,543,316,1.678571429
+936711,Sound School,Sounds School,41.28195234,-72.92864495,619.65,332,287.65,2.066666667
+932911,Truman School,Elementary and K-8 Schools,41.2928811,-72.9410789,655,398,257,1.800595238
+933211,Wexler Grant School,Elementary and K-8 Schools,41.3193433,-72.9308938,490,402,88,2.157738095
+936111,Wilbur Cross High School,High School,41.324718,-72.9079853,1784.15,1614,170.15,1.866071429
+933811-1,Worthington Hooker School (3-8),Elementary and K-8 Schools,41.3289084,-72.9134838,324,287,37,1.654761905
+933811-2,Worthington Hooker School (K-2),Elementary and K-8 Schools,41.3237592,-72.9141789,156,140,16,1.5
