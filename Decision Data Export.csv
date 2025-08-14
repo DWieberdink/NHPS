@@ -1,6 +1,6 @@
-Facility_Number,Building Name,Utilization,2014-2024_EnrollmentGrowth,ExpectedUtilization10yrs,DistanceUnderutilizedschools,BuildingTreshhold,AdequateProgramOffer,SiteCapacity,Scorecard,SquareFt,Enrollment,2014Enrollment,School Level
+Facility_Number,Building Name,Utilization,2014-2024_EnrollmentGrowth,ExpectedUtilization10yrs,DistanceUnderutilizedschools,BuildingScore,AdequateProgramOffer,SiteCapacity,Scorecard,SquareFt,Enrollment,2014Enrollment,School Level
 930811,John S. Martinez Sea & Sky STEM Magnet School,0.82,-0.043307087,0.82962963,0.69,1.87202381,5,No,3,101529,445,508,Elementary and K-8 Schools
-936111,Wilbur Cross High School,0.90,0.279001468,0.700053247,4.19,1.866071429,7,Yes,3,258300,1614,1362,High School
+936111,Wilbur Cross High School,0.9,0.279001468,0.700053247,4.19,1.866071429,7,Yes,3,258300,1614,1362,High School
 937011,New Haven Academy Magnet,0.66,0.215909091,0.524950721,0.49,1.089285714,2,No,3,67100,317,264,High School
 936211,James Hillhouse High School,0.66,0.081809432,0.577708978,1.24,2.074404762,8,No,5,216000,1062,1039,High School
 931711,Engineering & Science University Magnet School,0.94,0.064798599,0.441558442,0.5,0.916666667,5,No,3,109186,580,571,High School
@@ -11,20 +11,20 @@ Facility_Number,Building Name,Utilization,2014-2024_EnrollmentGrowth,ExpectedUti
 936011,Metropolitan Business Academy,0.62,-0.028132992,0.476075204,0.16,1.25,3,No,4,78768,383,391,High School
 933811-1,Worthington Hooker School (3-8),0.89,-0.04137931,0.811728395,0.73,1.654761905,5,No,2,61003,287,290,Elementary and K-8 Schools
 932911,Truman School,0.61,-0.047619048,0.732824427,0.53,1.800595238,4,No,3,101700,398,483,Elementary and K-8 Schools
-933811-2,Worthington Hooker School (K-2),0.90,-0.059602649,0.826923077,0.47,1.5,2,No,2,24000,140,151,Elementary and K-8 Schools
+933811-2,Worthington Hooker School (K-2),0.9,-0.059602649,0.826923077,0.47,1.5,2,No,2,24000,140,151,Elementary and K-8 Schools
 931811,Benjamin Jepson Magnet,0.89,-0.065764023,0.907407407,1.28,1.782738095,4,Yes,3,90200,478,517,Elementary and K-8 Schools
 931611,Fair Haven School,0.67,-0.066157761,0.713721619,0.51,1.758928571,6,No,3,180362,680,786,Elementary and K-8 Schools
 936311,Hill Regional Career Magnet,0.47,-0.074074074,0.639497629,0.78,1.895833333,3,Yes,3,165000,621,675,High School
 930311,LW Beecher Museum School of Arts & Sciences Interdistrict Magnet,0.85,-0.079681275,0.841071429,0.28,1.776785714,4,Yes,3,90740,475,502,Elementary and K-8 Schools
 931411,Nathan Hale School,0.79,-0.083333333,0.854304636,2.42,1.892857143,4,Yes,2,94853,475,552,Elementary and K-8 Schools
-936411,Cooperative Arts & Humanities High School,0.60,-0.087947883,0.641975309,0.54,1.392857143,12,No,3,145000,568,614,High School
+936411,Cooperative Arts & Humanities High School,0.6,-0.087947883,0.641975309,0.54,1.392857143,12,No,3,145000,568,614,High School
 934811,Celentano Biotech Health & Medical Magnet,0.68,-0.093922652,0.644444444,0.47,1.75,2,No,3,92530,367,362,Elementary and K-8 Schools
 931211,Edgewood Creative Thinking Through STEAM Magnet School,0.85,-0.095671982,0.877083333,1.03,2.270833333,4,No,3,47688,409,439,Elementary and K-8 Schools
 930711,Hill Central Music Academy,0.68,-0.096638655,0.766143106,0.54,1.55952381,3,Yes,3,78768,391,476,Elementary and K-8 Schools
 936611,High School In The Community,0.51,-0.109929078,0.402059814,0.16,1.791666667,4,Yes,3,72000,256,282,High School
 931911,Mauro Sheridan Science Technology & Communications School,0.71,-0.112338858,0.722139673,0.58,1.744047619,5,No,4,101322,475,543,Elementary and K-8 Schools
 930211,Barnard Environment Studies Interdistrict Magnet School,0.72,-0.114285714,0.711738484,0.86,1.541666667,5,Yes,3,90000,485,560,Elementary and K-8 Schools
-934611,East Rock Community & Cultural Studies Magnet School,0.70,-0.12992126,0.710651828,0.7,1.5625,4,No,3,77598,442,508,Elementary and K-8 Schools
+934611,East Rock Community & Cultural Studies Magnet School,0.7,-0.12992126,0.710651828,0.7,1.5625,4,No,3,77598,442,508,Elementary and K-8 Schools
 931011,Ross Woodward Classical Studies Magnet School,0.63,-0.167407407,0.696158324,1.23,1.678571429,3,Yes,3,108000,543,675,Elementary and K-8 Schools
 934311,Bishop Woods Architecture & Design Magnet,0.82,-0.180722892,0.751020408,1.39,1.556547619,4,Yes,3,72240,401,498,Elementary and K-8 Schools
 932811,Barack H. Obama Magnet University School,0.75,-0.2004662,0.68487395,0.28,0.089285714,3,No,3,64000,356,429,Elementary and K-8 Schools
@@ -33,9 +33,9 @@ Facility_Number,Building Name,Utilization,2014-2024_EnrollmentGrowth,ExpectedUti
 930611,Clinton Avenue School,0.63,-0.25542571,0.569526627,1.06,1.964285714,4,Yes,3,100960,423,599,Elementary and K-8 Schools
 933011,King Robinson Interdistrict Magnet School,0.78,-0.269503546,0.846153846,0.79,1.916666667,5,Yes,3,105900,407,564,Elementary and K-8 Schools
 939111,Riverside Academy,0.22,-0.333333333,0.470588235,1.4,1.523809524,1,Yes,3,30400,51,117,High School
-932011,Lincoln Bassett Community School,0.00,-0.365591398,0.648752399,0.79,2.43452381,4,No,3,94749,0,372,Elementary and K-8 Schools
+932011,Lincoln Bassett Community School,0,-0.365591398,0.648752399,0.79,2.43452381,4,No,3,94749,0,372,Elementary and K-8 Schools
 931511,Augusta Lewis Troup School,0.56,-0.387755102,0.695652174,0.65,1.75297619,3,Yes,5,113200,308,490,Elementary and K-8 Schools
 933211,Wexler Grant School,0.82,-0.517412935,0.514285714,0.99,2.157738095,4,Yes,5,91866,402,402,Elementary and K-8 Schools
-932111,Brennan Rogers School of Communication and Media,0.00,-0.601178782,1.018315018,0.12,1.87202381,3,Yes,5,57216,0,509,Elementary and K-8 Schools
+932111,Brennan Rogers School of Communication and Media,0,-0.601178782,1.018315018,0.12,1.87202381,3,Yes,5,57216,0,509,Elementary and K-8 Schools
 934211,Clemente Leadership Academy,0.66,,0.58,0.35,1.94047619,2,Yes,4,79177,427,0,Elementary and K-8 Schools
 932711,Dr. Reginald Mayo Early Learning Center,0.37,,0.448387097,0.04,1.226190476,0,No,0,77606,228,0,Early Childhood Program
