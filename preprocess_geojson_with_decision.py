@@ -25,7 +25,7 @@ def evaluate_school(row, t=default_thresholds):
         'K': to_float(row['ExpectedUtilization10yrs']) > t['projectedUtilization'],
         'I': to_float(row['2014-2024_EnrollmentGrowth']) > t['enrollmentGrowth'],
         'M': to_float(row['DistanceUnderutilizedschools']) <= t['distanceUnderutilized'],
-        'U': to_float(row['BuildingTreshhold']) <= t['buildingThreshold'],
+        'U': to_float(row['BuildingScore']) <= t['buildingThreshold'],
         'X': to_float(row['AdequateProgramOffer']) >= t['adequateProgramsMin'],
         'W': to_float(row['AdequateProgramOffer']) >= t['adequateProgramsMin'],
         'Z': str(row['SiteCapacity']).lower().strip() == 'yes'

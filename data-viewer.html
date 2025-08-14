@@ -560,7 +560,7 @@
                              <th class="sortable" onclick="sortTable('mapTable', 2)">Latitude</th>
                              <th class="sortable" onclick="sortTable('mapTable', 3)">Longitude</th>
                              <th class="sortable" onclick="sortTable('mapTable', 4)">Capacity</th>
-                             <th class="sortable" onclick="sortTable('mapTable', 5)">Current Enrollment</th>
+                             <th class="sortable" onclick="sortTable('mapTable', 5)">Enrollment</th>
                              <th class="sortable" onclick="sortTable('mapTable', 6)">Available Seats</th>
                              <th class="sortable" onclick="sortTable('mapTable', 7)">Building Score</th>
                          </tr>
@@ -934,6 +934,7 @@
         
         // CSV parsing function that handles quoted fields
         function parseCSVRow(row) {
+            console.log('Parsing CSV row:', row);
             const result = [];
             let current = '';
             let inQuotes = false;
@@ -952,18 +953,29 @@
             }
             
             result.push(current.trim());
+            console.log('Parsed result:', result);
             return result;
         }
         
         // Load decision data
         async function loadDecisionData() {
             try {
-                const response = await fetch('https://raw.githubusercontent.com/DWieberdink/NHPS/main/Decision%20Data%20Export.csv');
+                const response = await fetch('Decision Data Export.csv');
                 const csvText = await response.text();
-                const rows = csvText.split('\n').slice(1); // Skip header
+                console.log('Decision CSV text (first 200 chars):', csvText.substring(0, 200));
+                
+                const allRows = csvText.split('\n');
+                console.log('Decision total rows:', allRows.length);
+                console.log('Decision first row (header):', allRows[0]);
+                console.log('Decision second row (first data):', allRows[1]);
+                
+                const rows = allRows.slice(1); // Skip header
+                console.log('Decision data rows after slice:', rows.length);
                 
                 const tbody = document.getElementById('decisionTableBody');
-                rows.forEach(row => {
+                tbody.innerHTML = ''; // Clear existing content
+                
+                rows.forEach((row, index) => {
                     if (row.trim()) {
                         const cells = parseCSVRow(row);
                         const tr = document.createElement('tr');
@@ -998,26 +1010,38 @@
         // Load map data
         async function loadMapData() {
             try {
-                const response = await fetch('https://raw.githubusercontent.com/DWieberdink/NHPS/main/Map_Export.csv');
+                const response = await fetch('Map_Export.csv');
                 const csvText = await response.text();
-                const rows = csvText.split('\n').slice(1); // Skip header
+                console.log('Raw CSV text (first 200 chars):', csvText.substring(0, 200));
+                
+                const allRows = csvText.split('\n');
+                console.log('Total rows:', allRows.length);
+                console.log('First row (header):', allRows[0]);
+                console.log('Second row (first data):', allRows[1]);
+                
+                const rows = allRows.slice(1); // Skip header
+                console.log('Data rows after slice:', rows.length);
                 
                 const tbody = document.getElementById('mapTableBody');
-                rows.forEach(row => {
+                tbody.innerHTML = ''; // Clear existing content
+                
+                rows.forEach((row, index) => {
                     if (row.trim()) {
                         const cells = parseCSVRow(row);
+                        console.log(`Row ${index + 1} cells:`, cells);
+                        
                         const tr = document.createElement('tr');
                         
                         // Format the data for display
                         const formattedCells = [
-                            cells[0] || 'N/A', // Building Name
-                            cells[1] || 'N/A', // School Level
-                            cells[2] || 'N/A', // Latitude
-                            cells[3] || 'N/A', // Longitude
-                            cells[4] || 'N/A', // Capacity
-                            cells[5] || 'N/A', // Enrollment
-                            cells[6] || 'N/A', // Available Seats
-                            cells[7] || 'N/A'  // Building Score
+                            cells[1] || 'N/A', // Building Name (column 1)
+                            cells[2] || 'N/A', // School Level (column 2)
+                            cells[3] || 'N/A', // Latitude (column 3)
+                            cells[4] || 'N/A', // Longitude (column 4)
+                            cells[5] || 'N/A', // Capacity (column 5)
+                            cells[6] || 'N/A', // Enrollment (column 6)
+                            cells[7] || 'N/A', // Available Seats (column 7)
+                            cells[8] || 'N/A'  // Building Score (column 8)
                         ];
                         
                         formattedCells.forEach(cell => {
