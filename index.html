@@ -1347,6 +1347,75 @@
 </div>
 <!-- End Assignment Results Modal -->
 
+<!-- 👇 Data Viewer Modal -->
+<div id="dataViewerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; overflow-y:auto;">
+  <div style="position:relative; background:white; margin:20px auto; max-width:1200px; min-height:600px; border-radius:8px; box-shadow:0 10px 30px rgba(0,0,0,0.3);">
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:20px; border-bottom:1px solid #ddd;">
+      <h2 style="margin:0; color:#007cbf;">NHPS Dashboard Data & Logic</h2>
+      <button id="closeDataViewerBtn" style="background:none; border:none; font-size:24px; cursor:pointer; color:#666;">&times;</button>
+    </div>
+    <div style="padding:20px;">
+      <div style="display:flex; gap:20px; flex-wrap:wrap;">
+        <!-- Left Column -->
+        <div style="flex:1; min-width:300px;">
+          <h3>📊 Data Sources</h3>
+          <div style="background:#f8f9fa; padding:15px; border-radius:6px; margin-bottom:20px;">
+            <h4>Current Data Files:</h4>
+            <ul style="margin:0; padding-left:20px;">
+              <li><strong>Map_Export.csv</strong> - School enrollment and facility data</li>
+              <li><strong>NHPSSchools.geojson</strong> - Geographic school boundaries</li>
+              <li><strong>DecisionLogic.js</strong> - School evaluation algorithms</li>
+              <li><strong>FlowchartLogic.js</strong> - Decision flowchart visualization</li>
+            </ul>
+          </div>
+          
+          <h3>🔧 System Status</h3>
+          <div id="systemStatus" style="background:#f8f9fa; padding:15px; border-radius:6px; margin-bottom:20px;">
+            <div id="statusIndicator" style="display:inline-block; width:12px; height:12px; border-radius:50%; background:#28a745; margin-right:8px;"></div>
+            <span id="statusText">System Ready</span>
+          </div>
+          
+          <h3>📈 Data Validation</h3>
+          <div id="dataValidation" style="background:#f8f9fa; padding:15px; border-radius:6px;">
+            <div id="validationResults">Click "Validate Data" to check data integrity</div>
+            <button id="validateDataBtn" style="margin-top:10px; background:#007cbf; color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer;">Validate Data</button>
+          </div>
+        </div>
+        
+        <!-- Right Column -->
+        <div style="flex:1; min-width:300px;">
+          <h3>⚙️ Logic Configuration</h3>
+          <div style="background:#f8f9fa; padding:15px; border-radius:6px; margin-bottom:20px;">
+            <h4>Current Thresholds:</h4>
+            <div id="currentThresholds">
+              <p><strong>Enrollment:</strong> <span id="currentEnrollment">200</span></p>
+              <p><strong>Utilization:</strong> <span id="currentUtilization">65%</span></p>
+              <p><strong>Building Quality:</strong> <span id="currentBuilding">1.5</span></p>
+              <p><strong>Program Minimum:</strong> <span id="currentPrograms">2</span></p>
+            </div>
+          </div>
+          
+          <h3>🔍 Debug Information</h3>
+          <div style="background:#f8f9fa; padding:15px; border-radius:6px; margin-bottom:20px;">
+            <h4>Console Logs:</h4>
+            <div id="consoleLogs" style="background:#fff; border:1px solid #ddd; padding:10px; height:150px; overflow-y:auto; font-family:monospace; font-size:12px;">
+              <div>Ready to capture console logs...</div>
+            </div>
+            <button id="clearLogsBtn" style="margin-top:10px; background:#6c757d; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:12px;">Clear Logs</button>
+          </div>
+          
+          <h3>📋 Quick Actions</h3>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button id="refreshDataBtn" style="background:#28a745; color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer;">Refresh Data</button>
+            <button id="exportDataBtn" style="background:#17a2b8; color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer;">Export Data</button>
+            <button id="resetDefaultsBtn" style="background:#ffc107; color:#212529; border:none; padding:8px 16px; border-radius:4px; cursor:pointer;">Reset Defaults</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   var helpIcon = document.getElementById('decision-help-icon');
