@@ -129,3 +129,4 @@ If you encounter issues with the validation script:
 2. Ensure Node.js is properly installed
 3. Review the console output for specific error messages
 4. Check the generated JSON report for detailed information
+

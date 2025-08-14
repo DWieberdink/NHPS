@@ -274,10 +274,163 @@
             font-weight: bold;
         }
         
-        .flow-step:first-child::before {
-            display: none;
-        }
-    </style>
+                 .flow-step:first-child::before {
+             display: none;
+         }
+         
+         /* Data Mapping Table Styles */
+         .data-mapping-section {
+             margin-top: 20px;
+             padding-top: 20px;
+             border-top: 1px solid #e9ecef;
+         }
+         
+         .data-mapping-section h5 {
+             margin-top: 0;
+             color: #007cbf;
+             font-size: 16px;
+         }
+         
+         .table-controls {
+             margin-bottom: 15px;
+             display: flex;
+             gap: 10px;
+         }
+         
+         .edit-btn, .save-btn, .cancel-btn, .add-btn {
+             padding: 8px 16px;
+             border: none;
+             border-radius: 6px;
+             font-family: 'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif;
+             font-size: 14px;
+             font-weight: bold;
+             cursor: pointer;
+             transition: all 0.2s ease;
+         }
+         
+         .edit-btn {
+             background: #007cbf;
+             color: white;
+         }
+         
+         .edit-btn:hover {
+             background: #005a8b;
+         }
+         
+         .add-btn {
+             background: #17a2b8;
+             color: white;
+         }
+         
+         .add-btn:hover {
+             background: #138496;
+         }
+         
+         .restore-btn {
+             background: #ffc107;
+             color: #212529;
+         }
+         
+         .restore-btn:hover {
+             background: #e0a800;
+         }
+         
+         .clear-btn {
+             background: #6c757d;
+             color: white;
+         }
+         
+         .clear-btn:hover {
+             background: #5a6268;
+         }
+         
+         .save-btn {
+             background: #28a745;
+             color: white;
+         }
+         
+         .save-btn:hover {
+             background: #218838;
+         }
+         
+         .cancel-btn {
+             background: #dc3545;
+             color: white;
+         }
+         
+         .cancel-btn:hover {
+             background: #c82333;
+         }
+         
+         .data-mapping-table {
+             width: 100%;
+             border-collapse: collapse;
+             margin-top: 15px;
+             font-size: 14px;
+         }
+         
+         .data-mapping-table th {
+             background: #f8f9fa;
+             color: #333;
+             padding: 12px 8px;
+             text-align: left;
+             font-weight: bold;
+             border: 1px solid #dee2e6;
+         }
+         
+         .data-mapping-table td {
+             padding: 10px 8px;
+             border: 1px solid #dee2e6;
+             vertical-align: top;
+         }
+         
+         .data-mapping-table tr:nth-child(even) {
+             background: #f8f9fa;
+         }
+         
+         .data-mapping-table tr:hover {
+             background: #e3f2fd;
+         }
+         
+         .data-mapping-table input {
+             width: 100%;
+             padding: 6px 8px;
+             border: 1px solid #ced4da;
+             border-radius: 4px;
+             font-family: 'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif;
+             font-size: 14px;
+             box-sizing: border-box;
+         }
+         
+         .data-mapping-table input:focus {
+             outline: none;
+             border-color: #007cbf;
+             box-shadow: 0 0 0 2px rgba(0, 124, 191, 0.25);
+         }
+         
+         .delete-row-btn {
+             background: #dc3545;
+             color: white;
+             border: none;
+             border-radius: 4px;
+             padding: 4px 8px;
+             font-size: 12px;
+             cursor: pointer;
+             transition: all 0.2s ease;
+             font-family: 'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif;
+         }
+         
+         .delete-row-btn:hover {
+             background: #c82333;
+             transform: scale(1.05);
+         }
+         
+         .delete-row-btn:disabled {
+             background: #6c757d;
+             cursor: not-allowed;
+             transform: none;
+         }
+     </style>
 </head>
 <body>
     <button class="back-btn" onclick="window.close()">← Back to Dashboard</button>
@@ -303,13 +456,41 @@
                 <h2>📋 Dashboard Overview</h2>
                 <p>The NHPS Dashboard uses two primary data sources to evaluate schools and provide strategic decision recommendations:</p>
                 
-                <div class="metric-card">
-                    <h4>🎯 Primary Data Sources</h4>
-                    <ul>
-                        <li><strong>Decision Data Export.csv</strong> - Contains evaluation metrics, growth data, and building scores</li>
-                        <li><strong>Map_Export.csv</strong> - Contains geographic data, capacity, and current enrollment</li>
-                    </ul>
-                </div>
+                                 <div class="metric-card">
+                     <h4>🎯 Primary Data Sources</h4>
+                     <ul>
+                         <li><strong>Decision Data Export.csv</strong> - Contains evaluation metrics, growth data, and building scores</li>
+                         <li><strong>Map_Export.csv</strong> - Contains geographic data, capacity, and current enrollment</li>
+                     </ul>
+                     
+                     <div class="data-mapping-section">
+                         <h5>📋 Data Field Mapping</h5>
+                         <p>This table shows all data fields used by the dashboard and their source files:</p>
+                         
+                                                   <div class="table-controls">
+                              <button id="editDataMappingBtn" class="edit-btn" onclick="toggleDataMappingEdit()">✏️ Edit</button>
+                              <button id="addRowBtn" class="add-btn" onclick="addDataMappingRow()">➕ Add Row</button>
+                              <button id="restoreDataBtn" class="restore-btn" onclick="restoreDataIfNeeded()">🔄 Restore</button>
+                              <button id="clearStorageBtn" class="clear-btn" onclick="clearLocalStorage()">🗑️ Clear Storage</button>
+                                                             <button id="saveDataMappingBtn" class="save-btn" onclick="saveDataMapping()" style="display: none;">💾 Save & Download</button>
+                              <button id="cancelDataMappingBtn" class="cancel-btn" onclick="cancelDataMappingEdit()" style="display: none;">❌ Cancel</button>
+                          </div>
+                         
+                                                   <table class="data-mapping-table" id="dataMappingTable">
+                              <thead>
+                                  <tr>
+                                      <th>Data Field</th>
+                                      <th>Source File</th>
+                                      <th>Date Received</th>
+                                      <th>Actions</th>
+                                  </tr>
+                              </thead>
+                              <tbody id="dataMappingTableBody">
+                                  <!-- Data will be populated here -->
+                              </tbody>
+                          </table>
+                     </div>
+                 </div>
                 
                 <div class="metric-card">
                     <h4>🔧 Key Features</h4>
@@ -789,14 +970,14 @@
                         
                                                  // Format the data for display
                          const formattedCells = [
-                             cells[1] || 'N/A', // Building Name
-                             cells[2] ? (parseFloat(cells[2]) * 100).toFixed(1) + '%' : 'N/A', // Utilization
-                             cells[3] ? (parseFloat(cells[3]) * 100).toFixed(1) + '%' : 'N/A', // Enrollment Growth
-                             cells[4] ? (parseFloat(cells[4]) * 100).toFixed(1) + '%' : 'N/A', // Expected Utilization
-                             cells[5] || 'N/A', // Distance
-                             cells[6] || 'N/A', // Building Threshold
-                             cells[7] || 'N/A', // Program Offer
-                             cells[12] || 'N/A'  // 2014 Enrollment
+                             cells[1] || 'N/A', // Building Name (now index 1, was 0)
+                             cells[2] ? (parseFloat(cells[2]) * 100).toFixed(1) + '%' : 'N/A', // Utilization (now index 2, was 1)
+                             cells[3] ? (parseFloat(cells[3]) * 100).toFixed(1) + '%' : 'N/A', // Enrollment Growth (now index 3, was 2)
+                             cells[4] ? (parseFloat(cells[4]) * 100).toFixed(1) + '%' : 'N/A', // Expected Utilization (now index 4, was 3)
+                             cells[5] || 'N/A', // Distance (now index 5, was 4)
+                             cells[6] || 'N/A', // Building Threshold (now index 6, was 5)
+                             cells[7] || 'N/A', // Program Offer (now index 7, was 6)
+                             cells[12] || 'N/A'  // 2014 Enrollment (now index 12, was 11)
                          ];
                         
                         formattedCells.forEach(cell => {
@@ -829,14 +1010,14 @@
                         
                         // Format the data for display
                         const formattedCells = [
-                            cells[1] || 'N/A', // Building Name
-                            cells[2] || 'N/A', // School Level
-                            cells[3] || 'N/A', // Latitude
-                            cells[4] || 'N/A', // Longitude
-                            cells[5] || 'N/A', // Capacity
-                            cells[6] || 'N/A', // Enrollment
-                            cells[7] || 'N/A', // Available Seats
-                            cells[8] || 'N/A'  // Building Score
+                            cells[0] || 'N/A', // Building Name
+                            cells[1] || 'N/A', // School Level
+                            cells[2] || 'N/A', // Latitude
+                            cells[3] || 'N/A', // Longitude
+                            cells[4] || 'N/A', // Capacity
+                            cells[5] || 'N/A', // Enrollment
+                            cells[6] || 'N/A', // Available Seats
+                            cells[7] || 'N/A'  // Building Score
                         ];
                         
                         formattedCells.forEach(cell => {
@@ -854,10 +1035,473 @@
             }
         }
         
-        // Load data when page loads
+                 // Data mapping table functionality
+         let originalDataMapping = [];
+         let isEditingDataMapping = false;
+         
+         // Define the default mapping array in the HTML file
+         const defaultMapping = [
+             { field: 'Building Name', source: 'NHPS Master Facility List 2017-18 v5 with logo', dateReceived: '2025-02-06' },
+             { field: 'Enrollment Growth (2014-2024)', source: '2023 New Haven Public School Long-Range Facilities Planning Study', dateReceived: '2025-01-24' },
+             { field: 'Expected Enrollment (10yrs)', source: '2023 New Haven Public School Long-Range Facilities Planning Study', dateReceived: '2025-01-24' },
+             { field: 'Distance to Underutilized Schools', source: 'Decision Data Export.csv', dateReceived: '2024-01-15' },
+             { field: 'Building Score', source: '2023 New Haven Public School Long-Range Facilities Planning Study', dateReceived: '2025-01-24' },
+             { field: 'Adequate Program Offer', source: '2023 New Haven Public School Long-Range Facilities Planning Study', dateReceived: '2025-01-24' },
+             { field: 'Site Capacity', source: 'Google Maps', dateReceived: '2025-06-15' },
+             { field: 'Scorecard', source: 'School Categories_2023-24 Scorecard', dateReceived: '2025-06-20' },
+             { field: 'Square Footage', source: 'NHPS Master Facility List 2017-18 v5 with logo', dateReceived: '2025-02-06' },
+             { field: 'Current Enrollment', source: 'Enrollment Reports', dateReceived: '2025-08-07' },
+             { field: 'School Level', source: 'NHPS Master Facility List 2017-18 v5 with logo', dateReceived: '2025-01-15' },
+             { field: 'Latitude/Latitude', source: 'Derived from Addresses in NHPS Master Facility List 2017-18 v5 with logo', dateReceived: '2025-02-06' },
+             { field: 'Capacity', source: 'Drawings and Floor Plans-20250306', dateReceived: '2025-03-06' }
+         ];
+        
+                                    // Initialize data mapping table
+          function initializeDataMappingTable() {
+              // First, try to load from localStorage (user's saved changes)
+              const savedMapping = localStorage.getItem('nhpsDataMapping');
+              
+              if (savedMapping) {
+                  try {
+                      originalDataMapping = JSON.parse(savedMapping);
+                      console.log('Loaded your saved data from localStorage:', originalDataMapping);
+                  } catch (e) {
+                      console.error('Error parsing saved data:', e);
+                      originalDataMapping = [];
+                  }
+              }
+              
+              // If no localStorage data, try to read from the current HTML file
+              if (originalDataMapping.length === 0) {
+                  console.log('No localStorage data, trying to read from HTML file...');
+                  
+                  // Try to find and parse the defaultMapping array from the HTML file
+                  const scripts = document.querySelectorAll('script');
+                  let targetScript = null;
+                  
+                  for (let script of scripts) {
+                      if (script.textContent.includes('const defaultMapping = [')) {
+                          targetScript = script;
+                          break;
+                      }
+                  }
+                  
+                  if (targetScript) {
+                      try {
+                          // Extract the defaultMapping array from the HTML
+                          const scriptContent = targetScript.textContent;
+                          const regex = /const defaultMapping = \[([\s\S]*?)\];/;
+                          const match = scriptContent.match(regex);
+                          
+                          if (match) {
+                              // Parse the array content manually
+                              const arrayContent = match[1];
+                              const lines = arrayContent.split('\n').filter(line => line.trim());
+                              
+                              originalDataMapping = lines.map(line => {
+                                  const fieldMatch = line.match(/field: '([^']+)'/);
+                                  const sourceMatch = line.match(/source: '([^']+)'/);
+                                  const dateMatch = line.match(/dateReceived: '([^']+)'/);
+                                  
+                                  if (fieldMatch && sourceMatch) {
+                                      return {
+                                          field: fieldMatch[1],
+                                          source: sourceMatch[1],
+                                          dateReceived: dateMatch ? dateMatch[1] : 'N/A'
+                                      };
+                                  }
+                                  return null;
+                              }).filter(item => item !== null);
+                              
+                              console.log('Successfully loaded data from HTML file:', originalDataMapping);
+                          } else {
+                              console.log('Could not parse defaultMapping array, using hardcoded defaults');
+                              loadHardcodedDefaults();
+                          }
+                      } catch (e) {
+                          console.error('Error parsing HTML file data:', e);
+                          loadHardcodedDefaults();
+                      }
+                  } else {
+                      console.log('Could not find defaultMapping in HTML, using hardcoded defaults');
+                      loadHardcodedDefaults();
+                  }
+              }
+              
+              console.log('Final originalDataMapping:', originalDataMapping);
+              renderDataMappingTable();
+          }
+         
+                   // Load hardcoded defaults as fallback
+          function loadHardcodedDefaults() {
+              console.log('Loading hardcoded defaults');
+              originalDataMapping = [...defaultMapping];
+          }
+        
+                 // Render the data mapping table
+         function renderDataMappingTable() {
+             const tbody = document.getElementById('dataMappingTableBody');
+             if (!tbody) {
+                 console.error('Could not find tbody element');
+                 return;
+             }
+             
+             console.log('Rendering table with data:', originalDataMapping);
+             console.log('Data length:', originalDataMapping.length);
+             
+             tbody.innerHTML = '';
+             
+             // Show restore button if no data
+             const restoreBtn = document.getElementById('restoreDataBtn');
+             if (restoreBtn) {
+                 restoreBtn.style.display = originalDataMapping.length === 0 ? 'inline-block' : 'none';
+             }
+             
+             if (originalDataMapping.length === 0) {
+                 console.warn('No data to render');
+                 tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #666; padding: 20px;">No data available. Click "🔄 Restore" to load default data.</td></tr>';
+                 return;
+             }
+             
+             originalDataMapping.forEach((item, index) => {
+                 console.log('Rendering item:', item, 'at index:', index);
+                 const tr = document.createElement('tr');
+                 tr.innerHTML = `
+                     <td>${item.field}</td>
+                     <td>${item.source}</td>
+                     <td>${item.dateReceived || 'N/A'}</td>
+                     <td>
+                         <button class="delete-row-btn" onclick="deleteDataMappingRow(${index})" ${originalDataMapping.length <= 1 ? 'disabled' : ''}>🗑️ Delete</button>
+                     </td>
+                 `;
+                 tbody.appendChild(tr);
+             });
+             
+             console.log('Table rendering complete. Rows added:', tbody.querySelectorAll('tr').length);
+         }
+        
+                 // Toggle edit mode
+         function toggleDataMappingEdit() {
+             if (isEditingDataMapping) return;
+             
+             isEditingDataMapping = true;
+             document.getElementById('editDataMappingBtn').style.display = 'none';
+             document.getElementById('addRowBtn').style.display = 'none';
+             document.getElementById('saveDataMappingBtn').style.display = 'inline-block';
+             document.getElementById('cancelDataMappingBtn').style.display = 'inline-block';
+             
+             // Convert table to editable inputs
+             const tbody = document.getElementById('dataMappingTableBody');
+             tbody.querySelectorAll('tr').forEach((row, index) => {
+                 const cells = row.querySelectorAll('td');
+                 const field = cells[0].textContent;
+                 const source = cells[1].textContent;
+                 const dateReceived = cells[2].textContent;
+                 
+                 cells[0].innerHTML = `<input type="text" value="${field}" data-field="${index}">`;
+                 cells[1].innerHTML = `<input type="text" value="${source}" data-source="${index}">`;
+                 cells[2].innerHTML = `<input type="date" value="${dateReceived}" data-date="${index}">`;
+                 // Keep the delete button in the actions column
+                 cells[3].innerHTML = `<button class="delete-row-btn" onclick="deleteDataMappingRow(${index})" ${originalDataMapping.length <= 1 ? 'disabled' : ''}>🗑️ Delete</button>`;
+             });
+         }
+        
+                                    // Save changes and download instructions
+          function saveDataMapping() {
+              const tbody = document.getElementById('dataMappingTableBody');
+              const updatedMapping = [];
+              
+              tbody.querySelectorAll('tr').forEach((row, index) => {
+                  const fieldInput = row.querySelector('input[data-field]');
+                  const sourceInput = row.querySelector('input[data-source]');
+                  const dateInput = row.querySelector('input[data-date]');
+                  
+                  if (fieldInput && sourceInput && dateInput) {
+                      updatedMapping.push({
+                          field: fieldInput.value.trim(),
+                          source: sourceInput.value.trim(),
+                          dateReceived: dateInput.value || 'N/A'
+                      });
+                  }
+              });
+              
+              // Validate that we have data
+              if (updatedMapping.length === 0) {
+                  showErrorMessage('No data to save. Please check your inputs.');
+                  return;
+              }
+              
+              // Update the data
+              originalDataMapping = updatedMapping;
+              
+              // Save to localStorage
+              localStorage.setItem('nhpsDataMapping', JSON.stringify(updatedMapping));
+              
+              // Generate and download instructions file
+              downloadUpdateInstructions(updatedMapping);
+               
+              // Exit edit mode
+              exitEditMode();
+              
+              // Re-render table
+              renderDataMappingTable();
+              
+              // Show success message
+              showSuccessMessage(`Data saved to localStorage! Instructions file downloaded.`);
+          }
+        
+        // Cancel edit mode
+        function cancelDataMappingEdit() {
+            exitEditMode();
+            renderDataMappingTable();
+        }
+        
+                          // Exit edit mode
+         function exitEditMode() {
+             isEditingDataMapping = false;
+             document.getElementById('editDataMappingBtn').style.display = 'inline-block';
+             document.getElementById('addRowBtn').style.display = 'inline-block';
+             document.getElementById('saveDataMappingBtn').style.display = 'none';
+             document.getElementById('cancelDataMappingBtn').style.display = 'none';
+         }
+         
+         // Add a new row to the data mapping table
+         function addDataMappingRow() {
+             const newRow = {
+                 field: 'New Data Field',
+                 source: 'Decision Data Export.csv',
+                 dateReceived: new Date().toISOString().split('T')[0] // Today's date
+             };
+             
+             originalDataMapping.push(newRow);
+             
+             // Save to localStorage
+             localStorage.setItem('nhpsDataMapping', JSON.stringify(originalDataMapping));
+             
+             // Re-render table
+             renderDataMappingTable();
+         }
+         
+         // Delete a row from the data mapping table
+         function deleteDataMappingRow(index) {
+             if (originalDataMapping.length <= 1) {
+                 alert('Cannot delete the last row. At least one data field mapping must remain.');
+                 return;
+             }
+             
+             if (confirm(`Are you sure you want to delete the row for "${originalDataMapping[index].field}"?`)) {
+                 originalDataMapping.splice(index, 1);
+                 
+                                   // Save to localStorage
+                  localStorage.setItem('nhpsDataMapping', JSON.stringify(originalDataMapping));
+                  
+                  // Re-render table
+                  renderDataMappingTable();
+             }
+         }
+         
+                   // Download instructions for manually updating the HTML file
+          function downloadUpdateInstructions(newMapping) {
+              try {
+                  // Create the new defaultMapping array as a string
+                  const mappingString = newMapping.map(item => 
+                      `                { field: '${item.field}', source: '${item.source}', dateReceived: '${item.dateReceived}' }`
+                  ).join(',\n');
+                  
+                  // Create the instructions text
+                  const instructions = `NHPS Dashboard Data Mapping Update Instructions
+=====================================================
+
+This file contains instructions for manually updating your data-viewer.html file
+with the new data mapping information.
+
+STEP 1: LOCATE THE FILE
+- Find your data-viewer.html file
+- Open it in a text editor (VS Code, Notepad++, etc.)
+
+STEP 2: FIND THE TARGET LOCATION
+- Search for this exact text:
+  "// Only load hardcoded defaults if this is the very first time"
+
+STEP 3: REPLACE THE DATA
+- Find the line that starts with: "const defaultMapping = ["
+- Replace the ENTIRE array (from "[" to "]") with this new data:
+
+const defaultMapping = [
+${mappingString}
+];
+
+STEP 4: SAVE AND TEST
+- Save the file
+- Refresh your browser to see the updated data
+- Push the updated file to GitHub
+
+IMPORTANT NOTES:
+- Make sure to keep the exact formatting (spaces, quotes, commas)
+- The array must start with "const defaultMapping = [" and end with "];"
+- Each line should have exactly 16 spaces before the opening brace
+- Test locally before pushing to GitHub
+
+Your updated data mapping:
+${newMapping.map((item, index) => `${index + 1}. ${item.field} → ${item.source} (${item.dateReceived})`).join('\n')}
+
+Generated on: ${new Date().toLocaleString()}
+`;
+
+                  // Create and download the file
+                  const blob = new Blob([instructions], { type: 'text/plain' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = 'NHPS_Data_Mapping_Update_Instructions.txt';
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+                  
+                  console.log('Instructions file downloaded successfully');
+                  
+              } catch (error) {
+                  console.error('Error generating instructions file:', error);
+                  showErrorMessage('Error generating instructions file. Please try again.');
+              }
+          }
+         
+         
+         
+         // Show success message
+         function showSuccessMessage(message) {
+             const successDiv = document.createElement('div');
+             successDiv.className = 'success-message';
+             successDiv.textContent = message;
+             successDiv.style.cssText = `
+                 position: fixed;
+                 top: 150px;
+                 left: 20px;
+                 background: #28a745;
+                 color: white;
+                 border-radius: 8px;
+                 padding: 12px 16px;
+                 font-family: 'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif;
+                 font-size: 14px;
+                 font-weight: bold;
+                 box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                 z-index: 1001;
+                 max-width: 300px;
+             `;
+             
+             // Remove any existing success message
+             const existingMsg = document.querySelector('.success-message');
+             if (existingMsg) {
+                 existingMsg.remove();
+             }
+             
+             document.body.appendChild(successDiv);
+             
+             // Auto-remove after 5 seconds
+             setTimeout(() => {
+                 if (successDiv.parentNode) {
+                     successDiv.remove();
+                 }
+             }, 5000);
+         }
+         
+         // Show error message
+         function showErrorMessage(message) {
+             const errorDiv = document.createElement('div');
+             errorDiv.className = 'error-message';
+             errorDiv.textContent = message;
+             errorDiv.style.cssText = `
+                 position: fixed;
+                 top: 150px;
+                 left: 20px;
+                 background: #dc3545;
+                 color: white;
+                 border-radius: 8px;
+                 padding: 12px 16px;
+                 font-family: 'Franklin Gothic Book', 'Franklin Gothic', 'Arial Narrow', Arial, sans-serif;
+                 font-size: 14px;
+                 font-weight: bold;
+                 box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                 z-index: 1001;
+                 max-width: 300px;
+             `;
+             
+             // Remove any existing error message
+             const existingMsg = document.querySelector('.error-message');
+             if (existingMsg) {
+                 existingMsg.remove();
+             }
+             
+             document.body.appendChild(errorDiv);
+             
+             // Auto-remove after 5 seconds
+             setTimeout(() => {
+                 if (errorDiv.parentNode) {
+                     errorDiv.remove();
+                 }
+             }, 5000);
+         }
+         
+                   // Clear localStorage and reload from HTML file
+          function clearLocalStorage() {
+              if (confirm('Are you sure you want to clear all saved data? This will reset the table to show the data from your HTML file.')) {
+                  // Clear localStorage
+                  localStorage.removeItem('nhpsDataMapping');
+                  
+                  // Reset the data array
+                  originalDataMapping = [];
+                  
+                  // Re-initialize the table to load from HTML file
+                  initializeDataMappingTable();
+                  
+                  // Show success message
+                  showSuccessMessage('Local storage cleared! The table now shows data from your HTML file.');
+                  
+                  console.log('Local storage cleared successfully');
+              }
+          }
+         
+         // Restore data from localStorage if table is empty
+         function restoreDataIfNeeded() {
+             console.log('Restore function called');
+             console.log('Current originalDataMapping:', originalDataMapping);
+             
+             if (originalDataMapping.length === 0) {
+                 const savedMapping = localStorage.getItem('nhpsDataMapping');
+                 console.log('Saved mapping from localStorage:', savedMapping);
+                 
+                 if (savedMapping) {
+                     try {
+                         originalDataMapping = JSON.parse(savedMapping);
+                         console.log('Successfully parsed localStorage data:', originalDataMapping);
+                         showSuccessMessage('Your saved data restored!');
+                         renderDataMappingTable();
+                     } catch (e) {
+                         console.error('Error parsing localStorage data:', e);
+                         showErrorMessage('Your saved data appears corrupted. Loading initial defaults.');
+                         // Load initial defaults as fallback
+                         initializeDataMappingTable();
+                     }
+                 } else {
+                     console.log('No saved data found, loading initial defaults');
+                     // Load initial defaults
+                     initializeDataMappingTable();
+                     showSuccessMessage('Initial default data loaded!');
+                 }
+             } else {
+                 console.log('Data already exists, re-rendering table');
+                 renderDataMappingTable();
+             }
+         }
+         
+
+         
+         // Load data when page loads
         window.addEventListener('load', () => {
             loadDecisionData();
             loadMapData();
+            initializeDataMappingTable();
         });
     </script>
 </body>

@@ -22,7 +22,7 @@ Facility_Number,Building Name,Utilization,2014-2024_EnrollmentGrowth,ExpectedUti
 931211,Edgewood Creative Thinking Through STEAM Magnet School,0.85,-0.095671982,0.877083333,1.03,2.270833333,4,No,3,47688,409,439,Elementary and K-8 Schools
 930711,Hill Central Music Academy,0.68,-0.096638655,0.766143106,0.54,1.55952381,3,Yes,3,78768,391,476,Elementary and K-8 Schools
 936611,High School In The Community,0.51,-0.109929078,0.402059814,0.16,1.791666667,4,Yes,3,72000,256,282,High School
-931911,"Mauro Sheridan Science, Technology & Communications School",0.71,-0.112338858,0.722139673,0.58,1.744047619,5,No,4,101322,475,543,Elementary and K-8 Schools
+931911,Mauro Sheridan Science Technology & Communications School,0.71,-0.112338858,0.722139673,0.58,1.744047619,5,No,4,101322,475,543,Elementary and K-8 Schools
 930211,Barnard Environment Studies Interdistrict Magnet School,0.72,-0.114285714,0.711738484,0.86,1.541666667,5,Yes,3,90000,485,560,Elementary and K-8 Schools
 934611,East Rock Community & Cultural Studies Magnet School,0.70,-0.12992126,0.710651828,0.7,1.5625,4,No,3,77598,442,508,Elementary and K-8 Schools
 931011,Ross Woodward Classical Studies Magnet School,0.63,-0.167407407,0.696158324,1.23,1.678571429,3,Yes,3,108000,543,675,Elementary and K-8 Schools
@@ -33,9 +33,9 @@ Facility_Number,Building Name,Utilization,2014-2024_EnrollmentGrowth,ExpectedUti
 930611,Clinton Avenue School,0.63,-0.25542571,0.569526627,1.06,1.964285714,4,Yes,3,100960,423,599,Elementary and K-8 Schools
 933011,King Robinson Interdistrict Magnet School,0.78,-0.269503546,0.846153846,0.79,1.916666667,5,Yes,3,105900,407,564,Elementary and K-8 Schools
 939111,Riverside Academy,0.22,-0.333333333,0.470588235,1.4,1.523809524,1,Yes,3,30400,51,117,High School
-932011,Lincoln Bassett Community School,0.00,-0.365591398,0.648752399,0.79,2.43452381,4,No,3,94749,,372,Elementary and K-8 Schools
+932011,Lincoln Bassett Community School,0.00,-0.365591398,0.648752399,0.79,2.43452381,4,No,3,94749,0,372,Elementary and K-8 Schools
 931511,Augusta Lewis Troup School,0.56,-0.387755102,0.695652174,0.65,1.75297619,3,Yes,5,113200,308,490,Elementary and K-8 Schools
 933211,Wexler Grant School,0.82,-0.517412935,0.514285714,0.99,2.157738095,4,Yes,5,91866,402,402,Elementary and K-8 Schools
-932111,Brennan Rogers School of Communication and Media,0.00,-0.601178782,1.018315018,0.12,1.87202381,3,Yes,5,57216,,509,Elementary and K-8 Schools
-934211,Clemente Leadership Academy,0.66,,0.58,0.35,1.94047619,2,Yes,4,79177,427,,Elementary and K-8 Schools
-932711,Dr. Reginald Mayo Early Learning Center,0.37,,0.448387097,0.04,1.226190476,0,No,#N/A,77606,228,,Early Childhood Program
+932111,Brennan Rogers School of Communication and Media,0.00,-0.601178782,1.018315018,0.12,1.87202381,3,Yes,5,57216,0,509,Elementary and K-8 Schools
+934211,Clemente Leadership Academy,0.66,,0.58,0.35,1.94047619,2,Yes,4,79177,427,0,Elementary and K-8 Schools
+932711,Dr. Reginald Mayo Early Learning Center,0.37,,0.448387097,0.04,1.226190476,0,No,0,77606,228,0,Early Childhood Program
