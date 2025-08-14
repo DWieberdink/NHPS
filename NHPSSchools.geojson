@@ -1,47 +1,1084 @@
 {
-"type": "FeatureCollection",
-"name": "NHPSSchools",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-"features": [
-{ "type": "Feature", "properties": { "Building Name": "Barack H. Obama Magnet University School", "School Level": "Elementary and K-8 Schools", "Latitude": 41.32899609, "Longitude": -72.95416394, "Capacity": 476.0, "Enrollment": 343, "Available Seats": 133.0 }, "geometry": { "type": "Point", "coordinates": [ -72.95416394, 41.32899609 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Barnard Environment Studies Interdistrict Magnet School", "School Level": "Elementary and K-8 Schools", "Latitude": 41.3096543, "Longitude": -72.9524168, "Capacity": 673.0, "Enrollment": 496, "Available Seats": 177.0 }, "geometry": { "type": "Point", "coordinates": [ -72.9524168, 41.3096543 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Benjamin Jepson Magnet", "School Level": "Elementary and K-8 Schools", "Latitude": 41.2992489, "Longitude": -72.8867215, "Capacity": 540.0, "Enrollment": 483, "Available Seats": 57.0 }, "geometry": { "type": "Point", "coordinates": [ -72.8867215, 41.2992489 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Betsy Ross Arts and Design Academy", "School Level": "Middle School", "Latitude": 41.2891784, "Longitude": -72.9342738, "Capacity": 711.45, "Enrollment": 348, "Available Seats": 363.45 }, "geometry": { "type": "Point", "coordinates": [ -72.9342738, 41.2891784 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Bishop Woods Architecture & Design Magnet", "School Level": "Elementary and K-8 Schools", "Latitude": 41.3262779, "Longitude": -72.8668955, "Capacity": 490.0, "Enrollment": 408, "Available Seats": 82.0 }, "geometry": { "type": "Point", "coordinates": [ -72.8668955, 41.3262779 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Brennan Rogers School of Communication and Media", "School Level": "Elementary and K-8 Schools", "Latitude": 41.344398, "Longitude": -72.9588302, "Capacity": 273.0, "Enrollment": 203, "Available Seats": 70.0 }, "geometry": { "type": "Point", "coordinates": [ -72.9588302, 41.344398 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Celentano Biotech Health & Medical Magnet", "School Level": "Elementary and K-8 Schools", "Latitude": 41.3245332, "Longitude": -72.921934, "Capacity": 540.0, "Enrollment": 328, "Available Seats": 212.0 }, "geometry": { "type": "Point", "coordinates": [ -72.921934, 41.3245332 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Clemente Leadership Academy", "School Level": "Elementary and K-8 Schools", "Latitude": 41.2967749, "Longitude": -72.936413, "Capacity": 650.0, "Enrollment": 434, "Available Seats": 216.0 }, "geometry": { "type": "Point", "coordinates": [ -72.936413, 41.2967749 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Clinton Avenue School", "School Level": "Elementary and K-8 Schools", "Latitude": 41.3187495, "Longitude": -72.8919138, "Capacity": 676.0, "Enrollment": 446, "Available Seats": 230.0 }, "geometry": { "type": "Point", "coordinates": [ -72.8919138, 41.3187495 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Cooperative Arts & Humanities High School", "School Level": "High School", "Latitude": 41.3054759, "Longitude": -72.9295272, "Capacity": 940.95, "Enrollment": 560, "Available Seats": 380.95 }, "geometry": { "type": "Point", "coordinates": [ -72.9295272, 41.3054759 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Davis Academy for Arts & Design Innovation", "School Level": "Elementary and K-8 Schools", "Latitude": 41.3285687, "Longitude": -72.9733702, "Capacity": 540.0, "Enrollment": 489, "Available Seats": 51.0 }, "geometry": { "type": "Point", "coordinates": [ -72.9733702, 41.3285687 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Dr. Reginald Mayo Early Learning Center", "School Level": "Early Childhood Program", "Latitude": 41.3170963, "Longitude": -72.9359109, "Capacity": 620.0, "Enrollment": 358, "Available Seats": 262.0 }, "geometry": { "type": "Point", "coordinates": [ -72.9359109, 41.3170963 ] } },
-{ "type": "Feature", "properties": { "Building Name": "East Rock Community & Cultural Studies Magnet School", "School Level": "Elementary and K-8 Schools", "Latitude": 41.3193103, "Longitude": -72.9072577, "Capacity": 629.0, "Enrollment": 442, "Available Seats": 187.0 }, "geometry": { "type": "Point", "coordinates": [ -72.9072577, 41.3193103 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Edgewood Creative Thinking Through STEAM Magnet School", "School Level": "Elementary and K-8 Schools", "Latitude": 41.3182296, "Longitude": -72.9608451, "Capacity": 480.0, "Enrollment": 397, "Available Seats": 83.0 }, "geometry": { "type": "Point", "coordinates": [ -72.9608451, 41.3182296 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Engineering & Science University Magnet School", "School Level": "High School", "Latitude": 41.31041064, "Longitude": -72.92425364, "Capacity": 616.0, "Enrollment": 608, "Available Seats": 8.0 }, "geometry": { "type": "Point", "coordinates": [ -72.92425364, 41.31041064 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Fair Haven School", "School Level": "Elementary and K-8 Schools", "Latitude": 41.308695, "Longitude": -72.8933884, "Capacity": 1013.0, "Enrollment": 734, "Available Seats": 279.0 }, "geometry": { "type": "Point", "coordinates": [ -72.8933884, 41.308695 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Family Academy of Multilingual Exploration", "School Level": "Elementary and K-8 Schools", "Latitude": 41.3096236, "Longitude": -72.8988665, "Capacity": 572.0, "Enrollment": 441, "Available Seats": 131.0 }, "geometry": { "type": "Point", "coordinates": [ -72.8988665, 41.3096236 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Harry A. Conte West Hills Magnet School", "School Level": "Elementary and K-8 Schools", "Latitude": 41.30373939, "Longitude": -72.91526289, "Capacity": 840.0, "Enrollment": 496, "Available Seats": 344.0 }, "geometry": { "type": "Point", "coordinates": [ -72.91526289, 41.30373939 ] } },
-{ "type": "Feature", "properties": { "Building Name": "High School In The Community", "School Level": "High School", "Latitude": 41.3014699, "Longitude": -72.9226538, "Capacity": 504.9, "Enrollment": 251, "Available Seats": 253.9 }, "geometry": { "type": "Point", "coordinates": [ -72.9226538, 41.3014699 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Hill Central Music Academy", "School Level": "Elementary and K-8 Schools", "Latitude": 41.2952895, "Longitude": -72.9360657, "Capacity": 573.0, "Enrollment": 430, "Available Seats": 143.0 }, "geometry": { "type": "Point", "coordinates": [ -72.9360657, 41.2952895 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Hill Regional Career Magnet", "School Level": "High School", "Latitude": 41.3055779, "Longitude": -72.9400892, "Capacity": 1308.15, "Enrollment": 625, "Available Seats": 683.15 }, "geometry": { "type": "Point", "coordinates": [ -72.9400892, 41.3055779 ] } },
-{ "type": "Feature", "properties": { "Building Name": "James Hillhouse High School", "School Level": "High School", "Latitude": 41.3214517, "Longitude": -72.9404057, "Capacity": 1615.0, "Enrollment": 1124, "Available Seats": 491.0 }, "geometry": { "type": "Point", "coordinates": [ -72.9404057, 41.3214517 ] } },
-{ "type": "Feature", "properties": { "Building Name": "John C. Daniels School of International Communication", "School Level": "Elementary and K-8 Schools", "Latitude": 41.3006112, "Longitude": -72.9384062, "Capacity": 560.0, "Enrollment": 522, "Available Seats": 38.0 }, "geometry": { "type": "Point", "coordinates": [ -72.9384062, 41.3006112 ] } },
-{ "type": "Feature", "properties": { "Building Name": "John S. Martinez Sea & Sky STEM Magnet School", "School Level": "Elementary and K-8 Schools", "Latitude": 41.3052219, "Longitude": -72.9033854, "Capacity": 540.0, "Enrollment": 486, "Available Seats": 54.0 }, "geometry": { "type": "Point", "coordinates": [ -72.9033854, 41.3052219 ] } },
-{ "type": "Feature", "properties": { "Building Name": "King Robinson Interdistrict Magnet School", "School Level": "Elementary and K-8 Schools", "Latitude": 41.32927494, "Longitude": -72.94198552, "Capacity": 520.0, "Enrollment": 412, "Available Seats": 108.0 }, "geometry": { "type": "Point", "coordinates": [ -72.94198552, 41.32927494 ] } },
-{ "type": "Feature", "properties": { "Building Name": "LW Beecher Museum School of Arts & Sciences Interdistrict Magnet", "School Level": "Elementary and K-8 Schools", "Latitude": 41.325913, "Longitude": -72.9534499, "Capacity": 560.0, "Enrollment": 462, "Available Seats": 98.0 }, "geometry": { "type": "Point", "coordinates": [ -72.9534499, 41.325913 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Lincoln Bassett Community School", "School Level": "Elementary and K-8 Schools", "Latitude": 41.3303694, "Longitude": -72.9313439, "Capacity": 521.0, "Enrollment": 236, "Available Seats": 285.0 }, "geometry": { "type": "Point", "coordinates": [ -72.9313439, 41.3303694 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Mauro Sheridan Science, Technology & Communications School", "School Level": "Elementary and K-8 Schools", "Latitude": 41.3275807, "Longitude": -72.9658555, "Capacity": 673.0, "Enrollment": 482, "Available Seats": 191.0 }, "geometry": { "type": "Point", "coordinates": [ -72.9658555, 41.3275807 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Metropolitan Business Academy", "School Level": "High School", "Latitude": 41.30109589, "Longitude": -72.91953259, "Capacity": 619.65, "Enrollment": 380, "Available Seats": 239.65 }, "geometry": { "type": "Point", "coordinates": [ -72.91953259, 41.30109589 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Nathan Hale School", "School Level": "Elementary and K-8 Schools", "Latitude": 41.2697141, "Longitude": -72.8975076, "Capacity": 604.0, "Enrollment": 506, "Available Seats": 98.0 }, "geometry": { "type": "Point", "coordinates": [ -72.8975076, 41.2697141 ] } },
-{ "type": "Feature", "properties": { "Building Name": "New Haven Academy Magnet", "School Level": "High School", "Latitude": 41.31313672, "Longitude": -72.91885315, "Capacity": 481.95, "Enrollment": 321, "Available Seats": 160.95 }, "geometry": { "type": "Point", "coordinates": [ -72.91885315, 41.31313672 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Riverside Academy", "School Level": "High School", "Latitude": 41.28556749, "Longitude": -72.9292969, "Capacity": 229.5, "Enrollment": 78, "Available Seats": 151.5 }, "geometry": { "type": "Point", "coordinates": [ -72.9292969, 41.28556749 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Ross Woodward Classical Studies Magnet School", "School Level": "Elementary and K-8 Schools", "Latitude": 41.3236629, "Longitude": -72.8780599, "Capacity": 859.0, "Enrollment": 562, "Available Seats": 297.0 }, "geometry": { "type": "Point", "coordinates": [ -72.8780599, 41.3236629 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Sound School", "School Level": "Sounds School", "Latitude": 41.28195234, "Longitude": -72.92864495000001, "Capacity": 619.65, "Enrollment": 322, "Available Seats": 297.65 }, "geometry": { "type": "Point", "coordinates": [ -72.92864495, 41.28195234 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Augusta Lewis Troup School", "School Level": "Elementary and K-8 Schools", "Latitude": 41.313256, "Longitude": -72.9422382, "Capacity": 552.0, "Enrollment": 300, "Available Seats": 252.0 }, "geometry": { "type": "Point", "coordinates": [ -72.9422382, 41.313256 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Truman School", "School Level": "Elementary and K-8 Schools", "Latitude": 41.2928811, "Longitude": -72.9410789, "Capacity": 655.0, "Enrollment": 460, "Available Seats": 195.0 }, "geometry": { "type": "Point", "coordinates": [ -72.9410789, 41.2928811 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Wexler Grant School", "School Level": "Elementary and K-8 Schools", "Latitude": 41.3193433, "Longitude": -72.9308938, "Capacity": 490.0, "Enrollment": 194, "Available Seats": 296.0 }, "geometry": { "type": "Point", "coordinates": [ -72.9308938, 41.3193433 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Wilbur Cross High School", "School Level": "High School", "Latitude": 41.324718, "Longitude": -72.9079853, "Capacity": 1784.15, "Enrollment": 1742, "Available Seats": 42.15 }, "geometry": { "type": "Point", "coordinates": [ -72.9079853, 41.324718 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Worthington Hooker School (3-8)", "School Level": "Elementary and K-8 Schools", "Latitude": 41.3289084, "Longitude": -72.9134838, "Capacity": 324.0, "Enrollment": 278, "Available Seats": 46.0 }, "geometry": { "type": "Point", "coordinates": [ -72.9134838, 41.3289084 ] } },
-{ "type": "Feature", "properties": { "Building Name": "Worthington Hooker School (K-2)", "School Level": "Elementary and K-8 Schools", "Latitude": 41.3237592, "Longitude": -72.9141789, "Capacity": 156.0, "Enrollment": 142, "Available Seats": 14.0 }, "geometry": { "type": "Point", "coordinates": [ -72.9141789, 41.3237592 ] } }
-]
+  "type": "FeatureCollection",
+  "name": "NHPSSchools",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Barack H. Obama Magnet University School",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.32899609,
+        "Longitude": -72.95416394,
+        "Capacity": 476,
+        "Enrollment": 356,
+        "Available Seats": 120,
+        "Building Score": "0.089285714",
+        "Utilization": 0.75,
+        "Enrollment Growth": -0.2004662,
+        "Expected Utilization": 0.68487395,
+        "Distance to Underutilized": 0.28,
+        "Building Threshold": 0,
+        "Program Offer": 3,
+        "2014 Enrollment": 429
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.95416394,
+          41.32899609
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Barnard Environment Studies Interdistrict Magnet School",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.3096543,
+        "Longitude": -72.9524168,
+        "Capacity": 673,
+        "Enrollment": 485,
+        "Available Seats": 188,
+        "Building Score": "1.541666667",
+        "Utilization": 0.72,
+        "Enrollment Growth": -0.114285714,
+        "Expected Utilization": 0.711738484,
+        "Distance to Underutilized": 0.86,
+        "Building Threshold": 0,
+        "Program Offer": 5,
+        "2014 Enrollment": 560
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.9524168,
+          41.3096543
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Benjamin Jepson Magnet",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.2992489,
+        "Longitude": -72.8867215,
+        "Capacity": 540,
+        "Enrollment": 478,
+        "Available Seats": 62,
+        "Building Score": "1.782738095",
+        "Utilization": 0.89,
+        "Enrollment Growth": -0.065764023,
+        "Expected Utilization": 0.907407407,
+        "Distance to Underutilized": 1.28,
+        "Building Threshold": 0,
+        "Program Offer": 4,
+        "2014 Enrollment": 517
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.8867215,
+          41.2992489
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Betsy Ross Arts and Design Academy",
+        "School Level": "Middle School",
+        "Latitude": 41.2891784,
+        "Longitude": -72.9342738,
+        "Capacity": 711.45,
+        "Enrollment": 319,
+        "Available Seats": 392.45,
+        "Building Score": "2.044642857",
+        "Utilization": 0.45,
+        "Enrollment Growth": -0.241830065,
+        "Expected Utilization": 0.576287863,
+        "Distance to Underutilized": 0,
+        "Building Threshold": 0,
+        "Program Offer": 9,
+        "2014 Enrollment": 459
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.9342738,
+          41.2891784
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Bishop Woods Architecture & Design Magnet",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.3262779,
+        "Longitude": -72.8668955,
+        "Capacity": 490,
+        "Enrollment": 401,
+        "Available Seats": 89,
+        "Building Score": "1.556547619",
+        "Utilization": 0.82,
+        "Enrollment Growth": -0.180722892,
+        "Expected Utilization": 0.751020408,
+        "Distance to Underutilized": 1.39,
+        "Building Threshold": 0,
+        "Program Offer": 4,
+        "2014 Enrollment": 498
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.8668955,
+          41.3262779
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Brennan Rogers School of Communication and Media",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.344398,
+        "Longitude": -72.9588302,
+        "Capacity": 273,
+        "Enrollment": 0,
+        "Available Seats": 273,
+        "Building Score": "1.87202381",
+        "Utilization": 0,
+        "Enrollment Growth": -0.601178782,
+        "Expected Utilization": 1.018315018,
+        "Distance to Underutilized": 0.12,
+        "Building Threshold": 0,
+        "Program Offer": 3,
+        "2014 Enrollment": 509
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.9588302,
+          41.344398
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Celentano Biotech Health & Medical Magnet",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.3245332,
+        "Longitude": -72.921934,
+        "Capacity": 540,
+        "Enrollment": 367,
+        "Available Seats": 173,
+        "Building Score": "1.75",
+        "Utilization": 0.68,
+        "Enrollment Growth": -0.093922652,
+        "Expected Utilization": 0.644444444,
+        "Distance to Underutilized": 0.47,
+        "Building Threshold": 0,
+        "Program Offer": 2,
+        "2014 Enrollment": 362
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.921934,
+          41.3245332
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Clemente Leadership Academy",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.2967749,
+        "Longitude": -72.936413,
+        "Capacity": 650,
+        "Enrollment": 427,
+        "Available Seats": 223,
+        "Building Score": "1.94047619",
+        "Utilization": 0.66,
+        "Enrollment Growth": 0,
+        "Expected Utilization": 0.58,
+        "Distance to Underutilized": 0.35,
+        "Building Threshold": 0,
+        "Program Offer": 2,
+        "2014 Enrollment": 0
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.936413,
+          41.2967749
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Clinton Avenue School",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.3187495,
+        "Longitude": -72.8919138,
+        "Capacity": 676,
+        "Enrollment": 423,
+        "Available Seats": 253,
+        "Building Score": "1.964285714",
+        "Utilization": 0.63,
+        "Enrollment Growth": -0.25542571,
+        "Expected Utilization": 0.569526627,
+        "Distance to Underutilized": 1.06,
+        "Building Threshold": 0,
+        "Program Offer": 4,
+        "2014 Enrollment": 599
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.8919138,
+          41.3187495
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Cooperative Arts & Humanities High School",
+        "School Level": "High School",
+        "Latitude": 41.3054759,
+        "Longitude": -72.9295272,
+        "Capacity": 940.95,
+        "Enrollment": 568,
+        "Available Seats": 372.95,
+        "Building Score": "1.392857143",
+        "Utilization": 0.6,
+        "Enrollment Growth": -0.087947883,
+        "Expected Utilization": 0.641975309,
+        "Distance to Underutilized": 0.54,
+        "Building Threshold": 0,
+        "Program Offer": 12,
+        "2014 Enrollment": 614
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.9295272,
+          41.3054759
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Davis Academy for Arts & Design Innovation",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.3285687,
+        "Longitude": -72.9733702,
+        "Capacity": 540,
+        "Enrollment": 506,
+        "Available Seats": 34,
+        "Building Score": "1.580357143",
+        "Utilization": 0.94,
+        "Enrollment Growth": 0.060737527,
+        "Expected Utilization": 0.951851852,
+        "Distance to Underutilized": 0.74,
+        "Building Threshold": 0,
+        "Program Offer": 5,
+        "2014 Enrollment": 461
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.9733702,
+          41.3285687
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Dr. Reginald Mayo Early Learning Center",
+        "School Level": "Early Childhood Program",
+        "Latitude": 41.3170963,
+        "Longitude": -72.9359109,
+        "Capacity": 620,
+        "Enrollment": 228,
+        "Available Seats": 392,
+        "Building Score": "1.226190476",
+        "Utilization": 0.37,
+        "Enrollment Growth": 0,
+        "Expected Utilization": 0.448387097,
+        "Distance to Underutilized": 0.04,
+        "Building Threshold": 0,
+        "Program Offer": 0,
+        "2014 Enrollment": 0
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.9359109,
+          41.3170963
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "East Rock Community & Cultural Studies Magnet School",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.3193103,
+        "Longitude": -72.9072577,
+        "Capacity": 629,
+        "Enrollment": 442,
+        "Available Seats": 187,
+        "Building Score": "1.5625",
+        "Utilization": 0.7,
+        "Enrollment Growth": -0.12992126,
+        "Expected Utilization": 0.710651828,
+        "Distance to Underutilized": 0.7,
+        "Building Threshold": 0,
+        "Program Offer": 4,
+        "2014 Enrollment": 508
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.9072577,
+          41.3193103
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Edgewood Creative Thinking Through STEAM Magnet School",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.3182296,
+        "Longitude": -72.9608451,
+        "Capacity": 480,
+        "Enrollment": 409,
+        "Available Seats": 71,
+        "Building Score": "2.270833333",
+        "Utilization": 0.85,
+        "Enrollment Growth": -0.095671982,
+        "Expected Utilization": 0.877083333,
+        "Distance to Underutilized": 1.03,
+        "Building Threshold": 0,
+        "Program Offer": 4,
+        "2014 Enrollment": 439
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.9608451,
+          41.3182296
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Engineering & Science University Magnet School",
+        "School Level": "High School",
+        "Latitude": 41.31041064,
+        "Longitude": -72.92425364,
+        "Capacity": 616,
+        "Enrollment": 580,
+        "Available Seats": 36,
+        "Building Score": "0.916666667",
+        "Utilization": 0.94,
+        "Enrollment Growth": 0.064798599,
+        "Expected Utilization": 0.441558442,
+        "Distance to Underutilized": 0.5,
+        "Building Threshold": 0,
+        "Program Offer": 5,
+        "2014 Enrollment": 571
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.92425364,
+          41.31041064
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Fair Haven School",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.308695,
+        "Longitude": -72.8933884,
+        "Capacity": 1013,
+        "Enrollment": 680,
+        "Available Seats": 333,
+        "Building Score": "1.758928571",
+        "Utilization": 0.67,
+        "Enrollment Growth": -0.066157761,
+        "Expected Utilization": 0.713721619,
+        "Distance to Underutilized": 0.51,
+        "Building Threshold": 0,
+        "Program Offer": 6,
+        "2014 Enrollment": 786
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.8933884,
+          41.308695
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Family Academy of Multilingual Exploration",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.3096236,
+        "Longitude": -72.8988665,
+        "Capacity": 572,
+        "Enrollment": 422,
+        "Available Seats": 150,
+        "Building Score": "1.803571429",
+        "Utilization": 0.74,
+        "Enrollment Growth": -0.022172949,
+        "Expected Utilization": 0.863636364,
+        "Distance to Underutilized": 0.43,
+        "Building Threshold": 0,
+        "Program Offer": 4,
+        "2014 Enrollment": 451
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.8988665,
+          41.3096236
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Harry A. Conte West Hills Magnet School",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.30373939,
+        "Longitude": -72.91526289,
+        "Capacity": 840,
+        "Enrollment": 484,
+        "Available Seats": 356,
+        "Building Score": "2.306547619",
+        "Utilization": 0.58,
+        "Enrollment Growth": -0.225,
+        "Expected Utilization": 0.823809524,
+        "Distance to Underutilized": 0.71,
+        "Building Threshold": 0,
+        "Program Offer": 3,
+        "2014 Enrollment": 640
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.91526289,
+          41.30373939
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "High School In The Community",
+        "School Level": "High School",
+        "Latitude": 41.3014699,
+        "Longitude": -72.9226538,
+        "Capacity": 504.9,
+        "Enrollment": 256,
+        "Available Seats": 248.9,
+        "Building Score": "1.791666667",
+        "Utilization": 0.51,
+        "Enrollment Growth": -0.109929078,
+        "Expected Utilization": 0.402059814,
+        "Distance to Underutilized": 0.16,
+        "Building Threshold": 0,
+        "Program Offer": 4,
+        "2014 Enrollment": 282
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.9226538,
+          41.3014699
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Hill Central Music Academy",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.2952895,
+        "Longitude": -72.9360657,
+        "Capacity": 573,
+        "Enrollment": 391,
+        "Available Seats": 182,
+        "Building Score": "1.55952381",
+        "Utilization": 0.68,
+        "Enrollment Growth": -0.096638655,
+        "Expected Utilization": 0.766143106,
+        "Distance to Underutilized": 0.54,
+        "Building Threshold": 0,
+        "Program Offer": 3,
+        "2014 Enrollment": 476
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.9360657,
+          41.2952895
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Hill Regional Career Magnet",
+        "School Level": "High School",
+        "Latitude": 41.3055779,
+        "Longitude": -72.9400892,
+        "Capacity": 1308.15,
+        "Enrollment": 621,
+        "Available Seats": 687.15,
+        "Building Score": "1.895833333",
+        "Utilization": 0.47,
+        "Enrollment Growth": -0.074074074,
+        "Expected Utilization": 0.639497629,
+        "Distance to Underutilized": 0.78,
+        "Building Threshold": 0,
+        "Program Offer": 3,
+        "2014 Enrollment": 675
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.9400892,
+          41.3055779
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "James Hillhouse High School",
+        "School Level": "High School",
+        "Latitude": 41.3214517,
+        "Longitude": -72.9404057,
+        "Capacity": 1615,
+        "Enrollment": 1062,
+        "Available Seats": 553,
+        "Building Score": "2.074404762",
+        "Utilization": 0.66,
+        "Enrollment Growth": 0.081809432,
+        "Expected Utilization": 0.577708978,
+        "Distance to Underutilized": 1.24,
+        "Building Threshold": 0,
+        "Program Offer": 8,
+        "2014 Enrollment": 1039
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.9404057,
+          41.3214517
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "John C. Daniels School of International Communication",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.3006112,
+        "Longitude": -72.9384062,
+        "Capacity": 560,
+        "Enrollment": 524,
+        "Available Seats": 36,
+        "Building Score": "1.758928571",
+        "Utilization": 0.94,
+        "Enrollment Growth": 0,
+        "Expected Utilization": 0.878571429,
+        "Distance to Underutilized": 0.47,
+        "Building Threshold": 0,
+        "Program Offer": 4,
+        "2014 Enrollment": 522
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.9384062,
+          41.3006112
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "John S. Martinez Sea & Sky STEM Magnet School",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.3052219,
+        "Longitude": -72.9033854,
+        "Capacity": 540,
+        "Enrollment": 445,
+        "Available Seats": 95,
+        "Building Score": "1.87202381",
+        "Utilization": 0.82,
+        "Enrollment Growth": -0.043307087,
+        "Expected Utilization": 0.82962963,
+        "Distance to Underutilized": 0.69,
+        "Building Threshold": 0,
+        "Program Offer": 5,
+        "2014 Enrollment": 508
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.9033854,
+          41.3052219
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "King Robinson Interdistrict Magnet School",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.32927494,
+        "Longitude": -72.94198552,
+        "Capacity": 520,
+        "Enrollment": 407,
+        "Available Seats": 113,
+        "Building Score": "1.916666667",
+        "Utilization": 0.78,
+        "Enrollment Growth": -0.269503546,
+        "Expected Utilization": 0.846153846,
+        "Distance to Underutilized": 0.79,
+        "Building Threshold": 0,
+        "Program Offer": 5,
+        "2014 Enrollment": 564
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.94198552,
+          41.32927494
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "LW Beecher Museum School of Arts & Sciences Interdistrict Magnet",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.325913,
+        "Longitude": -72.9534499,
+        "Capacity": 560,
+        "Enrollment": 475,
+        "Available Seats": 85,
+        "Building Score": "1.776785714",
+        "Utilization": 0.85,
+        "Enrollment Growth": -0.079681275,
+        "Expected Utilization": 0.841071429,
+        "Distance to Underutilized": 0.28,
+        "Building Threshold": 0,
+        "Program Offer": 4,
+        "2014 Enrollment": 502
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.9534499,
+          41.325913
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Lincoln Bassett Community School",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.3303694,
+        "Longitude": -72.9313439,
+        "Capacity": 521,
+        "Enrollment": 0,
+        "Available Seats": 521,
+        "Building Score": "2.43452381",
+        "Utilization": 0,
+        "Enrollment Growth": -0.365591398,
+        "Expected Utilization": 0.648752399,
+        "Distance to Underutilized": 0.79,
+        "Building Threshold": 0,
+        "Program Offer": 4,
+        "2014 Enrollment": 372
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.9313439,
+          41.3303694
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Mauro Sheridan Science, Technology & Communications School",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.3275807,
+        "Longitude": -72.9658555,
+        "Capacity": 673,
+        "Enrollment": 482,
+        "Available Seats": 191
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.9658555,
+          41.3275807
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Metropolitan Business Academy",
+        "School Level": "High School",
+        "Latitude": 41.30109589,
+        "Longitude": -72.91953259,
+        "Capacity": 619.65,
+        "Enrollment": 383,
+        "Available Seats": 236.65,
+        "Building Score": "1.25",
+        "Utilization": 0.62,
+        "Enrollment Growth": -0.028132992,
+        "Expected Utilization": 0.476075204,
+        "Distance to Underutilized": 0.16,
+        "Building Threshold": 0,
+        "Program Offer": 3,
+        "2014 Enrollment": 391
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.91953259,
+          41.30109589
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Nathan Hale School",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.2697141,
+        "Longitude": -72.8975076,
+        "Capacity": 604,
+        "Enrollment": 475,
+        "Available Seats": 129,
+        "Building Score": "1.892857143",
+        "Utilization": 0.79,
+        "Enrollment Growth": -0.083333333,
+        "Expected Utilization": 0.854304636,
+        "Distance to Underutilized": 2.42,
+        "Building Threshold": 0,
+        "Program Offer": 4,
+        "2014 Enrollment": 552
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.8975076,
+          41.2697141
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "New Haven Academy Magnet",
+        "School Level": "High School",
+        "Latitude": 41.31313672,
+        "Longitude": -72.91885315,
+        "Capacity": 481.95,
+        "Enrollment": 317,
+        "Available Seats": 164.95,
+        "Building Score": "1.089285714",
+        "Utilization": 0.66,
+        "Enrollment Growth": 0.215909091,
+        "Expected Utilization": 0.524950721,
+        "Distance to Underutilized": 0.49,
+        "Building Threshold": 0,
+        "Program Offer": 2,
+        "2014 Enrollment": 264
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.91885315,
+          41.31313672
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Riverside Academy",
+        "School Level": "High School",
+        "Latitude": 41.28556749,
+        "Longitude": -72.9292969,
+        "Capacity": 229.5,
+        "Enrollment": 51,
+        "Available Seats": 178.5,
+        "Building Score": "1.523809524",
+        "Utilization": 0.22,
+        "Enrollment Growth": -0.333333333,
+        "Expected Utilization": 0.470588235,
+        "Distance to Underutilized": 1.4,
+        "Building Threshold": 0,
+        "Program Offer": 1,
+        "2014 Enrollment": 117
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.9292969,
+          41.28556749
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Ross Woodward Classical Studies Magnet School",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.3236629,
+        "Longitude": -72.8780599,
+        "Capacity": 859,
+        "Enrollment": 543,
+        "Available Seats": 316,
+        "Building Score": "1.678571429",
+        "Utilization": 0.63,
+        "Enrollment Growth": -0.167407407,
+        "Expected Utilization": 0.696158324,
+        "Distance to Underutilized": 1.23,
+        "Building Threshold": 0,
+        "Program Offer": 3,
+        "2014 Enrollment": 675
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.8780599,
+          41.3236629
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Sound School",
+        "School Level": "Sounds School",
+        "Latitude": 41.28195234,
+        "Longitude": -72.92864495,
+        "Capacity": 619.65,
+        "Enrollment": 332,
+        "Available Seats": 287.65,
+        "Building Score": "2.066666667",
+        "Utilization": 0.54,
+        "Enrollment Growth": -0.024242424,
+        "Expected Utilization": 0.450254176,
+        "Distance to Underutilized": 3.5,
+        "Building Threshold": 0,
+        "Program Offer": 1,
+        "2014 Enrollment": 330
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.92864495,
+          41.28195234
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Augusta Lewis Troup School",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.313256,
+        "Longitude": -72.9422382,
+        "Capacity": 552,
+        "Enrollment": 308,
+        "Available Seats": 244,
+        "Building Score": "1.75297619",
+        "Utilization": 0.56,
+        "Enrollment Growth": -0.387755102,
+        "Expected Utilization": 0.695652174,
+        "Distance to Underutilized": 0.65,
+        "Building Threshold": 0,
+        "Program Offer": 3,
+        "2014 Enrollment": 490
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.9422382,
+          41.313256
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Truman School",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.2928811,
+        "Longitude": -72.9410789,
+        "Capacity": 655,
+        "Enrollment": 398,
+        "Available Seats": 257,
+        "Building Score": "1.800595238",
+        "Utilization": 0.61,
+        "Enrollment Growth": -0.047619048,
+        "Expected Utilization": 0.732824427,
+        "Distance to Underutilized": 0.53,
+        "Building Threshold": 0,
+        "Program Offer": 4,
+        "2014 Enrollment": 483
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.9410789,
+          41.2928811
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Wexler Grant School",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.3193433,
+        "Longitude": -72.9308938,
+        "Capacity": 490,
+        "Enrollment": 402,
+        "Available Seats": 88,
+        "Building Score": "2.157738095",
+        "Utilization": 0.82,
+        "Enrollment Growth": -0.517412935,
+        "Expected Utilization": 0.514285714,
+        "Distance to Underutilized": 0.99,
+        "Building Threshold": 0,
+        "Program Offer": 4,
+        "2014 Enrollment": 402
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.9308938,
+          41.3193433
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Wilbur Cross High School",
+        "School Level": "High School",
+        "Latitude": 41.324718,
+        "Longitude": -72.9079853,
+        "Capacity": 1784.15,
+        "Enrollment": 1614,
+        "Available Seats": 170.15,
+        "Building Score": "1.866071429",
+        "Utilization": 0.9,
+        "Enrollment Growth": 0.279001468,
+        "Expected Utilization": 0.700053247,
+        "Distance to Underutilized": 4.19,
+        "Building Threshold": 0,
+        "Program Offer": 7,
+        "2014 Enrollment": 1362
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.9079853,
+          41.324718
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Worthington Hooker School (3-8)",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.3289084,
+        "Longitude": -72.9134838,
+        "Capacity": 324,
+        "Enrollment": 287,
+        "Available Seats": 37,
+        "Building Score": "1.654761905",
+        "Utilization": 0.89,
+        "Enrollment Growth": -0.04137931,
+        "Expected Utilization": 0.811728395,
+        "Distance to Underutilized": 0.73,
+        "Building Threshold": 0,
+        "Program Offer": 5,
+        "2014 Enrollment": 290
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.9134838,
+          41.3289084
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Building Name": "Worthington Hooker School (K-2)",
+        "School Level": "Elementary and K-8 Schools",
+        "Latitude": 41.3237592,
+        "Longitude": -72.9141789,
+        "Capacity": 156,
+        "Enrollment": 140,
+        "Available Seats": 16,
+        "Building Score": "1.5",
+        "Utilization": 0.9,
+        "Enrollment Growth": -0.059602649,
+        "Expected Utilization": 0.826923077,
+        "Distance to Underutilized": 0.47,
+        "Building Threshold": 0,
+        "Program Offer": 2,
+        "2014 Enrollment": 151
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -72.9141789,
+          41.3237592
+        ]
+      }
+    }
+  ]
 }

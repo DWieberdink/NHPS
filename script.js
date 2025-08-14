@@ -1050,7 +1050,7 @@ function normalizeName(name) {
 function injectDecisionsIntoGeoJSON(geojson, decisions) {
   const decisionMap = new Map(decisions.map(row => [normalizeName(row["Building Name"]), row["decision"] || "Unknown"]));
   const scorecardMap = new Map(decisions.map(row => [normalizeName(row["Building Name"]), parseFloat(row["Scorecard"] || "0")]));
-  const buildingQualityMap = new Map(decisions.map(row => [normalizeName(row["Building Name"]), parseFloat(row["BuildingScore"] || "0")]));
+  const buildingQualityMap = new Map(decisions.map(row => [normalizeName(row["Building Name"]), parseFloat(row["BuildingTreshhold"] || "0")]));
   // Add a map for Utilization
   const utilizationMap = new Map(decisions.map(row => [normalizeName(row["Building Name"]), parseFloat(row["Utilization"] || "0")]));
 
@@ -1439,7 +1439,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const scorecard = parseFloat(destProperties["Scorecard"]) || 0;
                 const utilization = parseFloat(destProperties["Utilization"]) || 0;
 
-                // Lower Building Quality (BuildingScore) is better
+                // Lower Building Quality (BuildingTreshhold) is better
                 const qualityScore = maxQuality > 0 ? (1 - (quality / maxQuality)) : 0; // Lower is better
                 const distanceScore = maxDistance > 0 ? (1 - (distance / maxDistance)) : 0; // Closer is better
                 const enrollmentScore = maxUtilization > 0 ? (utilization / maxUtilization) : 0; // Higher utilization is better
@@ -3195,10 +3195,8 @@ document.addEventListener('DOMContentLoaded', function() {
       decisionBySchoolHelpTooltip.style.right = 'auto';
     }, true);
   }
-});
 
-// Add event listener for the data viewer button
-document.addEventListener('DOMContentLoaded', function() {
+  // Add event listener for the data viewer button
   const dataViewerBtn = document.getElementById('dataViewerBtn');
   if (dataViewerBtn) {
     dataViewerBtn.addEventListener('click', function() {

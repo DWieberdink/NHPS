@@ -391,7 +391,7 @@ function evaluatePath(row, t) {
     K: +row.ExpectedUtilization10yrs > t.projectedUtilization ? "Yes" : "No",
     I: +row["2014-2024_EnrollmentGrowth"] > t.enrollmentGrowth ? "Yes" : "No",
     M: +row.DistanceUnderutilizedschools <= t.distanceUnderutilized ? "Yes" : "No",
-    U: +row.BuildingScore <= t.buildingThreshold ? "Yes" : "No",
+    U: +row.BuildingTreshhold <= t.buildingThreshold ? "Yes" : "No",
     X: +row.AdequateProgramOffer >= t.adequateProgramsMin ? "Yes" : "No",
     W: +row.AdequateProgramOffer >= t.adequateProgramsMin ? "Yes" : "No",
     Z: (row.SiteCapacity || "").toLowerCase().includes("yes") ? "Yes" : "No",
@@ -727,7 +727,7 @@ function updateFlowchartSchoolInfo(name) {
     numPrograms = "N/A";
   }
   // Get building quality score from Decision Data Export.csv
-        let buildingScore = row["BuildingScore"];
+  let buildingScore = row["BuildingTreshhold"];
   if (buildingScore !== undefined && buildingScore !== null && buildingScore !== "") {
     buildingScore = parseFloat(buildingScore).toFixed(2);
   } else {
